@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kryptographie – Prüfungsvorbereitung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+
+<nav class="study-nav">
+  <span class="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>nscs</b></span>
+  <a href="/notes" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"/>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// reference · security concepts</div>
+  <h1 class="page-title">🔐 Kryptographie – Prüfungsvorbereitung</h1>
+  <p class="page-sub">Basiert auf: cryptpub.html · cert.html · sockets.html · seckey.html &nbsp;|&nbsp; Fokus: wiederholte Prüfungsfragen</p>
+</header>
+
+<nav class="topic-nav">
+  <a href="#dh">Diffie-Hellman</a>
+  <a href="#rsa">RSA</a>
+  <a href="#sign">Digitale Signatur</a>
+  <a href="#pop3">POP3 Pseudocode</a>
+  <a href="#tls">TLS / PFS</a>
+  <a href="#certs">Zertifikate</a>
+  <a href="#auth">Auth mit Zertifikat</a>
+  <a href="#certbot">Certbot</a>
+  <a href="#mitm">Man-in-the-Middle</a>
+  <a href="#keys">Schlüssellängen</a>
+  <a href="#random">Zufallszahlen</a>
+  <a href="#brute">Brute-Force</a>
+  <a href="#storage">Private Key Verwahrung</a>
+  <a href="#other">Andere Verfahren</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════
+     1. DIFFIE-HELLMAN
+════════════════════════════════════════════ -->
+<section id="dh" class="visible">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">01</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Diffie-Hellman Schlüsselaustausch</h2>
+  </div>
+
+  <div class="exam-badge">⚠ Prüfung: Rechenaufgabe handschriftlich ohne Taschenrechner!</div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Grundprinzip</span></div>
+    <div class="card-content">
+      <p>Diffie-Hellman löst das Problem der sicheren Schlüsselübertragung. Beide Seiten einigen sich auf öffentliche Parameter <strong>g</strong> (Generator) und <strong>mod</strong> (Primzahl). Jede Seite wählt einen geheimen privaten Schlüssel und berechnet daraus den öffentlichen Schlüssel.</p>
+      <p>Sicherheitsbasis: <strong>Modulare Exponentiation</strong> ist leicht zu berechnen, die Umkehroperation (diskreter Logarithmus) ist für große Zahlen praktisch unlösbar.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Ablauf (g=2, mod=29)</span></div>
+    <div class="card-content">
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-text"><span class="flow-who">Beide</span> einigen sich auf <strong>g = 2</strong>, <strong>mod = 29</strong> (öffentlich)</div>
+        </div>
+        <div class="flow-step send">
+          <div class="flow-text"><span class="flow-who">Bob</span> wählt privaten Schlüssel <strong>b = 10</strong>, berechnet <strong>B = 2¹⁰ mod 29 = 9</strong> → sendet B=9</div>
+        </div>
+        <div class="flow-step send">
+          <div class="flow-text"><span class="flow-who">Alice</span> wählt privaten Schlüssel <strong>a = 17</strong>, berechnet <strong>A = 2¹⁷ mod 29 = 21</strong> → sendet A=21</div>
+        </div>
+        <div class="flow-step check">
+          <div class="flow-text"><span class="flow-who">Alice</span> berechnet Shared Secret: <strong>B<sup>a</sup> mod 29 = 9¹⁷ mod 29 = 4</strong></div>
+        </div>
+        <div class="flow-step check">
+          <div class="flow-text"><span class="flow-who">Bob</span> berechnet Shared Secret: <strong>A<sup>b</sup> mod 29 = 21¹⁰ mod 29 = 4</strong></div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 16px;">
+        <strong>Warum funktioniert das?</strong>
+        (g<sup>b</sup>)<sup>a</sup> mod p = g<sup>b·a</sup> mod p = g<sup>a·b</sup> mod p = (g<sup>a</sup>)<sup>b</sup> mod p
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Rechenbeispiel – 2¹⁰ mod 29 (Prüfungsaufgabe!)</span></div>
+    <div class="card-content">
+      <div class="callout warn">
+        <strong>Trick: Exponenten aufteilen!</strong>
+        Man muss nicht 2¹⁰ = 1024 ausrechnen. Teile den Exponenten in Hälften.
+      </div>
+      <div class="mathbox">
+<span class="step">Schritt 1:</span>  2⁵ mod 29
+         = 32 mod 29 = <strong>3</strong>
+
+<span class="step">Schritt 2:</span>  2¹⁰ mod 29
+         = (2⁵ mod 29) × (2⁵ mod 29) mod 29
+         = 3 × 3 mod 29
+         = 9 mod 29 = <strong>9</strong>  ✓
+
+<span class="step">Für 2¹⁷:</span>   2¹⁷ = 2⁵ × 2⁵ × 2⁵ × 2²
+         = 3 × 3 × 3 × 4 mod 29
+         = (9 × 3) mod 29 × 4 mod 29
+         = 27 mod 29 × 4 mod 29
+         = 27 × 4 mod 29 = 108 mod 29 = <strong>21</strong>
+      </div>
+
+      <h3 style="font-size:12px; margin-top:16px; margin-bottom:8px; font-weight:600; color:var(--hi);">Shared Secret Berechnung</h3>
+      <div class="mathbox">
+<span class="step">Alice berechnet (9¹⁷ mod 29):</span>
+  9² = 81 mod 29 = 23
+  23⁸ mod 29: 23² = 529 mod 29 = 7
+               7² = 49 mod 29 = 20 (=23⁴ mod 29)
+               20² = 400 mod 29 = 400 - 13×29 = 400-377 = 23 (=23⁸ mod 29)
+  9¹⁷ = 23⁸ × 9 mod 29 = 23 × 9 mod 29 = 207 mod 29 = <strong>4</strong>
+
+<span class="step">Bob berechnet (21¹⁰ mod 29):</span>
+  21² = 441 mod 29 = 441 - 15×29 = 441-435 = 6
+  6⁵ mod 29: 6² = 36 mod 29 = 7
+              7² = 49 mod 29 = 20  (=6⁴ mod 29)
+              20 × 6 mod 29 = 120 mod 29 = 120 - 4×29 = 120-116 = <strong>4</strong>
+
+<span class="step">→ Beide haben Shared Secret = 4 ✓</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Effizienter Modexp-Algorithmus (Pseudocode)</span></div>
+    <div class="card-content">
+      <pre><code>func modexp(a, b, m):
+    r = 1
+    while b >= 1:
+        if b mod 2 = 1:
+            r = r * a mod m
+        b = b div 2
+        a = a * a mod m
+    return r</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     2. RSA
+════════════════════════════════════════════ -->
+<section id="rsa">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">02</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">RSA – Rivest Shamir Adleman</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Grundlagen</span></div>
+      <div class="card-content">
+        <ul>
+          <li>Entwickelt in den 70er-Jahren</li>
+          <li>Sicherheit basiert auf <strong>Primfaktorzerlegung</strong> großer Zahlen</li>
+          <li>Anders als DH: Daten direkt mit Public-Key <strong>verschlüsseln</strong></li>
+          <li>Entschlüsseln nur mit Private-Key möglich</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Verwendung</span></div>
+      <div class="card-content">
+        <ul>
+          <li>Verschlüsseln von Daten (direkt, aber langsam)</li>
+          <li>In der Praxis: nur <strong>Session-Key</strong> verschlüsseln, dann AES</li>
+          <li>Digitale <strong>Signaturen</strong> (Unterschreiben)</li>
+          <li>Server-Authentifizierung bei TLS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Verschlüsselung mit RSA (Prinzip)</span></div>
+    <div class="card-content">
+      <!-- SVG inline styling matches our new theme -->
+      <svg viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#090a0f;border-radius:6px;padding:8px;margin:.6rem 0;">
+        <defs>
+          <marker id="ah1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#66fcf1"/></marker>
+          <marker id="ah1b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#c5c6c7"/></marker>
+        </defs>
+        <text x="10" y="20" fill="#66fcf1" font-size="13" font-weight="700" font-family="'Geist Mono', monospace">Public-Key-Cipher</text>
+        <rect x="290" y="28" width="160" height="80" rx="4" fill="#131921" stroke="#66fcf1" stroke-width="1.5"/>
+        <text x="370" y="46" fill="#66fcf1" font-size="11" font-weight="600" text-anchor="middle">Public Keys</text>
+        <text x="370" y="61" fill="#8899a6" font-size="10" text-anchor="middle" font-family="monospace">Bob 119</text>
+        <text x="370" y="73" fill="#8899a6" font-size="10" text-anchor="middle" font-family="monospace">Joe 187</text>
+        <text x="370" y="85" fill="#8899a6" font-size="10" text-anchor="middle" font-family="monospace">Alice 143</text>
+        <text x="370" y="97" fill="#8899a6" font-size="10" text-anchor="middle" font-family="monospace">...</text>
+        <rect x="10" y="80" width="190" height="120" rx="4" fill="#131921" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="70" y="98" fill="#4f46e5" font-size="12" font-weight="700">Bob</text>
+        <rect x="70" y="103" width="90" height="32" rx="3" fill="#1b222c" stroke="#22303c" stroke-width="1"/>
+        <text x="115" y="117" fill="#e2e8f0" font-size="9" text-anchor="middle">Sehr geheimer</text>
+        <text x="115" y="128" fill="#e2e8f0" font-size="9" text-anchor="middle">Text ...</text>
+        <text x="20" y="158" fill="#8899a6" font-size="9" font-family="monospace">RSA-Key</text>
+        <text x="20" y="170" fill="#8899a6" font-size="9" font-family="monospace">Publ. 119</text>
+        <text x="20" y="182" fill="#8899a6" font-size="9" font-family="monospace">Priv. 7*17</text>
+        <rect x="110" y="148" width="60" height="24" rx="3" fill="#1f2833" stroke="#4f46e5" stroke-width="1"/>
+        <text x="140" y="164" fill="#66fcf1" font-size="10" text-anchor="middle">Encrypt</text>
+        <rect x="300" y="148" width="120" height="38" rx="4" fill="#090a0f" stroke="#22303c" stroke-width="1.5"/>
+        <text x="360" y="164" fill="#10b981" font-size="9" text-anchor="middle" font-family="monospace">XzyVwxdfm</text>
+        <text x="360" y="177" fill="#10b981" font-size="9" text-anchor="middle" font-family="monospace">dZvYt ...</text>
+        <rect x="560" y="80" width="190" height="120" rx="4" fill="#131921" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="630" y="98" fill="#4f46e5" font-size="12" font-weight="700">Alice</text>
+        <rect x="600" y="103" width="90" height="32" rx="3" fill="#1b222c" stroke="#22303c" stroke-width="1"/>
+        <text x="645" y="117" fill="#e2e8f0" font-size="9" text-anchor="middle">Sehr geheimer</text>
+        <text x="645" y="128" fill="#e2e8f0" font-size="9" text-anchor="middle">Text ...</text>
+        <text x="565" y="158" fill="#8899a6" font-size="9" font-family="monospace">RSA-Key</text>
+        <text x="565" y="170" fill="#8899a6" font-size="9" font-family="monospace">Publ. 143</text>
+        <text x="565" y="182" fill="#8899a6" font-size="9" font-family="monospace">Priv. 11*13</text>
+        <rect x="680" y="148" width="60" height="24" rx="3" fill="#1f2833" stroke="#4f46e5" stroke-width="1"/>
+        <text x="710" y="164" fill="#66fcf1" font-size="10" text-anchor="middle">Decrypt</text>
+        <line x1="105" y1="80" x2="310" y2="50" stroke="#66fcf1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah1)"/>
+        <line x1="450" y1="68" x2="170" y2="148" stroke="#66fcf1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah1)"/>
+        <line x1="200" y1="162" x2="300" y2="165" stroke="#c5c6c7" stroke-width="1.5" marker-end="url(#ah1b)"/>
+        <line x1="420" y1="165" x2="680" y2="165" stroke="#c5c6c7" stroke-width="1.5" marker-end="url(#ah1b)"/>
+      </svg>
+      <p>Alice verschlüsselt mit Bobs <strong>Public-Key</strong>. Bob entschlüsselt mit seinem <strong>Private-Key</strong>. Kein eigener Schlüssel vom Sender nötig (anders als DH).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Geheimschlüssel mit RSA übertragen (Hybrid)</span></div>
+    <div class="card-content">
+      <!-- Hybrid Encrypt SVG -->
+      <svg viewBox="0 0 760 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;background:#090a0f;border-radius:6px;padding:8px;margin:.6rem 0;">
+        <defs>
+          <marker id="ah2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#66fcf1"/></marker>
+          <marker id="ah2b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#c5c6c7"/></marker>
+        </defs>
+        <text x="10" y="18" fill="#66fcf1" font-size="12" font-weight="700" font-family="'Geist Mono', monospace">Public-Key + Symmetric Key (Hybrid)</text>
+        <rect x="290" y="25" width="150" height="75" rx="4" fill="#131921" stroke="#66fcf1" stroke-width="1.5"/>
+        <text x="365" y="42" fill="#66fcf1" font-size="10" font-weight="600" text-anchor="middle">Public Keys</text>
+        <rect x="10" y="78" width="230" height="145" rx="4" fill="#131921" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="90" y="95" fill="#4f46e5" font-size="12" font-weight="700">Bob</text>
+        <line x1="365" y1="100" x2="200" y2="165" stroke="#66fcf1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah2)"/>
+        <line x1="93" y1="176" x2="300" y2="169" stroke="#c5c6c7" stroke-width="1.5" marker-end="url(#ah2b)"/>
+        <rect x="520" y="78" width="230" height="145" rx="4" fill="#131921" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="610" y="95" fill="#4f46e5" font-size="12" font-weight="700">Alice</text>
+      </svg>
+      <p style="font-size:12px;color:var(--dim);">RSA verschlüsselt nur den zufälligen AES-Key. AES verschlüsselt die eigentlichen Daten. So kombiniert man Sicherheit (RSA) mit Geschwindigkeit (AES).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>RSA OpenSSL-Befehle (Referenz)</span></div>
+    <div class="card-content">
+      <pre><code><span class="cmt"># Private Key erzeugen (2048 Bit)</span>
+openssl genrsa 2048 > priv.key
+
+<span class="cmt"># Public Key exportieren</span>
+openssl rsa &lt;priv.key -pubout > publ_bob.key
+
+<span class="cmt"># Verschlüsseln</span>
+echo "Hallo Bob" | openssl pkeyutl -encrypt -pubin -inkey publ_bob.key > bob.txt
+
+<span class="cmt"># Entschlüsseln</span>
+openssl pkeyutl -decrypt -inkey priv.key &lt; bob.txt</code></pre>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     3. DIGITALE SIGNATUR
+════════════════════════════════════════════ -->
+<section id="sign">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">03</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Digitales Unterschreiben (Signatur)</h2>
+  </div>
+
+  <div class="exam-badge">⚠ Prüfung: Unterschreiben mit RSA + Hash + spezifischen Zahlen</div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Prinzip</span></div>
+    <div class="card-content">
+      <p>Daten werden mit dem <strong>eigenen Private-Key verschlüsselt</strong> (= unterschrieben). Der Empfänger entschlüsselt mit dem <strong>Public-Key des Absenders</strong> → beweist Echtheit.</p>
+      <div class="callout danger">
+        <strong>Wichtig: Nicht die Daten selbst signieren!</strong>
+        Public-Key-Operationen sind langsam. In der Praxis wird nur der <strong>Hash (SHA-256)</strong> der Daten signiert!
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Ablauf: Unterschreiben mit Hash</span></div>
+    <div class="card-content">
+      <div class="flow">
+        <div class="flow-step send">
+          <div class="flow-text"><span class="flow-who">Sender</span> Berechne <strong>Hash</strong> der Daten (z.B. SHA-256) → kurzer Fingerabdruck</div>
+        </div>
+        <div class="flow-step send">
+          <div class="flow-text"><span class="flow-who">Sender</span> Verschlüssele Hash mit <strong>eigenem Private-Key</strong> → das ist die Signatur</div>
+        </div>
+        <div class="flow-step send">
+          <div class="flow-text"><span class="flow-who">Sender</span> Schicke: Originaldaten + Signatur + (Public-Key / Zertifikat)</div>
+        </div>
+        <div class="flow-step check">
+          <div class="flow-text"><span class="flow-who">Empfänger</span> Berechne Hash der empfangenen Daten selbst</div>
+        </div>
+        <div class="flow-step check">
+          <div class="flow-text"><span class="flow-who">Empfänger</span> Entschlüssele Signatur mit Senders <strong>Public-Key</strong> → erhält Original-Hash</div>
+        </div>
+        <div class="flow-step check">
+          <div class="flow-text"><span class="flow-who">Empfänger</span> Vergleiche beide Hashes → gleich = Unterschrift echt ✓</div>
+        </div>
+      </div>
+      <div class="callout warn" style="margin-top: 16px;">
+        <strong>MD5 darf NICHT mehr verwendet werden!</strong>
+        Wegen Kollisionen. Nur SHA-256 oder stärker verwenden.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════
+     4. POP3 PSEUDOCODE
+════════════════════════════════════════════ -->
+<section id="pop3">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">04</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">POP3-Client Pseudocode</h2>
+  </div>
+
+  <div class="exam-badge">⚠ Prüfung: POP3 Client – alle Nachrichten abrufen (Pseudocode)</div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>POP3-Protokoll Ablauf</span></div>
+    <div class="card-content">
+      <p>Port: <strong>110</strong>. Server antwortet mit <code>+OK</code> oder <code>-ERR</code>. Befehle: <code>USER</code>, <code>PASS</code>, <code>LIST</code>, <code>RETR n</code>, <code>QUIT</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Vollständiger Pseudocode – alle Mails abrufen</span></div>
+    <div class="card-content">
+      <pre><code><span class="cmt">// POP3 Client – alle Nachrichten abrufen</span>
+socket = new TcpClient()
+socket.Connect("mailserver", <span class="num">110</span>)
+
+rd = StreamReader(socket)
+wr = StreamWriter(socket)   <span class="cmt">// AutoFlush=true, NewLine="\r\n"</span>
+
+<span class="cmt">// Greeting vom Server lesen</span>
+s = rd.ReadLine()           <span class="cmt">// "+OK POP3 server ready"</span>
+
+<span class="cmt">// Login</span>
+wr.WriteLine(<span class="str">"USER uXX"</span>)
+s = rd.ReadLine()           <span class="cmt">// "+OK"</span>
+
+wr.WriteLine(<span class="str">"PASS geheim"</span>)
+s = rd.ReadLine()
+if not s.StartsWith(<span class="str">"+OK"</span>):
+    print(<span class="str">"Passwort falsch"</span>)
+    return
+
+<span class="cmt">// Mailanzahl ermitteln via LIST</span>
+wr.WriteLine(<span class="str">"LIST"</span>)
+s = rd.ReadLine()           <span class="cmt">// "+OK n messages"</span>
+
+nMails = 0
+while true:
+    s = rd.ReadLine()
+    if s == <span class="str">"."</span>:            <span class="cmt">// Punkt = Ende der Liste</span>
+        break
+    nMails += 1
+
+<span class="cmt">// Alle Mails einzeln abrufen</span>
+for i = 1 to nMails:
+    wr.WriteLine(<span class="str">"RETR "</span> + i)
+    s = rd.ReadLine()       <span class="cmt">// "+OK n octets"</span>
+
+    while true:
+        s = rd.ReadLine()
+        if s == <span class="str">"."</span>:        <span class="cmt">// Punkt = Ende der Mail</span>
+            break
+        print(s)            <span class="cmt">// Mail-Inhalt ausgeben</span>
+
+<span class="cmt">// Verbindung beenden</span>
+wr.WriteLine(<span class="str">"QUIT"</span>)
+s = rd.ReadLine()
+socket.Close()</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     5. TLS / PFS
+════════════════════════════════════════════ -->
+<section id="tls">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">05</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Transport Layer Security (TLS) &amp; PFS</h2>
+  </div>
+
+  <div class="exam-badge">⚠ Prüfung: TLS mit PFS – Schritte kennen!</div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><span class="dot r"></span><span>TLS ohne Forward Secrecy (alt)</span></div>
+      <div class="card-content">
+        <div class="flow">
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Client</span> sendet Connection-Request</div></div>
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Server</span> sendet RSA-Public-Key (+ Zertifikat)</div></div>
+          <div class="flow-step check"><div class="flow-text"><span class="flow-who">Client</span> prüft RSA-Public-Key</div></div>
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Client</span> erzeugt Session-Key, verschlüsselt mit RSA-Pub → sendet</div></div>
+          <div class="flow-step check"><div class="flow-text"><span class="flow-who">Server</span> entschlüsselt mit Private-Key</div></div>
+        </div>
+        <div class="callout danger" style="margin-top: 12px;">
+          <strong>Problem</strong>
+          Wenn Private-Key später kompromittiert wird, können alle aufgezeichneten Sessions entschlüsselt werden!
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>TLS mit Perfect Forward Secrecy (PFS)</span></div>
+      <div class="card-content">
+        <div class="flow">
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Client</span> sendet Request</div></div>
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Server</span> sendet Zertifikat</div></div>
+          <div class="flow-step"><div class="flow-text"><span class="flow-who">Beide</span> erzeugen temporäre <strong>DH-Keys</strong></div></div>
+          <div class="flow-step send"><div class="flow-text"><span class="flow-who">Server</span> signiert DH-Public-Key mit RSA-Private-Key</div></div>
+          <div class="flow-step check"><div class="flow-text"><span class="flow-who">Beide</span> berechnen gemeinsamen Session-Key</div></div>
+          <div class="flow-step delete"><div class="flow-text"><span class="flow-who">Beide</span> <strong>löschen DH-Keys</strong> sofort!</div></div>
+        </div>
+        <div class="callout" style="margin-top: 12px;">
+          <strong>Security Choice</strong>
+          Temporäre Schlüssel werden verworfen. Späterer Diebstahl des Haupt-Private-Keys gefährdet vergangene Kommunikation nicht.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     6. ZERTIFIKATE
+════════════════════════════════════════════ -->
+<section id="certs">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">06</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Digitale Zertifikate</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Was ist ein Zertifikat?</span></div>
+    <div class="card-content">
+      <p>Ein Zertifikat ist eine von einer vertrauenswürdigen Stelle (CA) <strong>unterschriebene Public-Key/Name-Zuordnung</strong>. Es beweist, dass ein bestimmter Public-Key wirklich zu einer bestimmten Person/Domain gehört.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     7. AUTH MIT ZERTIFIKAT
+════════════════════════════════════════════ -->
+<section id="auth">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">07</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Authentifizierung mit Zertifikat</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Ablauf</span></div>
+    <div class="card-content">
+      <div class="flow">
+        <div class="flow-step send"><div class="flow-text"><span class="flow-who">Server</span> sendet Zertifikat (Public-Key + CA-Signatur)</div></div>
+        <div class="flow-step check"><div class="flow-text"><span class="flow-who">Client</span> prüft CA-Signatur mit CA-Public-Key</div></div>
+        <div class="flow-step check"><div class="flow-text"><span class="flow-who">Client</span> prüft DNS-Name + Gültigkeitsdatum</div></div>
+        <div class="flow-step check"><div class="flow-text"><span class="flow-who">Server</span> beweist Identität durch Signatur mit eigenem Private-Key</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     8. CERTBOT
+════════════════════════════════════════════ -->
+<section id="certbot">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">08</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Zertifikat anfordern – Let's Encrypt &amp; Certbot</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>ACME-Protokoll Challenge</span></div>
+    <div class="card-content">
+      <div class="flow">
+        <div class="flow-step"><div class="flow-text">Certbot erzeugt lokal Private-Key + CSR (Certificate Signing Request)</div></div>
+        <div class="flow-step"><div class="flow-text">Certbot erstellt einen zufälligen String und legt ihn unter <code>.well-known/acme-challenge/&lt;token&gt;</code> ab</div></div>
+        <div class="flow-step send"><div class="flow-text">Certbot schickt CSR + Domainname an Let's Encrypt CA</div></div>
+        <div class="flow-step check"><div class="flow-text">CA macht HTTP-Request an die Domain, um den Token auszulesen</div></div>
+        <div class="flow-step check"><div class="flow-text">Token stimmt überein → Domainbesitz bestätigt → CA schickt signiertes Zertifikat zurück</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     9. MITM
+════════════════════════════════════════════ -->
+<section id="mitm">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">09</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Man-in-the-Middle Attacke</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Szenario</span></div>
+    <div class="card-content">
+      <p>Trudy fängt den Public-Key-Austausch ab, sendet stattdessen ihren eigenen Key an beide Seiten. Trudy entschlüsselt, liest mit, verschlüsselt erneut mit dem echten Key und leitet weiter.</p>
+      <div class="callout warn" style="margin-top: 12px;">
+        <strong>Schutz</strong>
+        Verwendung von vertrauenswürdigen Zertifikaten, SSH Host Fingerprints oder Pre-shared Keys.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     10. SCHLÜSSELLÄNGEN
+════════════════════════════════════════════ -->
+<section id="keys">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">10</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Schlüssellängen</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Vergleichstabelle</span></div>
+    <div class="card-content">
+      <table>
+        <thead>
+          <tr><th>Verfahren</th><th>Schlüssellänge</th><th>Äquivalente Sicherheit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>AES (Symmetric)</td><td><strong>128 Bit</strong></td><td>Referenz</td></tr>
+          <tr><td>RSA / DH</td><td><strong>3072 Bit</strong></td><td>≈ 128 Bit symmetric</td></tr>
+          <tr><td>ECDSA / ECDHE</td><td><strong>224 Bit</strong></td><td>≈ 128 Bit symmetric</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     11. ZUFALLSZAHLEN
+════════════════════════════════════════════ -->
+<section id="random">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">11</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Zufallszahlen</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Entropiesammlung</span></div>
+    <div class="card-content">
+      <p>Schnittstellen wie <code>/dev/random</code> sammeln Umweltrauschen (Maus, Keyboard, CPU-Temperatur) in einem Entropie-Pool, um kryptographisch sicheren Zufall zu garantieren.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     12. BRUTE FORCE
+════════════════════════════════════════════ -->
+<section id="brute">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">12</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Brute Force</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Struktur</span></div>
+    <div class="card-content">
+      <pre><code>for key = 0 to MAX_KEY:
+    plaintext = decrypt(ciphertext, key)
+    if isReadable(plaintext):
+        print("Success:", key)
+        break</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     13. PRIVATE KEY VERWAHRUNG
+════════════════════════════════════════════ -->
+<section id="storage">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">13</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Sichere Verwahrung</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Smartcard Krypto-Chip</span></div>
+    <div class="card-content">
+      <p>Der Private-Key wird auf der Smartcard generiert und verlässt diese niemals. Entschlüsselung und Signaturen finden direkt auf dem Chip statt, um Diebstahl durch Malware zu verhindern.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     14. ANDERE VERFAHREN
+════════════════════════════════════════════ -->
+<section id="other">
+  <div class="section-header" style="display: flex; align-items: center; gap: .75rem; border-left: 4px solid var(--cyan); padding: .6rem 1rem; background: var(--surface2); border-radius: 0 6px 6px 0; margin-bottom: 1.2rem;">
+    <span class="section-num" style="font-size: .7rem; font-weight: 700; color: var(--cyan); background: var(--accent-dim); border: 1px solid var(--cyan); border-radius: 4px; padding: .1rem .45rem; white-space: nowrap;">14</span>
+    <h2 style="font-size: 1.05rem; font-weight: 600;">Andere Verfahren</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>DSA vs ECDSA</span></div>
+    <div class="card-content">
+      <p>Elliptische Kurven (ECDSA, ECDHE) bieten die gleiche Stärke wie RSA/DSA, jedoch mit wesentlich kürzeren Schlüsseln und geringerer CPU-Last.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="study-footer wrap">
+  <span>~/notes/nscs</span>
+  <span>Security Cheatsheet</span>
+</footer>
+
+</div><!-- .page -->
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  // Add smooth scrolling for anchors in topic-nav
+  document.querySelectorAll('.topic-nav a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Update active nav state
+      document.querySelectorAll('.topic-nav a').forEach(el => el.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

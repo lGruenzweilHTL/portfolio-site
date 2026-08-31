@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ code }} · {{ title }}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0e0d0b; color: #d0ccc0;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .wrap { max-width: 480px; text-align: center; }
+  .code {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 72px; font-weight: 500; color: #eba53a;
+    letter-spacing: -0.04em; line-height: 1; margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    font-size: 24px; font-weight: 600; color: #eceae1;
+    letter-spacing: -0.01em; margin-bottom: 10px;
+  }
+  p { color: #aca699; line-height: 1.6; font-size: 14.5px; margin-bottom: 28px; }
+  .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  a.btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 17px;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 13px; letter-spacing: 0.01em;
+    text-decoration: none; border-radius: 4px;
+    border: 1px solid transparent; cursor: pointer;
+  }
+  a.btn-solid { background: #eba53a; color: #17110a; border-color: #eba53a; font-weight: 500; }
+  a.btn-solid:hover { background: #f5be5f; border-color: #f5be5f; }
+  a.btn-outline { background: transparent; color: #aca699; border-color: #302c22; }
+  a.btn-outline:hover { color: #eceae1; border-color: #918c7f; }
+  .path {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 11px; color: #918c7f;
+    margin-top: 32px; word-break: break-all;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="code">{{ code }}</div>
+  <h1>{{ title }}</h1>
+  <p>{{ message }}</p>
+  <div class="actions">
+    <a class="btn btn-solid" href="/">Back to home</a>
+    <a class="btn btn-outline" href="/notes/">Notes</a>
+    <a class="btn btn-outline" href="/files/">Files</a>
+  </div>
+  {% if path %}<div class="path">{{ path }}</div>{% endif %}
+</div>
+</body>
+</html>

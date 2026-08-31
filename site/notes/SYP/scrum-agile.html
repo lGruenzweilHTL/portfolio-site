@@ -1,0 +1,273 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrum &amp; Agile Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id">~/<b>study</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// project management reference</div>
+  <h1 class="page-title">Scrum &amp; Agile Cheatsheet</h1>
+  <p class="page-sub">Roles &amp; artifacts · story points · DoD vs. acceptance criteria · V-Modell · classic vs. agile</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('roles',this)">Roles &amp; artifacts</button>
+  <button onclick="showTab('points',this)">Story points &amp; planning poker</button>
+  <button onclick="showTab('dodac',this)">DoD vs. Acceptance Criteria</button>
+  <button onclick="showTab('vmodell',this)">V-Modell</button>
+  <button onclick="showTab('klassischagil',this)">Classic vs. agile</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ ROLES & ARTIFACTS -->
+<div id="roles" class="section visible" data-title="Roles & artifacts">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>The three Scrum roles</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Role</th><th>Responsibility</th></tr>
+        <tr><td>Product Owner</td><td class="muted">Knows the product, drives priorities, represents the customer's view</td></tr>
+        <tr><td>Scrum Master</td><td class="muted">Coaches the team, removes impediments, fosters continuous improvement</td></tr>
+        <tr><td>Team</td><td class="muted">Developers, testers, architects — self-organizing, delivers the increment</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>The artifacts</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Artifact</th><th>Owned by</th></tr>
+          <tr><td>Product Backlog</td><td class="muted">Product Owner — prioritized, estimated user stories</td></tr>
+          <tr><td>Sprint Backlog</td><td class="muted">Team — tasks committed for the current sprint</td></tr>
+          <tr><td>Impediment Backlog</td><td class="muted">Scrum Master — blockers tracked &amp; resolved</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>User Story format</span></div>
+      <div class="card-content">
+        <pre>As a &lt;role&gt;
+I want &lt;feature/action&gt;
+in order to &lt;reason/benefit&gt;.</pre>
+        <p>Ensures every story shows <strong>who</strong> does <strong>what</strong> and <strong>why</strong>.</p>
+        <div class="callout">
+          <strong>Example</strong>
+          As a dungeon master I want to add a player in order to set up the player team for one game.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Meetings &amp; cadence</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Event</th><th>Purpose</th></tr>
+        <tr><td>Sprint</td><td class="muted">Fixed time period in which a chosen set of stories is implemented</td></tr>
+        <tr><td>Sprint Planning</td><td class="muted">Team selects &amp; refines stories for the upcoming sprint</td></tr>
+        <tr><td>Daily Scrum</td><td class="muted">Max. 15 min: what did I do yesterday, what today, any blockers?</td></tr>
+        <tr><td>Sprint Review</td><td class="muted">Shippable increment demoed to Product Owner / stakeholders</td></tr>
+        <tr><td>Sprint Retrospective</td><td class="muted">Team reflects: what went well, what didn't, how to improve</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ STORY POINTS -->
+<div id="points" class="section" data-title="Story points & planning poker">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Story point scale (modified Fibonacci)</span></div>
+    <div class="card-content">
+      <p>Scrum typically uses <strong>Planning Poker</strong> with a modified Fibonacci sequence to estimate relative effort/complexity in <strong>Story Points</strong>:</p>
+      <table>
+        <tr><th>Values</th></tr>
+        <tr><td class="muted">0, 0.5, 1, 2, 3, 5, 8, 13, 20, 40, 100</td></tr>
+      </table>
+      <div class="callout warn">
+        <strong>Why not absolute time (hours/days)?</strong>
+        <ol style="padding-left:18px; margin-top:6px;">
+          <li>Different developers work at different speeds (a senior might take 2h, a junior 8h) — but the story's <em>relative complexity</em> stays the same regardless of who estimates.</li>
+          <li>Story points capture inherent risk, uncertainty, and complexity better than a raw time figure.</li>
+          <li>Stakeholders tend to misread absolute time estimates as binding deadlines.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Planning poker procedure</span></div>
+      <div class="card-content">
+        <ol style="padding-left:18px; font-size:13px;">
+          <li>Each member gets a card deck</li>
+          <li>Team picks a story to estimate</li>
+          <li>Product Owner explains it until everyone understands</li>
+          <li>Everyone privately selects a card, places it face-down</li>
+          <li>All cards flip simultaneously</li>
+          <li>If all match → estimate is recorded, move on</li>
+          <li>If not → highest and lowest estimator explain their reasoning, then re-estimate</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Why this process matters</span></div>
+      <div class="card-content">
+        <p>The core value is <strong>discussion</strong>, not the number itself. Showing cards simultaneously prevents anchoring on the first person's guess. Disagreement forces the team to surface hidden assumptions or unclear scope before work starts.</p>
+        <p>Periodically re-check older estimates against newer ones to keep the scale internally consistent across the whole backlog.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DOD VS AC -->
+<div id="dodac" class="section" data-title="DoD vs. Acceptance Criteria">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Two different kinds of "done"</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Definition of Done (DoD)</th><th>Acceptance Criteria (AC)</th></tr>
+        <tr><td>Scope</td><td class="muted">Applies to <em>every</em> story / the whole increment</td><td class="muted">Specific to <em>one</em> story</td></tr>
+        <tr><td>Defined by</td><td class="muted">The development team, agreed once for the whole product</td><td class="muted">Product Owner (in collaboration with the team), per story</td></tr>
+        <tr><td>Answers</td><td class="muted">Is the increment production-ready as a whole? (tests pass, code reviewed, docs updated, ...)</td><td class="muted">Does <em>this specific</em> story meet the required functional behavior?</td></tr>
+        <tr><td>Example</td><td class="muted">"All unit tests pass", "Code reviewed by 1 peer", "No critical linter warnings"</td><td class="muted">"The password must be at least 8 characters long"</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Both must be satisfied</strong>
+        A story isn't truly complete until it meets <em>both</em> its own Acceptance Criteria <em>and</em> the team's general Definition of Done.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>User story template incl. AC</span></div>
+    <div class="card-content">
+      <pre><span class="cmt"># Story</span>
+As a &lt;role&gt; I want to &lt;requirement&gt; in order to &lt;reason&gt;.
+
+<span class="cmt"># Acceptance Criteria</span>
+- &lt;Criterion 1&gt;
+- &lt;Criterion 2&gt;
+- ...
+
+<span class="cmt"># Priority</span>
+&lt;Low | Medium | High&gt;
+
+<span class="cmt"># Effort</span>
+&lt;Story points&gt;</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ V-MODELL -->
+<div id="vmodell" class="section" data-title="V-Modell">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>The four paired levels</span></div>
+    <div class="card-content">
+      <p>The V-Modell pairs each development phase on the left side with a corresponding test phase on the right side — defined <em>together</em>, not as an afterthought:</p>
+      <table>
+        <tr><th>Left (Spec / Design)</th><th>↔</th><th>Right (Test)</th></tr>
+        <tr><td class="muted">System Specification<br><span style="font-size:11px">(Pflichtenheft, Use-Case-Diagramm)</span></td><td>↔</td><td class="muted">Abnahmetest / Akzeptanztest<br><span style="font-size:11px">durchgeführt gemeinsam mit dem Kunden</span></td></tr>
+        <tr><td class="muted">Design (Grobentwurf)<br><span style="font-size:11px">Schnittstellen, Package Diagram, Deployment Diagram</span></td><td>↔</td><td class="muted">Systemtest<br><span style="font-size:11px">Gesamtsystem getestet, z.B. GUI, REST-Schnittstellen</span></td></tr>
+        <tr><td class="muted">Design (Feinentwurf)<br><span style="font-size:11px">Klassendiagramm</span></td><td>↔</td><td class="muted">Integrationstest<br><span style="font-size:11px">Zusammenspiel verschiedener Komponenten</span></td></tr>
+        <tr><td class="muted">Implementierung</td><td>↔</td><td class="muted">Modultest / Unittest<br><span style="font-size:11px">nur Methoden einer Klasse; jUnit, AssertJ, Mockito</span></td></tr>
+      </table>
+      <div class="callout">
+        <strong>What the horizontal connections mean</strong>
+        Each left-side step and its right-side partner are planned at the <em>same level of detail</em>, simultaneously — e.g. acceptance tests are derived directly from the System Specification, before implementation even starts. This enables <strong>preventive testing</strong>: logic errors surface early instead of only at the very end (as in plain Waterfall).
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Verifikation vs. Validierung</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Verifikation</th><th>Validierung</th></tr>
+        <tr><td>Question</td><td class="muted">"Mache ich die Dinge richtig?"</td><td class="muted">"Mache ich die richtigen Dinge?"</td></tr>
+        <tr><td>Checks against</td><td class="muted">The design/specification itself</td><td class="muted">The actual customer need</td></tr>
+        <tr><td>Applies to (in this V-Modell)</td><td class="muted">The three lower levels: Systemtest, Integrationstest, Unittest</td><td class="muted">Only the top level: Abnahmetest, performed with the customer</td></tr>
+      </table>
+      <div class="callout warn">
+        <strong>Why only the top level is Validierung</strong>
+        Only the Akzeptanztest directly checks the result against what the customer actually wanted. The three lower test levels verify that the system matches its own internal design/specification — correct relative to the design, which is not the same as correct relative to the customer's real need.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Classic "Big-Bang" V-Modell vs. V-Modell with Scrum</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Big-Bang-Approach (classic)</th><th>V-Modell mit Scrum (agile)</th></tr>
+        <tr><td>How often the V runs</td><td class="muted">Once, for the entire system</td><td class="muted">Repeatedly — one small V per sprint</td></tr>
+        <tr><td>Output per cycle</td><td class="muted">The whole product, at the very end</td><td class="muted">An MVP (Minimal Viable Product) after every sprint</td></tr>
+        <tr><td>Feedback timing</td><td class="muted">Only after the single full V completes</td><td class="muted">Continuous — every sprint produces a testable increment</td></tr>
+      </table>
+      <p>The V-Modell's core idea (pairing each design step with its matching test level) isn't exclusive to classic processes — Scrum can apply the same V-shaped discipline at a much smaller scale, once per sprint, instead of once for the whole project.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CLASSIC VS AGILE -->
+<div id="klassischagil" class="section" data-title="Classic vs. agile">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Comparison</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Classic (Waterfall / V-Modell Big-Bang)</th><th>Agile (Scrum, V-Modell per sprint)</th></tr>
+        <tr><td>Requirements</td><td class="muted">Fixed early, in detail, before implementation</td><td class="muted">Captured incrementally, refined throughout the project</td></tr>
+        <tr><td>Process structure</td><td class="muted">Sequential phases, executed once</td><td class="muted">Short, iterative cycles (sprints) repeated until done</td></tr>
+        <tr><td>Change handling</td><td class="muted">Difficult and costly mid-project</td><td class="muted">Expected and embraced — backlog re-prioritized each sprint</td></tr>
+        <tr><td>Customer feedback</td><td class="muted">Mainly at the end (acceptance test)</td><td class="muted">Continuous, via Sprint Reviews after every sprint</td></tr>
+        <tr><td>Deliverable</td><td class="muted">One final product at the end</td><td class="muted">Working MVP/increment after every sprint</td></tr>
+        <tr><td>Best fit</td><td class="muted">Well-understood, stable requirements (e.g. regulated/safety-critical systems)</td><td class="muted">Evolving requirements, unclear scope, need for fast feedback</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Why agile models emerged</span></div>
+    <div class="card-content">
+      <p>Classic models assume requirements can be fully understood and frozen up front. In practice this is often unrealistic — agile models were developed specifically to react more flexibly to changing requirements, by shortening the feedback loop between "build something" and "find out if it's right".</p>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/scrum-agile</span>
+  <span>Scrum &amp; Agile Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('roles');
+</script>
+</body></html>

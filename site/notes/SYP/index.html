@@ -1,0 +1,260 @@
+<!--
+  GENERIC STUDY DIRECTORY INDEX
+  =============================
+  Symlink this exact file as `index.html` into every directory under /notes
+  that should show a browsable listing (root included). It is fully
+  self-locating — no per-directory edits needed.
+
+  Requires:
+  1. A single nginx regex location (works at any depth, see nginx-listing.conf):
+       location ~ ^(/notes(?:/.+)?)/_listing/?$ {
+           alias <document-root>$1/;
+           autoindex on;
+           autoindex_format json;
+       }
+  2. study.css served from a fixed absolute path (/notes/notes.css) — do NOT
+     use a relative "./notes.css" link, since this file lives at different
+     depths depending on where it's symlinked.
+  3. Clean URLs already working site-wide (./plsql instead of ./plsql.html,
+     ./subfolder/ instead of ./subfolder/index.html) — confirmed in place.
+-->
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study / Cheatsheets</title>
+<meta name="description" content="A collection of study cheatsheets and reference material.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id">~/<b>study</b></span>
+  <a href="/" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<main class="wrap">
+  <header class="page-header">
+    <div class="page-label">// reference</div>
+    <h1 class="page-title" id="page-title">Study &amp; Cheatsheets</h1>
+    <p class="page-sub">Quick-reference notes and cheatsheets.</p>
+  </header>
+  <section class="section visible">
+    <div class="section-heading">contents</div>
+    <div id="sheet-list" style="display: grid; gap: 1px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--line);">
+      <div style="padding: 40px 22px; text-align: center; color: var(--muted); font-size: 12px; background: var(--surface);">loading...</div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap study-footer">
+  <span id="footer-id">~/notes</span>
+  <span id="sheet-count">…</span>
+</footer>
+
+<script>
+// ---- Optional manual descriptions for individual cheatsheet files. ----
+// Keyed by filename-without-extension. Safe to leave entries out — falls
+// back to no subtitle. This map applies wherever this index.html is
+// symlinked, so only add entries relevant to that level if you want to
+// keep it tidy (irrelevant keys are simply unused).
+const descriptions = {
+  'plsql': 'Oracle PL/SQL — syntax, cursors, exceptions, packages',
+  'nscs':  'Networking &amp; security concepts',
+  'design-patterns': 'Design Patterns — creational, behavioral, structural, architectural patterns in Java',
+  'javafx': 'Property bindings, Stream API, events, FXML, MVC controllers',
+  'serialization-db': 'H2, try-with-resources, prepared statements, Serializable, object streams',
+  'git': 'Architecture, commands, branching strategies, merge vs. rebase',
+  'docker-k8s': 'Docker, Compose, Kubernetes concepts, Docker vs. Kubernetes',
+  'scrum-agile': 'Roles, story points, DoD vs. AC, V-Modell vs. Wasserfall',
+  'uml': 'Class diagrams, object diagrams',
+};
+
+const FILE_ICON = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+  '<rect x="2" y="1" width="10" height="12" rx="1.5"/><line x1="4.5" y1="5" x2="9.5" y2="5"/>' +
+  '<line x1="4.5" y1="7.5" x2="9.5" y2="7.5"/><line x1="4.5" y1="10" x2="7" y2="10"/></svg>';
+
+const FOLDER_ICON = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M1.5 3.5a1 1 0 0 1 1-1h2.8l1 1.2H11a1 1 0 0 1 1 1v5.8a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V3.5Z"/></svg>';
+
+const ARROW_ICON = '<svg class="sheet-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted); transition: color 0.15s, transform 0.15s;"><path d="M5 2l5 5-5 5"/></svg>';
+
+function prettify(name) {
+  return name.replace(/\.html$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function slug(name) {
+  return name.replace(/\.html$/i, '');
+}
+
+// Resolves to the directory this index.html is actually being served from,
+// regardless of whether it was loaded as ".../foo/" or ".../foo/index.html".
+const baseDir = new URL('.', location.href);
+
+function isHidden(name) {
+  return name.startsWith('.') || name.startsWith('_');
+}
+
+async function fetchListing(dirUrl) {
+  const res = await fetch(new URL('_listing/', dirUrl).href);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+function buildBreadcrumb() {
+  const path = location.pathname.replace(/\/index\.html$/i, '/');
+  const parts = path.split('/').filter(Boolean);
+  const navId = document.getElementById('nav-id');
+  const footerId = document.getElementById('footer-id');
+  navId.innerHTML = '';
+  navId.appendChild(document.createTextNode('~/'));
+
+  let acc = '';
+  parts.forEach((part, i) => {
+    acc += '/' + part;
+    const isLast = i === parts.length - 1;
+    if (isLast) {
+      const b = document.createElement('b');
+      b.textContent = part;
+      navId.appendChild(b);
+    } else {
+      const a = document.createElement('a');
+      a.href = acc + '/';
+      a.style.color = 'inherit';
+      a.style.textDecoration = 'none';
+      a.textContent = part;
+      navId.appendChild(a);
+      navId.appendChild(document.createTextNode('/'));
+    }
+  });
+
+  footerId.textContent = '~' + path.replace(/\/$/, '');
+  document.getElementById('page-title').textContent = parts.length ? prettify(parts[parts.length - 1]) : 'Study & Cheatsheets';
+
+  const backLink = document.getElementById('nav-back');
+  backLink.href = parts.length <= 1 ? '/' : '/' + parts.slice(0, -1).join('/') + '/';
+}
+
+function renderFileCard(name) {
+  const key = slug(name);
+  const label = prettify(name);
+  const desc = descriptions[key] || '';
+  const href = './' + key;
+  return `<a href="${href}" style="background: var(--surface); display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; text-decoration: none; color: var(--text); transition: background 0.12s, color 0.12s;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 32px; height: 32px; border: 1px solid var(--line2); border-radius: 5px; display: flex; align-items: center; justify-content: center; color: var(--dim); flex-shrink: 0; transition: border-color 0.15s, color 0.15s;">${FILE_ICON}</div>
+      <div>
+        <div style="font-size: 13px; font-weight: 500; color: var(--hi); letter-spacing: 0.01em;">${label}</div>
+        ${desc ? `<div style="font-size: 11px; color: var(--muted); margin-top: 2px;">${desc}</div>` : ''}
+      </div>
+    </div>
+    ${ARROW_ICON}
+  </a>`;
+}
+
+function renderFolderCard(name, counts) {
+  const label = prettify(name);
+  const href = './' + name + '/';
+  let desc = 'empty';
+  if (counts) {
+    const bits = [];
+    if (counts.sheetCount > 0) bits.push(counts.sheetCount + ' sheet' + (counts.sheetCount !== 1 ? 's' : ''));
+    if (counts.folderCount > 0) bits.push(counts.folderCount + ' folder' + (counts.folderCount !== 1 ? 's' : ''));
+    if (bits.length) desc = bits.join(' · ');
+  } else {
+    desc = '';
+  }
+  return `<a href="${href}" style="background: var(--surface); display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; text-decoration: none; color: var(--text); transition: background 0.12s, color 0.12s;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="width: 32px; height: 32px; border: 1px solid var(--cyan); border-radius: 5px; display: flex; align-items: center; justify-content: center; color: var(--cyan); flex-shrink: 0;">${FOLDER_ICON}</div>
+      <div>
+        <div style="font-size: 13px; font-weight: 500; color: var(--hi); letter-spacing: 0.01em; display:flex; align-items:center; gap:8px;">
+          ${label}
+          <span class="badge b" style="margin-left:0;">DIR</span>
+        </div>
+        ${desc ? `<div style="font-size: 11px; color: var(--muted); margin-top: 2px;">${desc}</div>` : ''}
+      </div>
+    </div>
+    ${ARROW_ICON}
+  </a>`;
+}
+
+function bindHover(el) {
+  el.addEventListener('mouseenter', () => {
+    el.style.background = 'var(--surface2)';
+    el.style.color = 'var(--hi)';
+    const arrow = el.querySelector('.sheet-arrow');
+    if (arrow) { arrow.style.color = 'var(--cyan)'; arrow.style.transform = 'translateX(3px)'; }
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.background = 'var(--surface)';
+    el.style.color = 'var(--text)';
+    const arrow = el.querySelector('.sheet-arrow');
+    if (arrow) { arrow.style.color = 'var(--muted)'; arrow.style.transform = 'none'; }
+  });
+}
+
+async function loadSheets() {
+  const list = document.getElementById('sheet-list');
+  const counter = document.getElementById('sheet-count');
+
+  let entries;
+  try {
+    entries = await fetchListing(baseDir);
+  } catch (err) {
+    list.innerHTML = '<div style="padding: 40px 22px; text-align: center; color: #ef4444; font-size: 12px; background: var(--surface);">Could not load directory listing.<br><small>' + err.message + '</small></div>';
+    return;
+  }
+
+  const files = entries
+    .filter(e => e.type === 'file' && /\.html$/i.test(e.name) && e.name.toLowerCase() !== 'index.html')
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const dirs = entries
+    .filter(e => e.type === 'directory' && !isHidden(e.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (files.length === 0 && dirs.length === 0) {
+    list.innerHTML = '<div style="padding: 40px 22px; text-align: center; color: var(--muted); font-size: 12px; background: var(--surface);">Nothing here yet.</div>';
+    counter.textContent = 'empty';
+    return;
+  }
+
+  // Folders rendered first (with placeholder counts), then files —
+  // immediately, so the page isn't blocked on the per-folder count fetches.
+  const folderPlaceholderIds = dirs.map(d => 'folder-' + d.name.replace(/[^a-zA-Z0-9_-]/g, '_'));
+  list.innerHTML =
+    dirs.map((d, i) => `<div id="${folderPlaceholderIds[i]}">${renderFolderCard(d.name, null)}</div>`).join('') +
+    files.map(f => renderFileCard(f.name)).join('');
+
+  list.querySelectorAll('a').forEach(bindHover);
+  counter.textContent = files.length + ' sheet' + (files.length !== 1 ? 's' : '') +
+    (dirs.length ? ', ' + dirs.length + ' folder' + (dirs.length !== 1 ? 's' : '') : '');
+
+  // Fill in folder counts as each one resolves (immediate children only).
+  dirs.forEach(async (d, i) => {
+    try {
+      const childUrl = new URL(d.name + '/', baseDir);
+      const childEntries = await fetchListing(childUrl);
+      const sheetCount = childEntries.filter(e => e.type === 'file' && /\.html$/i.test(e.name) && e.name.toLowerCase() !== 'index.html').length;
+      const folderCount = childEntries.filter(e => e.type === 'directory' && !isHidden(e.name)).length;
+      const container = document.getElementById(folderPlaceholderIds[i]);
+      if (container) {
+        container.innerHTML = renderFolderCard(d.name, { sheetCount, folderCount });
+        bindHover(container.querySelector('a'));
+      }
+    } catch (err) {
+      // Leave the "empty"-style placeholder if the subfolder's listing fails.
+    }
+  });
+}
+
+buildBreadcrumb();
+loadSheets();
+</script>
+</body></html>

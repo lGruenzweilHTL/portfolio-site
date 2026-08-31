@@ -1,0 +1,22 @@
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# Settings / config
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# Templating / PDF
+jinja2==3.1.4
+weasyprint==63.1      # PDF generation (see system deps in README)
+# WeasyPrint needs system libs (libpango, libcairo). On Debian/Ubuntu:
+#   apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libcairo2
+# On the homelab (Alpine): apk add pango harfbuzz cairo
+
+# HTTP client (OpenRouter, Turnstile siteverify)
+httpx==0.27.2
+
+# YAML
+pyyaml==6.0.2
+
+# secrets module is stdlib (used for secure-link token generation)

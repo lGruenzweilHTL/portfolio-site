@@ -1,0 +1,290 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>git</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// version control reference</div>
+  <h1 class="page-title">Git Cheatsheet</h1>
+  <p class="page-sub">Architecture &amp; commands · branching strategies · merge vs. rebase · advanced topics</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('architecture',this)">Architecture &amp; commands</button>
+  <button onclick="showTab('branching',this)">Branching strategies</button>
+  <button onclick="showTab('mergerebase',this)">Merge vs. rebase</button>
+  <button onclick="showTab('advanced',this)">Advanced</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ ARCHITECTURE -->
+<div id="architecture" class="section visible" data-title="Architecture & commands">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>The three areas</span></div>
+    <div class="card-content">
+      <p>Git tracks file state through three areas as changes move from disk into history.</p>
+      <table>
+        <tr><th>Area</th><th>What's in it</th></tr>
+        <tr><td>Working Directory</td><td class="muted">Your actual files on disk — anything edited, untracked, or staged</td></tr>
+        <tr><td>Staging Area (Index)</td><td class="muted">Changes marked with <code>git add</code>, ready to be committed</td></tr>
+        <tr><td>Local Repository (<code>.git</code>)</td><td class="muted">Committed history — snapshots reachable from a branch</td></tr>
+        <tr><td>Remote Repository</td><td class="muted">A copy of the history hosted elsewhere (e.g. GitHub) — synced via push/pull/fetch</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Distributed VCS</strong>
+        Unlike centralized systems (e.g. SVN), every clone holds the <em>full</em> history. There is no single point of failure, and commits can be made fully offline.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Creating &amp; cloning</span></div>
+      <div class="card-content">
+        <pre><span class="cmt"># create a new local repository</span>
+<span class="kw">git init</span>
+
+<span class="cmt"># clone an existing remote repository</span>
+<span class="kw">git clone</span> &lt;url&gt;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Local workflow</span></div>
+      <div class="card-content">
+        <pre><span class="kw">git status</span>                  <span class="cmt"># what changed?</span>
+<span class="kw">git add</span> &lt;file&gt;             <span class="cmt"># stage changes</span>
+<span class="kw">git commit -m</span> <span class="str">"message"</span>  <span class="cmt"># snapshot staged changes</span>
+<span class="kw">git log --oneline</span>          <span class="cmt"># compact commit history</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Syncing with a remote</span></div>
+    <div class="card-content">
+      <pre><span class="kw">git pull</span>     <span class="cmt"># fetch + merge in one step — run at the start of every work session</span>
+<span class="kw">git fetch</span>    <span class="cmt"># download remote changes WITHOUT integrating them — lets you inspect first</span>
+<span class="kw">git push</span>     <span class="cmt"># upload local commits to the remote</span></pre>
+      <div class="callout warn">
+        <strong>git pull vs. git fetch</strong>
+        <code>git pull</code> = <code>git fetch</code> + <code>git merge</code>. Fetch only updates your remote-tracking branches (e.g. <code>origin/main</code>) — your local branch is untouched until you explicitly merge or rebase.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Local user configuration</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Scope</th><th>Applies to</th></tr>
+        <tr><td><code>--local</code></td><td class="muted">Current repository only (default)</td></tr>
+        <tr><td><code>--global</code></td><td class="muted">All repositories of the current OS user</td></tr>
+      </table>
+      <pre><span class="cmt"># set local credentials (e.g. for a work project)</span>
+<span class="kw">git config --local user.name</span>  <span class="str">"Your Name"</span>
+<span class="kw">git config --local user.email</span> <span class="str">"you@example.com"</span>
+
+<span class="cmt"># show full effective config</span>
+<span class="kw">git config list</span>
+
+<span class="cmt"># remove global credentials (e.g. on a shared lab machine)</span>
+<span class="kw">git config --global --unset-all user.name</span>
+<span class="kw">git config --global --unset-all user.email</span></pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ BRANCHING -->
+<div id="branching" class="section" data-title="Branching strategies">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Types of branches</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Branch</th><th>Purpose</th></tr>
+        <tr><td>Main / Release</td><td class="muted">Always deployable — formerly called "master"</td></tr>
+        <tr><td>Develop</td><td class="muted">Integration branch for completed features (Git-Flow only)</td></tr>
+        <tr><td>Feature</td><td class="muted">One branch per new feature, merged back when done</td></tr>
+        <tr><td>Bugfix</td><td class="muted">Fixes a non-urgent bug</td></tr>
+        <tr><td>Hotfix</td><td class="muted">Like Bugfix, but urgent — usually branched directly off main</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Git-Flow workflow</span></div>
+      <div class="card-content">
+        <p>Two permanent branches (<code>main</code>, <code>develop</code>) plus several supporting branches (<code>feature/*</code>, <code>release/*</code>, <code>hotfix/*</code>). Structured and explicit — well suited to scheduled releases.</p>
+        <div class="callout">
+          <strong>Use when</strong>
+          You need formal release cycles, multiple versions in production, or strict QA gates before release.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>GitHub-Flow workflow</span></div>
+      <div class="card-content">
+        <p>Only one permanent branch (<code>main</code>) plus short-lived <code>feature/*</code> and <code>hotfix/*</code> branches, merged via pull request as soon as they're ready. Simpler, faster cadence.</p>
+        <div class="callout">
+          <strong>Use when</strong>
+          You deploy continuously and don't need to maintain multiple released versions in parallel.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Forks &amp; Pull Requests</span></div>
+    <div class="card-content">
+      <p>To contribute to a repo you don't own, you <strong>fork</strong> it — a smart copy that keeps a backlink to the original. After committing changes on your fork, you open a <strong>pull request</strong> asking the owner to merge your changes back in.</p>
+      <div class="callout warn">
+        <strong>Keep your fork synced</strong>
+        Before opening a pull request, sync your fork with the upstream original. Working from a stale fork is the most common cause of avoidable merge conflicts.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Forking vs. Templating</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Fork</th><th>Create from Template</th></tr>
+        <tr><td>Link to original</td><td class="muted">Maintained — can pull updates or send PRs back</td><td class="muted">None — fully independent from creation</td></tr>
+        <tr><td>Typical use</td><td class="muted">Contributing back to a shared project</td><td class="muted">Starting fresh from a boilerplate (e.g. assignment template)</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MERGE VS REBASE -->
+<div id="mergerebase" class="section" data-title="Merge vs. rebase">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>The core difference</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Merge</th><th>Rebase</th></tr>
+        <tr><td>History</td><td class="muted">Preserved as-is — both branch lines stay visible</td><td class="muted">Rewritten — feature commits are replayed on top of the target branch</td></tr>
+        <tr><td>Resulting shape</td><td class="muted">Branching, with a merge commit joining the lines</td><td class="muted">Linear — looks as if the feature was built directly on the latest target branch</td></tr>
+        <tr><td>Commit hashes</td><td class="muted">Unchanged</td><td class="muted">Changed — rebased commits get new hashes</td></tr>
+        <tr><td>Context</td><td class="muted">Original chronological context preserved</td><td class="muted">Original context can be lost/altered</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Merging</span></div>
+      <div class="card-content">
+        <pre><span class="kw">git switch</span> feature
+<span class="kw">git merge</span> main   <span class="cmt"># bring main's changes INTO feature</span>
+<span class="cmt"># creates a merge commit with two parents</span></pre>
+        <div class="callout">
+          <strong>Pro</strong>
+          Non-destructive — never rewrites existing commits. Safe on shared/public branches.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Rebasing</span></div>
+      <div class="card-content">
+        <pre><span class="kw">git switch</span> feature
+<span class="kw">git rebase</span> main   <span class="cmt"># replay feature's commits on top of main</span>
+<span class="cmt"># no merge commit — linear history</span></pre>
+        <div class="callout warn">
+          <strong>Caution</strong>
+          Never rebase commits that have already been pushed and shared — it rewrites history and breaks collaborators' clones.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>When to use which</span></div>
+    <div class="card-content">
+      <ul>
+        <li>Use <strong>merge</strong> on shared/public branches, or whenever you want to keep an accurate record of when branches diverged and rejoined.</li>
+        <li>Use <strong>rebase</strong> on your own local, not-yet-pushed feature branch to keep a clean linear history before opening a pull request.</li>
+        <li>A common combo: rebase locally to clean up, then merge (often via PR) into the shared branch.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ADVANCED -->
+<div id="advanced" class="section" data-title="Advanced">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>HEAD references</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Reference</th><th>Meaning</th></tr>
+          <tr><td><code>HEAD</code></td><td class="muted">The current/latest commit</td></tr>
+          <tr><td><code>HEAD~1</code></td><td class="muted">One commit before HEAD (second-to-last)</td></tr>
+          <tr><td><code>HEAD~2</code></td><td class="muted">Two commits before HEAD</td></tr>
+          <tr><td><code>HEAD^</code></td><td class="muted">The predecessor — same as HEAD~1 for a single-parent commit</td></tr>
+          <tr><td><code>HEAD^2</code></td><td class="muted">Second parent of a merge commit (HEAD^1 = first parent)</td></tr>
+        </table>
+        <pre><span class="kw">git checkout</span> HEAD~1   <span class="cmt"># check out the second-to-last commit</span></pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Cherry picking</span></div>
+      <div class="card-content">
+        <p>Applies a <em>single</em> commit from another branch onto the current branch — without merging the whole branch. Useful when a bugfix landed on an unfinished feature branch.</p>
+        <pre><span class="kw">git switch</span> main
+<span class="kw">git cherry-pick -x</span> &lt;commit-hash&gt;</pre>
+        <div class="callout">
+          <strong>-x flag</strong>
+          Records the original commit hash in the new commit message — useful for tracing where a cherry-picked commit came from.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>.gitignore</span></div>
+    <div class="card-content">
+      <p>Excludes matching files from being tracked — generated/build artifacts (e.g. <code>node_modules/</code>, compiled binaries) and secrets (<code>.env</code>) should never be committed.</p>
+      <div class="callout warn">
+        <strong>Rule of thumb</strong>
+        Anything that's generated (compiled, installed) doesn't belong in the repo. Config files, docs, and source code do — except credentials, API keys, or passwords.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/git</span>
+  <span>Git Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('architecture');
+</script>
+</body></html>

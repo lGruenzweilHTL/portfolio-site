@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Portfolio</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0d0b; --bg2: #15140f; --panel: #191712;
+    --line: #232019; --line2: #302c22;
+    --muted: #918c7f; --dim: #aca699; --text: #d0ccc0; --hi: #eceae1;
+    --accent: #eba53a; --accent-soft: rgba(235,165,58,0.10);
+    --accent-line: rgba(235,165,58,0.22); --white: #f6f4ee;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif;
+         font-size: 14px; line-height: 1.6; padding: 28px 32px; }
+  h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: var(--hi); font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
+  h2 { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+       text-transform: uppercase; letter-spacing: 0.08em; margin: 28px 0 10px; }
+  .top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .top .who { color: var(--dim); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .top .who b { color: var(--hi); font-weight: 500; }
+  .top .actions a, .top .actions button {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+    text-decoration: none; border: 1px solid var(--line2); background: var(--bg2);
+    padding: 5px 11px; border-radius: 3px; cursor: pointer; margin-left: 6px;
+  }
+  .top .actions a:hover, .top .actions button:hover { color: var(--accent); border-color: var(--accent-line); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+  .tile-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+                text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .tile-value { font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; color: var(--hi); letter-spacing: -0.01em; }
+  .tile-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 3px; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--bg2); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+       text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.012); }
+  .pill { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+          padding: 2px 7px; border-radius: 2px; border: 1px solid var(--line2); color: var(--dim); }
+  .pill.accent { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+  .pill.err { color: #eb7676; border-color: rgba(235,118,118,0.3); background: rgba(235,118,118,0.08); }
+  .msg { max-width: 460px; word-wrap: break-word; white-space: pre-wrap; color: var(--dim); }
+  .name { color: var(--hi); font-weight: 500; }
+  .muted { color: var(--muted); }
+  .small { font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+  .empty { padding: 20px; text-align: center; color: var(--muted); font-style: italic; }
+  .chat-row { cursor: pointer; }
+  .chat-row:hover td { background: rgba(235,165,58,0.04); }
+  .chat-row .expand { display: none; }
+  .chat-row.expanded .expand { display: table-row; }
+  .chat-msg-line { padding: 6px 12px; border-bottom: 1px solid var(--line); }
+  .chat-msg-line.user { color: var(--hi); }
+  .chat-msg-line.assistant { color: var(--dim); }
+  .chat-msg-line .role { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+                           color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; }
+  .top-paths { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row-split { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
+  .form-card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+  .form-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+                 text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .form-field > span { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+                       text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .form-field input, .form-field select {
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--line2); border-radius: 3px;
+    padding: 7px 10px; font-family: var(--font-mono); font-size: 12px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-field input:focus, .form-field select:focus { border-color: var(--accent-line); }
+  .form-hint { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .form-actions { margin-top: 6px; }
+  .btn-primary {
+    background: var(--accent); color: #17110a; border: none;
+    border-radius: 3px; padding: 7px 14px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: #f5be5f; }
+  .btn-link {
+    background: none; border: 1px solid var(--line2); color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
+    padding: 3px 9px; border-radius: 3px; cursor: pointer;
+  }
+  .btn-link:hover { color: #eb7676; border-color: rgba(235,118,118,0.3); }
+  .form-result { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--muted); }
+  .form-result.ok { color: var(--accent); }
+  .form-result.err { color: #eb7676; }
+  .form-result a { color: var(--accent); word-break: break-all; }
+  table.compact th, table.compact td { padding: 7px 10px; }
+  @media (max-width: 900px) { .row-split { grid-template-columns: 1fr; } }
+  .list-card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
+  .list-card h3 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+                  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .list-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+              padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .path { color: var(--hi); font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+                     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-row .count { color: var(--dim); font-family: 'IBM Plex Mono', monospace; font-size: 11px; flex-shrink: 0; }
+  @media (max-width: 720px) {
+    body { padding: 20px 16px; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .top-paths { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <h1>Admin</h1>
+    <div class="who">Signed in as <b>{{ user }}</b>{% if dev_bypass %} <span class="pill accent">DEV BYPASS</span>{% endif %}</div>
+  </div>
+  <div class="actions">
+    <a href="/admin/regenerate-resume" onclick="event.preventDefault(); fetch(this.href, {method:'POST'}).then(r=>r.text()).then(t=>alert(t));">Regenerate résumé PDF</a>
+    <a href="/">↗ View site</a>
+  </div>
+</div>
+
+<!-- TILES: snapshot numbers -->
+<div class="grid">
+  <div class="tile">
+    <div class="tile-label">Pageviews (7d)</div>
+    <div class="tile-value">{{ stats.pageviews_7d }}</div>
+    <div class="tile-sub">{{ stats.uniques_7d }} unique visitors</div>
+  </div>
+  <div class="tile">
+    <div class="tile-label">Events (7d)</div>
+    <div class="tile-value">{{ stats.events_7d }}</div>
+    <div class="tile-sub">chatbot, resume, links</div>
+  </div>
+  <div class="tile">
+    <div class="tile-label">Feedback (total)</div>
+    <div class="tile-value">{{ stats.feedback_total }}</div>
+    <div class="tile-sub">{{ stats.feedback_7d }} this week</div>
+  </div>
+  <div class="tile">
+    <div class="tile-label">Chat sessions (7d)</div>
+    <div class="tile-value">{{ stats.chat_sessions_7d }}</div>
+    <div class="tile-sub">{{ stats.chat_messages_7d }} messages</div>
+  </div>
+</div>
+
+<!-- TOP PATHS & EVENTS -->
+<h2>Top paths (7d)</h2>
+<div class="top-paths">
+  <div class="list-card">
+    <h3>By pageview</h3>
+    {% for row in top_paths %}
+      <div class="list-row">
+        <span class="path">{{ row.path }}</span>
+        <span class="count">{{ row.count }}</span>
+      </div>
+    {% else %}
+      <div class="empty">No data yet.</div>
+    {% endfor %}
+  </div>
+  <div class="list-card">
+    <h3>By event</h3>
+    {% for row in top_events %}
+      <div class="list-row">
+        <span class="path">{{ row.name }}</span>
+        <span class="count">{{ row.count }}</span>
+      </div>
+    {% else %}
+      <div class="empty">No data yet.</div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- SECURE LINKS -->
+<h2>Secure download links</h2>
+<div class="row-split">
+  <form id="secure-link-form" class="form-card" autocomplete="off">
+    <div class="form-title">Create link</div>
+    <label class="form-field">
+      <span>File</span>
+      <select name="filename" required>
+        <option value="">— select a file —</option>
+        {% for f in secure_files %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+      </select>
+      {% if not secure_files %}<div class="form-hint">No files in /site/files/secure/. Drop a file there and refresh.</div>{% endif %}
+    </label>
+    <label class="form-field">
+      <span>Expires in</span>
+      <input type="text" name="expires_in" value="7d" required pattern="[0-9]+[smhdw]?" placeholder="7d, 2h, 30m, 1w" />
+      <div class="form-hint">e.g. 30m, 2h, 1d, 3w, or raw seconds.</div>
+    </label>
+    <label class="form-field">
+      <span>Max uses (0 = unlimited)</span>
+      <input type="number" name="max_uses" value="5" min="0" max="10000" />
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Generate link</button>
+    </div>
+    <div id="secure-link-result" class="form-result" role="status"></div>
+  </form>
+
+  <div class="form-card">
+    <div class="form-title">Active links</div>
+    {% if secure_links %}
+    <table class="compact">
+      <thead><tr><th>File</th><th>Expires</th><th>Uses</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for l in secure_links %}
+        <tr>
+          <td>
+            <div class="name small">{{ l.filename }}</div>
+            <div class="muted small">#{{ l.id }} · created {{ l.created_at }}</div>
+          </td>
+          <td class="small muted">{{ l.expires_at }}</td>
+          <td class="small">
+            {% if l.max_uses == 0 %}<span class="muted">∞</span>
+            {% else %}{{ l.uses_remaining }} / {{ l.max_uses }}{% endif %}
+          </td>
+          <td>
+            {% if l.active %}<span class="pill accent">active</span>
+            {% elif l.revoked %}<span class="pill err">revoked</span>
+            {% elif l.expired %}<span class="pill">expired</span>
+            {% elif l.exhausted %}<span class="pill">exhausted</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if l.active %}
+              <button class="btn-link" data-revoke="{{ l.id }}">revoke</button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No links generated yet.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- RECENT FEEDBACK -->
+<h2>Recent feedback</h2>
+{% if feedback %}
+<table>
+  <thead><tr><th>When</th><th>From</th><th>Message</th></tr></thead>
+  <tbody>
+    {% for f in feedback %}
+    <tr>
+      <td class="small muted">{{ f.created_at }}</td>
+      <td>
+        <div class="name">{% if f.name %}{{ f.name }}{% else %}<span class="muted">anonymous</span>{% endif %}</div>
+        {% if f.email %}<div class="small muted">{{ f.email }}</div>{% endif %}
+        <div class="small muted">ip: {{ f.ip or "—" }}</div>
+      </td>
+      <td><div class="msg">{{ f.message }}</div></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">No feedback yet.</div>
+{% endif %}
+
+<!-- RECENT CHAT SESSIONS -->
+<h2>Recent chat sessions</h2>
+{% if chat_sessions %}
+<table>
+  <thead><tr><th>Started</th><th>Last active</th><th>Msgs</th><th>Errors</th><th>Session</th></tr></thead>
+  <tbody>
+    {% for s in chat_sessions %}
+    <tr class="chat-row" onclick="this.classList.toggle('expanded')">
+      <td class="small muted">{{ s.created_at }}</td>
+      <td class="small muted">{{ s.last_active_at }}</td>
+      <td>{{ s.message_count }}</td>
+      <td>{% if s.error_count %}<span class="pill err">{{ s.error_count }}</span>{% else %}<span class="muted small">0</span>{% endif %}</td>
+      <td class="small muted">{{ s.session_id[:12] }}…</td>
+    </tr>
+    <tr class="expand"><td colspan="5" style="padding:0;">
+      <div style="padding: 8px 12px;">
+        {% for m in s.messages %}
+          <div class="chat-msg-line {{ m.role }}">
+            <span class="role">{{ m.role }}{% if m.error %} · {{ m.error }}{% endif %}</span>{{ m.content }}
+          </div>
+        {% endfor %}
+      </div>
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">No chat sessions yet.</div>
+{% endif %}
+
+<p class="small muted" style="margin-top: 32px;">generated at {{ generated_at }} · data from resume.db</p>
+
+<script>
+// Secure link form + revoke buttons
+(function () {
+  const form = document.getElementById('secure-link-form');
+  const result = document.getElementById('secure-link-result');
+
+  if (form) {
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      result.textContent = '';
+      result.className = 'form-result';
+      const data = new FormData(form);
+      const body = {
+        filename: (data.get('filename') || '').toString(),
+        expires_in: (data.get('expires_in') || '').toString(),
+        max_uses: parseInt(data.get('max_uses') || '5', 10),
+      };
+      let resp;
+      try {
+        resp = await fetch('/admin/secure-links', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } catch (_) {
+        result.textContent = 'Network error.';
+        result.className = 'form-result err';
+        return;
+      }
+      const json = await resp.json().catch(() => ({}));
+      if (resp.ok && json.url) {
+        result.innerHTML = 'Link generated. <a href="' + json.url + '" target="_blank" rel="noopener">' + json.url + '</a> <button class="btn-link" id="copy-link">copy</button>';
+        document.getElementById('copy-link').addEventListener('click', function () {
+          navigator.clipboard && navigator.clipboard.writeText(json.url).then(
+            () => { this.textContent = 'copied'; },
+            () => { this.textContent = 'failed'; }
+          );
+        });
+        result.className = 'form-result ok';
+      } else {
+        result.textContent = json.detail || ('Error ' + resp.status);
+        result.className = 'form-result err';
+      }
+    });
+  }
+
+  // Revoke buttons (delegated)
+  document.addEventListener('click', async function (e) {
+    const btn = e.target.closest && e.target.closest('[data-revoke]');
+    if (!btn) return;
+    if (!confirm('Revoke this link? Anyone with the URL will lose access.')) return;
+    const id = btn.getAttribute('data-revoke');
+    btn.disabled = true;
+    let resp;
+    try {
+      resp = await fetch('/admin/secure-links/' + encodeURIComponent(id) + '/revoke', { method: 'POST' });
+    } catch (_) {
+      btn.disabled = false;
+      alert('Network error');
+      return;
+    }
+    if (resp.ok) {
+      location.reload();
+    } else {
+      btn.disabled = false;
+      alert('Failed to revoke');
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

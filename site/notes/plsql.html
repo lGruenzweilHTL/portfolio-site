@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle PL/SQL Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>plsql</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"/>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// oracle db reference</div>
+  <h1 class="page-title">Oracle PL/SQL Cheatsheet</h1>
+  <p class="page-sub">Exam reference — basics · DDL &amp; constraints · variables · control flow · loops · exceptions · triggers · procedures · parameters · cursors · data dictionary</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('basics',this)">Basics</button>
+  <button onclick="showTab('ddl',this)">DDL &amp; Constraints</button>
+  <button onclick="showTab('variables',this)">Variables &amp; types</button>
+  <button onclick="showTab('control',this)">Control flow</button>
+  <button onclick="showTab('loops',this)">Loops</button>
+  <button onclick="showTab('exceptions',this)">Exceptions</button>
+  <button onclick="showTab('triggers',this)">Triggers</button>
+  <button onclick="showTab('procs',this)">Procedures vs functions</button>
+  <button onclick="showTab('params',this)">Parameters</button>
+  <button onclick="showTab('cursors',this)">Cursors</button>
+  <button onclick="showTab('dict',this)">Data dictionary</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ BASICS -->
+<div id="basics" class="section visible" data-title="Basics">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Block structure</span></div>
+    <div class="card-content">
+      <pre><span class="kw">DECLARE</span>                   <span class="cmt">-- optional: variables, types, cursors</span>
+  v_name  <span class="type">VARCHAR2</span>(<span class="num">50</span>);
+  v_count <span class="type">NUMBER</span> := <span class="num">0</span>;
+<span class="kw">BEGIN</span>                      <span class="cmt">-- required: executable statements</span>
+  v_count := v_count + <span class="num">1</span>;
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(<span class="str">'Count: '</span> || v_count);
+<span class="kw">EXCEPTION</span>                  <span class="cmt">-- optional: error handlers</span>
+  <span class="kw">WHEN OTHERS THEN</span>
+    <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(<span class="str">'Error: '</span> || <span class="fn">SQLERRM</span>);
+<span class="kw">END</span>;
+/</pre>
+      <div class="callout warn">
+        <strong>The trailing slash ( / )</strong>
+        Tells SQL*Plus / SQL Developer "end of PL/SQL block, execute now" — it's the block terminator, distinct from the <code>;</code> that ends individual statements inside the block. Required after every standalone block, <code>CREATE OR REPLACE PROCEDURE/FUNCTION/TRIGGER</code>.
+      </div>
+      <div class="callout">
+        <strong>Always check USER_ERRORS after deploying</strong>
+        After any <code>CREATE OR REPLACE PROCEDURE/FUNCTION/TRIGGER</code>, run <code>SELECT * FROM USER_ERRORS;</code> — compilation errors don't always surface loudly, and a "successfully compiled" object can still be silently broken (status <code>INVALID</code>) if you don't check.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Assignment &amp; output</span></div>
+      <div class="card-content">
+        <pre>v_x := <span class="num">42</span>;
+v_msg := <span class="str">'hello'</span> || <span class="str">' world'</span>;
+
+<span class="cmt">-- Select into variable</span>
+<span class="kw">SELECT</span> salary <span class="kw">INTO</span> v_sal
+<span class="kw">FROM   </span>employees
+<span class="kw">WHERE  </span>emp_id = <span class="num">101</span>;
+
+<span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(v_msg);</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>NULL &amp; comparisons</span></div>
+      <div class="card-content">
+        <pre>v_x <span class="kw">IS NULL</span>          <span class="cmt">-- check for null</span>
+v_x <span class="kw">IS NOT NULL</span>
+
+<span class="cmt">-- NVL / NVL2</span>
+<span class="fn">NVL</span>(v_x, <span class="num">0</span>)           <span class="cmt">-- if null → 0</span>
+<span class="fn">NVL2</span>(v_x, <span class="str">'y'</span>, <span class="str">'n'</span>)  <span class="cmt">-- not-null / null branch</span>
+
+<span class="cmt">-- COALESCE returns first non-null</span>
+<span class="fn">COALESCE</span>(a, b, c)</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Common built-in functions</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Function</th><th>Use</th></tr>
+        <tr><td><code>SUBSTR(str, pos, len)</code></td><td class="muted">Extract a substring — <code>SUBSTR(p_ean, 1, 1)</code> gets digit 1</td></tr>
+        <tr><td><code>TO_NUMBER(str)</code></td><td class="muted">Convert text to a number — raises <code>VALUE_ERROR</code> if not numeric</td></tr>
+        <tr><td><code>TO_CHAR(num/date, fmt)</code></td><td class="muted">Convert a number/date to formatted text</td></tr>
+        <tr><td><code>MOD(n, base)</code></td><td class="muted">Modulo — remainder of n / base</td></tr>
+        <tr><td><code>LENGTH(str)</code></td><td class="muted">Number of characters in a string</td></tr>
+        <tr><td><code>INSTR(str, substr)</code></td><td class="muted">Position of a substring within a string (0 if not found)</td></tr>
+        <tr><td><code>TRUNC(n)</code> / <code>ROUND(n)</code></td><td class="muted">Truncate or round a number</td></tr>
+      </table>
+      <pre style="margin-top:12px"><span class="cmt">-- Classic pattern: extract & sum digits</span>
+<span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">12</span> <span class="kw">LOOP</span>
+  v_digit := <span class="fn">TO_NUMBER</span>(<span class="fn">SUBSTR</span>(p_ean, i, <span class="num">1</span>));
+  v_sum := v_sum + v_digit;
+<span class="kw">END LOOP</span>;
+v_check := <span class="fn">MOD</span>(<span class="num">10</span> - <span class="fn">MOD</span>(v_sum, <span class="num">10</span>), <span class="num">10</span>);</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DDL & CONSTRAINTS -->
+<div id="ddl" class="section" data-title="DDL & Constraints">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>CREATE TABLE anatomy</span></div>
+    <div class="card-content">
+      <pre><span class="kw">CREATE TABLE</span> Product (
+    Id         <span class="type">NUMBER</span> <span class="kw">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    EAN        <span class="type">CHAR</span>(<span class="num">13</span>) <span class="kw">UNIQUE</span>,
+    Descr      <span class="type">VARCHAR2</span>(<span class="num">500</span>),
+    CategoryId <span class="type">NUMBER</span>,
+
+    <span class="kw">CONSTRAINT</span> FK_Product_ProductCategory
+        <span class="kw">FOREIGN KEY</span> (CategoryId) <span class="kw">REFERENCES</span> ProductCategory(Id)
+);</pre>
+      <div class="callout">
+        <strong>IDENTITY primary key</strong>
+        <code>GENERATED BY DEFAULT AS IDENTITY</code> auto-generates the value on insert if none is supplied, but still lets you override it explicitly when needed (unlike <code>GENERATED ALWAYS</code>, which forbids supplying a value at all).
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Constraint types &amp; naming convention</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Constraint</th><th>Keyword</th><th>Naming convention</th></tr>
+        <tr><td>Primary Key</td><td class="muted"><code>PRIMARY KEY</code></td><td class="muted"><code>PK_TableName</code></td></tr>
+        <tr><td>Foreign Key</td><td class="muted"><code>FOREIGN KEY ... REFERENCES</code></td><td class="muted"><code>FK_TableName_TargetTable</code></td></tr>
+        <tr><td>Check</td><td class="muted"><code>CHECK (condition)</code></td><td class="muted"><code>C_TableName</code> or <code>CK_TableName</code></td></tr>
+        <tr><td>Unique</td><td class="muted"><code>UNIQUE</code></td><td class="muted"><code>UQ_TableName_Column</code></td></tr>
+        <tr><td>Not Null</td><td class="muted"><code>NOT NULL</code></td><td class="muted">usually inline, no separate name needed</td></tr>
+      </table>
+      <pre style="margin-top:12px"><span class="kw">CREATE TABLE</span> Warehouse (
+    Id            <span class="type">NUMBER</span> <span class="kw">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    Location      <span class="type">VARCHAR2</span>(<span class="num">200</span>),
+    TotalCapacity <span class="type">NUMBER</span>,
+
+    <span class="kw">CONSTRAINT</span> C_Warehouse <span class="kw">CHECK</span> (TotalCapacity &gt;= <span class="num">0</span>)
+);
+
+<span class="kw">CREATE TABLE</span> ProductCategory (
+    Id               <span class="type">NUMBER</span> <span class="kw">GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY</span>,
+    CategoryName     <span class="type">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL UNIQUE</span>,
+    ParentCategoryId <span class="type">NUMBER</span>,
+
+    <span class="cmt">-- self-referencing FK: a category's parent is another row in the SAME table</span>
+    <span class="kw">CONSTRAINT</span> FK_ProductCategory_ProductCategory
+        <span class="kw">FOREIGN KEY</span> (ParentCategoryId) <span class="kw">REFERENCES</span> ProductCategory(Id)
+);</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Composite (multi-column) primary &amp; foreign keys</span></div>
+    <div class="card-content">
+      <p>Used when a table's identity is the combination of two (or more) columns — e.g. a junction/link table — or when a foreign key must reference a multi-column primary key elsewhere.</p>
+      <pre><span class="kw">CREATE TABLE</span> ProductsInWarehouse (
+    WarehouseId <span class="type">NUMBER</span>,
+    ProductId   <span class="type">NUMBER</span>,
+    Amount      <span class="type">NUMBER</span>,
+
+    <span class="kw">CONSTRAINT</span> FK_ProductsInWarehouse_Product
+        <span class="kw">FOREIGN KEY</span> (ProductId) <span class="kw">REFERENCES</span> Product(Id),
+    <span class="kw">CONSTRAINT</span> FK_ProductsInWarehouse_Warehouse
+        <span class="kw">FOREIGN KEY</span> (WarehouseId) <span class="kw">REFERENCES</span> Warehouse(Id),
+    <span class="kw">CONSTRAINT</span> PK_ProductsInWarehouse
+        <span class="kw">PRIMARY KEY</span> (WarehouseId, ProductId)   <span class="cmt">-- composite PK</span>
+);
+
+<span class="cmt">-- a FK can reference a composite PK too — column ORDER must match</span>
+<span class="kw">CREATE TABLE</span> CommissionFromWarehouse (
+    WarehouseId  <span class="type">NUMBER</span>,
+    ProductId    <span class="type">NUMBER</span>,
+    Commissioner <span class="type">VARCHAR2</span>(<span class="num">200</span>),
+
+    <span class="kw">CONSTRAINT</span> FK_CommissionFromWarehouse
+        <span class="kw">FOREIGN KEY</span> (WarehouseId, ProductId)
+        <span class="kw">REFERENCES</span> ProductsInWarehouse(WarehouseId, ProductId),
+    <span class="kw">CONSTRAINT</span> PK_CommissionFromWarehouse
+        <span class="kw">PRIMARY KEY</span> (WarehouseId, ProductId)
+);</pre>
+      <div class="callout warn">
+        <strong>Column order matters</strong>
+        In a composite <code>FOREIGN KEY (A, B) REFERENCES Target(X, Y)</code>, column <em>position</em> defines the pairing (A↔X, B↔Y) — not the column names. Always list both sides in the same matching order.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>ALTER TABLE — adding constraints after creation</span></div>
+    <div class="card-content">
+      <pre><span class="kw">ALTER TABLE</span> Product
+    <span class="kw">ADD CONSTRAINT</span> C_Product_Descr <span class="kw">CHECK</span> (Descr <span class="kw">IS NOT NULL</span>);
+
+<span class="kw">ALTER TABLE</span> Warehouse
+    <span class="kw">ADD</span> CONSTRAINT FK_Warehouse_Region <span class="kw">FOREIGN KEY</span> (RegionId) <span class="kw">REFERENCES</span> Region(Id);</pre>
+      <p>Same <code>CONSTRAINT</code> syntax as inline — just prefixed with <code>ALTER TABLE ... ADD</code> instead of being declared at creation time.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ VARIABLES -->
+<div id="variables" class="section" data-title="Variables & types">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Scalar data types</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Type</th><th>Notes</th></tr>
+        <tr><td><code>VARCHAR2(n)</code></td><td class="muted">Variable string, up to 32 767 bytes in PL/SQL</td></tr>
+        <tr><td><code>CHAR(n)</code></td><td class="muted">Fixed-length, blank-padded</td></tr>
+        <tr><td><code>NUMBER(p,s)</code></td><td class="muted">Numeric; p = precision, s = scale</td></tr>
+        <tr><td><code>INTEGER</code></td><td class="muted">Subtype of NUMBER(38)</td></tr>
+        <tr><td><code>DATE</code></td><td class="muted">Date + time (second precision)</td></tr>
+        <tr><td><code>TIMESTAMP(n)</code></td><td class="muted">Date + time with fractional seconds (default 6)</td></tr>
+        <tr><td><code>BOOLEAN</code></td><td class="muted">TRUE / FALSE / NULL — PL/SQL only, not SQL</td></tr>
+        <tr><td><code>CLOB / BLOB</code></td><td class="muted">Large character / binary data</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>%TYPE &amp; %ROWTYPE anchoring</span></div>
+      <div class="card-content">
+        <pre><span class="cmt">-- Anchored to a single column type</span>
+v_sal employees.salary<span class="kw">%TYPE</span>;
+
+<span class="cmt">-- Anchored to an entire row</span>
+r_emp employees<span class="kw">%ROWTYPE</span>;
+<span class="kw">SELECT</span> * <span class="kw">INTO</span> r_emp
+<span class="kw">FROM   </span>employees
+<span class="kw">WHERE  </span>emp_id = <span class="num">1</span>;
+
+<span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(r_emp.last_name);</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Constants, subtypes &amp; records</span></div>
+      <div class="card-content">
+        <pre><span class="cmt">-- Constant declaration</span>
+c_max <span class="kw">CONSTANT NUMBER</span> := <span class="num">100</span>;
+
+<span class="cmt">-- Subtype alias</span>
+<span class="kw">SUBTYPE</span> t_name <span class="kw">IS</span> <span class="type">VARCHAR2</span>(<span class="num">50</span>);
+v_first t_name;
+
+<span class="cmt">-- User-defined record type</span>
+<span class="kw">TYPE</span> t_rec <span class="kw">IS RECORD</span> (
+  id  <span class="type">NUMBER</span>,
+  nm  <span class="type">VARCHAR2</span>(<span class="num">30</span>)
+);
+r t_rec;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Collections</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Type</th><th>Index</th><th>Persistent?</th><th>Notes</th></tr>
+        <tr><td><code>INDEX BY TABLE</code></td><td class="muted">Any scalar</td><td class="muted">No</td><td class="muted">PL/SQL only; fastest for in-memory lookup</td></tr>
+        <tr><td><code>NESTED TABLE</code></td><td class="muted">Sequential integer</td><td class="muted">Yes</td><td class="muted">Can be stored as a column type</td></tr>
+        <tr><td><code>VARRAY(n)</code></td><td class="muted">Sequential integer</td><td class="muted">Yes</td><td class="muted">Fixed maximum size n</td></tr>
+      </table>
+      <pre style="border-top:1px solid var(--line); margin-top: 16px;"><span class="kw">TYPE</span> t_ids <span class="kw">IS TABLE OF NUMBER INDEX BY BINARY_INTEGER</span>;
+v_ids t_ids;
+v_ids(<span class="num">1</span>) := <span class="num">100</span>;
+v_ids(<span class="num">2</span>) := <span class="num">200</span>;
+<span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(v_ids.<span class="fn">COUNT</span>); <span class="cmt">-- 2</span></pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CONTROL FLOW -->
+<div id="control" class="section" data-title="Control flow">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>IF / ELSIF / ELSE</span></div>
+      <div class="card-content">
+        <pre><span class="kw">IF</span> v_sal > <span class="num">10000</span> <span class="kw">THEN</span>
+  v_grade := <span class="str">'A'</span>;
+<span class="kw">ELSIF</span> v_sal > <span class="num">5000</span> <span class="kw">THEN</span>
+  v_grade := <span class="str">'B'</span>;
+<span class="kw">ELSE</span>
+  v_grade := <span class="str">'C'</span>;
+<span class="kw">END IF</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>CASE statement</span></div>
+      <div class="card-content">
+        <pre><span class="cmt">-- Simple CASE</span>
+<span class="kw">CASE</span> v_grade
+  <span class="kw">WHEN</span> <span class="str">'A'</span> <span class="kw">THEN</span> bonus := <span class="num">1000</span>;
+  <span class="kw">WHEN</span> <span class="str">'B'</span> <span class="kw">THEN</span> bonus := <span class="num">500</span>;
+  <span class="kw">ELSE          </span>bonus := <span class="num">0</span>;
+<span class="kw">END CASE</span>;
+
+<span class="cmt">-- Searched CASE</span>
+<span class="kw">CASE</span>
+  <span class="kw">WHEN</span> v_sal > <span class="num">10000</span> <span class="kw">THEN</span> ...
+  <span class="kw">WHEN</span> v_sal > <span class="num">5000</span>  <span class="kw">THEN</span> ...
+<span class="kw">END CASE</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>GOTO &amp; NULL statement</span></div>
+    <div class="card-content">
+      <pre><span class="kw">GOTO</span> skip_section;
+  <span class="cmt">-- code here is skipped</span>
+&lt;&lt;skip_section&gt;&gt;
+<span class="kw">NULL</span>;  <span class="cmt">-- explicit no-op; satisfies syntax where a statement is required</span></pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ LOOPS -->
+<div id="loops" class="section" data-title="Loops">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Basic LOOP</span></div>
+      <div class="card-content">
+        <pre><span class="kw">LOOP</span>
+  v_i := v_i + <span class="num">1</span>;
+  <span class="kw">EXIT WHEN</span> v_i > <span class="num">10</span>;
+  <span class="cmt">-- or: EXIT; (unconditional)</span>
+<span class="kw">END LOOP</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>WHILE LOOP</span></div>
+      <div class="card-content">
+        <pre><span class="kw">WHILE</span> v_i <= <span class="num">10</span> <span class="kw">LOOP</span>
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(v_i);
+  v_i := v_i + <span class="num">1</span>;
+<span class="kw">END LOOP</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Numeric FOR LOOP</span></div>
+      <div class="card-content">
+        <pre><span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">10</span> <span class="kw">LOOP</span>
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(i);
+<span class="kw">END LOOP</span>;
+
+<span class="cmt">-- Reverse (10 down to 1)</span>
+<span class="kw">FOR</span> i <span class="kw">IN REVERSE</span> <span class="num">1</span>..<span class="num">10</span> <span class="kw">LOOP</span>
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(i);
+<span class="kw">END LOOP</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Cursor FOR LOOP</span></div>
+      <div class="card-content">
+        <pre><span class="kw">FOR</span> r <span class="kw">IN</span> (
+  <span class="kw">SELECT</span> * <span class="kw">FROM</span> employees
+) <span class="kw">LOOP</span>
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(
+    r.last_name
+  );
+<span class="kw">END LOOP</span>;</pre>
+        <div class="callout" style="margin-top: 12px;">
+          <strong>Preferred style</strong>
+          Implicit open / fetch / close — preferred over manual cursor management.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Simple algorithm patterns: sum &amp; product</span></div>
+    <div class="card-content">
+      <p>The classic exam pattern: loop over a range or the digits of a string, accumulating a running sum or product. Always initialize the accumulator <em>before</em> the loop.</p>
+      <div class="grid2">
+        <pre><span class="cmt">-- Sum of 1..n</span>
+v_sum <span class="type">NUMBER</span> := <span class="num">0</span>;
+<span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..p_n <span class="kw">LOOP</span>
+  v_sum := v_sum + i;
+<span class="kw">END LOOP</span>;</pre>
+        <pre><span class="cmt">-- Product / factorial of n</span>
+v_product <span class="type">NUMBER</span> := <span class="num">1</span>;  <span class="cmt">-- starts at 1, not 0!</span>
+<span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..p_n <span class="kw">LOOP</span>
+  v_product := v_product * i;
+<span class="kw">END LOOP</span>;</pre>
+      </div>
+      <div class="callout warn">
+        <strong>Accumulator starting value</strong>
+        Sum starts at <code>0</code> (identity for addition); product/factorial starts at <code>1</code> (identity for multiplication). Starting a product accumulator at 0 is a very common bug — it zeroes out the entire result on the first multiplication.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>CONTINUE (12c+) &amp; labeled loops</span></div>
+    <div class="card-content">
+      <pre>&lt;&lt;outer&gt;&gt;
+<span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">5</span> <span class="kw">LOOP</span>
+  <span class="kw">FOR</span> j <span class="kw">IN</span> <span class="num">1</span>..<span class="num">5</span> <span class="kw">LOOP</span>
+    <span class="kw">CONTINUE</span> outer <span class="kw">WHEN</span> j = <span class="num">3</span>;  <span class="cmt">-- skip remainder of inner; continue outer</span>
+    <span class="kw">EXIT     </span>outer <span class="kw">WHEN</span> i = <span class="num">4</span>;  <span class="cmt">-- exit outer loop entirely</span>
+  <span class="kw">END LOOP</span>;
+<span class="kw">END LOOP</span> outer;</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ EXCEPTIONS -->
+<div id="exceptions" class="section" data-title="Exceptions">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Built-in named exceptions</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Exception</th><th>ORA-</th><th>Trigger condition</th></tr>
+        <tr><td><code>NO_DATA_FOUND</code></td><td class="muted">01403</td><td class="muted">SELECT INTO returns 0 rows</td></tr>
+        <tr><td><code>TOO_MANY_ROWS</code></td><td class="muted">01422</td><td class="muted">SELECT INTO returns more than 1 row</td></tr>
+        <tr><td><code>ZERO_DIVIDE</code></td><td class="muted">01476</td><td class="muted">Division by zero</td></tr>
+        <tr><td><code>VALUE_ERROR</code></td><td class="muted">06502</td><td class="muted">Conversion or truncation error — also commonly RAISEd manually for custom input validation</td></tr>
+        <tr><td><code>INVALID_NUMBER</code></td><td class="muted">01722</td><td class="muted">Invalid char-to-number conversion in SQL</td></tr>
+        <tr><td><code>DUP_VAL_ON_INDEX</code></td><td class="muted">00001</td><td class="muted">Unique constraint violation</td></tr>
+        <tr><td><code>CURSOR_ALREADY_OPEN</code></td><td class="muted">06511</td><td class="muted">Opening an already-open cursor</td></tr>
+        <tr><td><code>OTHERS</code></td><td class="muted">—</td><td class="muted">Catch-all handler; must be listed last</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Handling exceptions</span></div>
+      <div class="card-content">
+        <pre><span class="kw">BEGIN</span>
+  <span class="kw">SELECT</span> name <span class="kw">INTO</span> v_name
+  <span class="kw">FROM   </span>emp <span class="kw">WHERE</span> id = <span class="num">999</span>;
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN </span><span class="type">NO_DATA_FOUND</span> <span class="kw">THEN</span>
+    v_name := <span class="str">'Unknown'</span>;
+  <span class="kw">WHEN </span><span class="type">TOO_MANY_ROWS</span> <span class="kw">THEN</span>
+    <span class="fn">RAISE_APPLICATION_ERROR</span>(
+      -<span class="num">20001</span>, <span class="str">'Multiple rows found'</span>
+    );
+  <span class="kw">WHEN OTHERS THEN</span>
+    <span class="kw">ROLLBACK</span>;
+    <span class="fn">RAISE</span>;  <span class="cmt">-- re-raise to caller</span>
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Manually raising a built-in exception</span></div>
+      <div class="card-content">
+        <p>You don't need a user-defined exception to signal "this input is invalid" — raising an existing built-in exception by name is perfectly valid and often expected for input validation:</p>
+        <pre><span class="kw">PROCEDURE</span> check_input(p_val <span class="type">NUMBER</span>) <span class="kw">IS</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">IF</span> p_val <span class="kw">IS NULL OR</span> p_val &lt; <span class="num">0</span> <span class="kw">THEN</span>
+    <span class="fn">RAISE</span> <span class="type">VALUE_ERROR</span>;   <span class="cmt">-- no need to declare it, it's built in</span>
+  <span class="kw">END IF</span>;
+<span class="kw">END</span>;</pre>
+        <p>The caller then catches it with a plain <code>WHEN VALUE_ERROR THEN</code> handler — no <code>PRAGMA EXCEPTION_INIT</code> needed (that's only for mapping a <em>custom-named</em> exception to a specific ORA- error code).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>User-defined exceptions</span></div>
+    <div class="card-content">
+      <pre><span class="kw">DECLARE</span>
+  e_too_low <span class="kw">EXCEPTION</span>;
+  <span class="kw">PRAGMA EXCEPTION_INIT</span>(
+    e_too_low, -<span class="num">20100</span>
+  );
+<span class="kw">BEGIN</span>
+  <span class="kw">IF</span> v_sal < <span class="num">0</span> <span class="kw">THEN</span>
+    <span class="fn">RAISE</span> e_too_low;
+  <span class="kw">END IF</span>;
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN </span>e_too_low <span class="kw">THEN</span>
+    <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(<span class="fn">SQLERRM</span>);
+    <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(<span class="fn">SQLCODE</span>);
+<span class="kw">END</span>;</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TRIGGERS -->
+<div id="triggers" class="section" data-title="Triggers">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>CREATE TRIGGER anatomy</span></div>
+    <div class="card-content">
+      <pre><span class="kw">CREATE OR REPLACE TRIGGER</span> TR_INSERTUPDATE_PRODUCT_VALIDATE_EAN
+<span class="kw">BEFORE INSERT OR UPDATE ON</span> Product
+<span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+  check_ean13(:<span class="kw">NEW</span>.EAN);
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(<span class="str">'check_ean13 passed for Product '</span> || :<span class="kw">NEW</span>.Id);
+<span class="kw">END</span>;
+/
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> USER_ERRORS;</pre>
+      <div class="callout">
+        <strong>Always use the procedure, not inline logic</strong>
+        If a task says "use the procedure" for validation inside a trigger, call it directly with the pseudorecord column as the argument — don't duplicate the validation logic inline in the trigger body.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Timing &amp; event matrix</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Timing</th><th>Meaning</th></tr>
+          <tr><td><code>BEFORE</code></td><td class="muted">Runs before the DML — can validate/modify <code>:NEW</code> values before they're written</td></tr>
+          <tr><td><code>AFTER</code></td><td class="muted">Runs after the DML completed — for logging, cascading effects</td></tr>
+          <tr><td><code>INSTEAD OF</code></td><td class="muted">Replaces the DML entirely — only valid on views</td></tr>
+        </table>
+        <table style="margin-top:12px">
+          <tr><th>Event(s)</th></tr>
+          <tr><td class="muted"><code>INSERT</code> / <code>UPDATE</code> / <code>DELETE</code> — can combine with <code>OR</code></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Row-level vs. statement-level</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th></th><th><code>FOR EACH ROW</code></th><th>(omitted)</th></tr>
+          <tr><td>Fires</td><td class="muted">Once per affected row</td><td class="muted">Once per statement, regardless of row count</td></tr>
+          <tr><td>Access to <code>:NEW</code>/<code>:OLD</code></td><td class="muted">Yes</td><td class="muted">No</td></tr>
+          <tr><td>Typical use</td><td class="muted">Per-row validation (e.g. EAN check)</td><td class="muted">Bulk auditing, one summary log line per statement</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>:NEW / :OLD pseudorecords</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th><code>INSERT</code></th><th><code>UPDATE</code></th><th><code>DELETE</code></th></tr>
+        <tr><td><code>:NEW</code></td><td class="muted">The row being inserted</td><td class="muted">The row's new values</td><td class="muted">Not available</td></tr>
+        <tr><td><code>:OLD</code></td><td class="muted">Not available</td><td class="muted">The row's previous values</td><td class="muted">The row being deleted</td></tr>
+      </table>
+      <p>Only available in <code>FOR EACH ROW</code> triggers. Reference a column with <code>:NEW.ColumnName</code> / <code>:OLD.ColumnName</code>.</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot r"></span><span>Mutating table error</span></div>
+      <div class="card-content">
+        <p>A <code>FOR EACH ROW</code> trigger that tries to <code>SELECT</code> (or modify) the <em>same table</em> it's defined on raises <code>ORA-04091: table is mutating, trigger/function may not see it</code>.</p>
+        <pre><span class="cmt">-- INSIDE a trigger on Product — this fails:</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">INTO</span> v_cnt <span class="kw">FROM</span> Product;</pre>
+        <div class="callout warn">
+          <strong>Why this matters here</strong>
+          Calling an external validation <em>procedure</em> like <code>check_ean13</code> is safe — it doesn't query the Product table. The trap appears if you try to inline a query against the trigger's own table instead.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Enabling / disabling triggers</span></div>
+      <div class="card-content">
+        <pre><span class="kw">ALTER TRIGGER</span> TR_INSERTUPDATE_PRODUCT_VALIDATE_EAN <span class="kw">DISABLE</span>;
+<span class="kw">ALTER TRIGGER</span> TR_INSERTUPDATE_PRODUCT_VALIDATE_EAN <span class="kw">ENABLE</span>;
+
+<span class="cmt">-- disable/enable ALL triggers on a table at once</span>
+<span class="kw">ALTER TABLE</span> Product <span class="kw">DISABLE ALL TRIGGERS</span>;
+<span class="kw">ALTER TABLE</span> Product <span class="kw">ENABLE ALL TRIGGERS</span>;</pre>
+        <p>Useful for bulk-loading data without re-validating every row, then re-enabling afterward.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PROCS VS FUNCTIONS -->
+<div id="procs" class="section" data-title="Procedures vs functions">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Comparison</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Feature</th><th>Procedure <span class="badge b">PROC</span></th><th>Function <span class="badge g">FUNC</span></th></tr>
+        <tr><td>Returns a value</td><td class="muted">No — uses OUT parameters</td><td class="muted">Yes — exactly one RETURN value</td></tr>
+        <tr><td>Callable from SQL</td><td class="muted">No</td><td class="muted">Yes (if no DML side-effects in SQL context)</td></tr>
+        <tr><td>RETURN statement</td><td class="muted">Optional (exits early)</td><td class="muted">Mandatory on every execution path</td></tr>
+        <tr><td>Use in expressions</td><td class="muted">No</td><td class="muted">Yes — <code>x := my_fn(v)</code></td></tr>
+        <tr><td>Transaction control</td><td class="muted">COMMIT / ROLLBACK allowed</td><td class="muted">Not from a SQL context</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Procedure example</span></div>
+      <div class="card-content">
+        <pre><span class="kw">CREATE OR REPLACE PROCEDURE</span>
+  raise_salary(
+    p_id  <span class="kw">IN  </span><span class="type">NUMBER</span>,
+    p_pct <span class="kw">IN  </span><span class="type">NUMBER</span>,
+    p_new <span class="kw">OUT </span><span class="type">NUMBER</span>
+  )
+<span class="kw">IS</span>
+  v_old <span class="type">NUMBER</span>;
+<span class="kw">BEGIN</span>
+  <span class="kw">SELECT</span> salary <span class="kw">INTO</span> v_old
+  <span class="kw">FROM   </span>employees
+  <span class="kw">WHERE  </span>emp_id = p_id;
+
+  p_new := v_old * (<span class="num">1</span> + p_pct/<span class="num">100</span>);
+
+  <span class="kw">UPDATE</span> employees
+  <span class="kw">SET    </span>salary = p_new
+  <span class="kw">WHERE  </span>emp_id = p_id;
+<span class="kw">END</span> raise_salary;
+/</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Function example</span></div>
+      <div class="card-content">
+        <pre><span class="kw">CREATE OR REPLACE FUNCTION</span>
+  full_name(
+    p_first <span class="kw">IN </span><span class="type">VARCHAR2</span>,
+    p_last  <span class="kw">IN </span><span class="type">VARCHAR2</span>
+  )
+<span class="kw">RETURN </span><span class="type">VARCHAR2</span>
+<span class="kw">IS</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">RETURN</span> p_first || <span class="str">' '</span> || p_last;
+<span class="kw">EXCEPTION</span>
+  <span class="kw">WHEN OTHERS THEN</span>
+    <span class="kw">RETURN NULL</span>;
+<span class="kw">END</span> full_name;
+/
+
+<span class="cmt">-- Call directly in SQL</span>
+<span class="kw">SELECT </span><span class="fn">full_name</span>(first_nm, last_nm)
+<span class="kw">FROM   </span>employees;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Worked example: validation algorithm with built-in exception</span></div>
+    <div class="card-content">
+      <p>The exam-style pattern: validate input shape first (length/null checks), then run a simple sum/product algorithm over the digits, then compare a computed result against an expected value — raising a built-in exception on any failure.</p>
+      <pre><span class="kw">CREATE OR REPLACE PROCEDURE</span> check_ean13 (
+    p_ean <span class="kw">IN</span> Product.EAN<span class="kw">%TYPE</span>
+)
+<span class="kw">IS</span>
+    v_sum   <span class="type">NUMBER</span> := <span class="num">0</span>;
+    v_digit <span class="type">NUMBER</span>;
+    v_check <span class="type">NUMBER</span>;
+<span class="kw">BEGIN</span>
+    <span class="cmt">-- 1. validate shape first</span>
+    <span class="kw">IF</span> p_ean <span class="kw">IS NULL OR</span> p_ean = <span class="str">''</span> <span class="kw">OR</span> <span class="fn">LENGTH</span>(p_ean) != <span class="num">13</span> <span class="kw">THEN</span>
+        <span class="fn">RAISE</span> <span class="type">VALUE_ERROR</span>;
+    <span class="kw">END IF</span>;
+
+    <span class="cmt">-- 2. accumulate weighted sum over digits 1..12</span>
+    <span class="kw">FOR</span> i <span class="kw">IN</span> <span class="num">1</span>..<span class="num">12</span> <span class="kw">LOOP</span>
+        v_digit := <span class="fn">TO_NUMBER</span>(<span class="fn">SUBSTR</span>(p_ean, i, <span class="num">1</span>));  <span class="cmt">-- non-numeric chars raise VALUE_ERROR here too</span>
+        <span class="kw">IF</span> <span class="fn">MOD</span>(i, <span class="num">2</span>) = <span class="num">0</span> <span class="kw">THEN</span>
+            v_sum := v_sum + (v_digit * <span class="num">3</span>);
+        <span class="kw">ELSE</span>
+            v_sum := v_sum + v_digit;
+        <span class="kw">END IF</span>;
+    <span class="kw">END LOOP</span>;
+
+    <span class="cmt">-- 3. compute & compare check digit</span>
+    v_check := <span class="fn">MOD</span>(<span class="num">10</span> - <span class="fn">MOD</span>(v_sum, <span class="num">10</span>), <span class="num">10</span>);
+    <span class="kw">IF</span> v_check != <span class="fn">TO_NUMBER</span>(<span class="fn">SUBSTR</span>(p_ean, <span class="num">13</span>, <span class="num">1</span>)) <span class="kw">THEN</span>
+        <span class="fn">RAISE</span> <span class="type">VALUE_ERROR</span>;
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> USER_ERRORS;</pre>
+      <div class="callout">
+        <strong>Note the implicit validation</strong>
+        <code>TO_NUMBER(SUBSTR(...))</code> already raises <code>VALUE_ERROR</code> by itself if a character isn't numeric — you don't always need a separate explicit check for that specific case, only for things Oracle won't catch for you (null, wrong length).
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PARAMETERS -->
+<div id="params" class="section" data-title="Parameters">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Parameter modes</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Mode</th><th>Direction</th><th>Default?</th><th>Notes</th></tr>
+        <tr><td><code>IN</code></td><td class="muted">Caller → subprogram</td><td class="muted">Yes — DEFAULT keyword</td><td class="muted">Read-only inside; default mode if omitted</td></tr>
+        <tr><td><code>OUT</code></td><td class="muted">Subprogram → caller</td><td class="muted">No</td><td class="muted">Uninitialized on entry; caller must pass a variable</td></tr>
+        <tr><td><code>IN OUT</code></td><td class="muted">Both directions</td><td class="muted">No</td><td class="muted">Read and write; caller variable is updated</td></tr>
+        <tr><td><code>NOCOPY</code></td><td class="muted">Hint (OUT / IN OUT)</td><td class="muted">—</td><td class="muted">Pass large collections by reference for performance</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Default &amp; named notation</span></div>
+      <div class="card-content">
+        <pre><span class="kw">PROCEDURE</span> greet(
+  p_name <span class="kw">IN </span><span class="type">VARCHAR2</span>,
+  p_lang <span class="kw">IN </span><span class="type">VARCHAR2</span> <span class="kw">DEFAULT</span> <span class="str">'EN'</span>
+);
+
+<span class="cmt">-- Positional notation</span>
+greet(<span class="str">'Alice'</span>, <span class="str">'FR'</span>);
+
+<span class="cmt">-- Named notation (order-independent)</span>
+greet(p_lang => <span class="str">'DE'</span>,
+      p_name => <span class="str">'Bob'</span>);
+
+<span class="cmt">-- Default used for p_lang</span>
+greet(<span class="str">'Carol'</span>);</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Scope &amp; variable visibility</span></div>
+      <div class="card-content">
+        <pre><span class="cmt">-- Inner blocks shadow outer variables</span>
+<span class="kw">DECLARE</span>
+  v_x <span class="type">NUMBER</span> := <span class="num">1</span>;   <span class="cmt">-- outer</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">DECLARE</span>
+    v_x <span class="type">NUMBER</span> := <span class="num">2</span>; <span class="cmt">-- inner (shadows)</span>
+  <span class="kw">BEGIN</span>
+    <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(v_x); <span class="cmt">-- 2</span>
+  <span class="kw">END</span>;
+  <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(v_x);   <span class="cmt">-- 1</span>
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CURSORS -->
+<div id="cursors" class="section" data-title="Cursors">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Explicit cursor</span></div>
+      <div class="card-content">
+        <pre><span class="kw">DECLARE</span>
+  <span class="kw">CURSOR</span> c_emp <span class="kw">IS</span>
+    <span class="kw">SELECT </span>emp_id, salary
+    <span class="kw">FROM   </span>employees
+    <span class="kw">WHERE  </span>dept_id = <span class="num">10</span>;
+  r_emp c_emp<span class="kw">%ROWTYPE</span>;
+<span class="kw">BEGIN</span>
+  <span class="kw">OPEN</span> c_emp;
+  <span class="kw">LOOP</span>
+    <span class="kw">FETCH</span> c_emp <span class="kw">INTO </span>r_emp;
+    <span class="kw">EXIT WHEN </span>c_emp<span class="kw">%NOTFOUND</span>;
+    <span class="fn">DBMS_OUTPUT</span>.<span class="fn">PUT_LINE</span>(r_emp.emp_id);
+  <span class="kw">END LOOP</span>;
+  <span class="kw">CLOSE</span> c_emp;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Cursor attributes</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Attribute</th><th>Meaning</th></tr>
+          <tr><td><code>%FOUND</code></td><td class="muted">Last FETCH returned a row</td></tr>
+          <tr><td><code>%NOTFOUND</code></td><td class="muted">Last FETCH returned nothing</td></tr>
+          <tr><td><code>%ROWCOUNT</code></td><td class="muted">Number of rows fetched so far</td></tr>
+          <tr><td><code>%ISOPEN</code></td><td class="muted">TRUE if the cursor is open</td></tr>
+        </table>
+        <div class="callout" style="margin-top: 12px;">
+          <strong>Implicit cursors</strong>
+          SQL%FOUND, SQL%ROWCOUNT etc. apply the same attributes to implicit cursors after DML statements.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Parameterized cursor &amp; REF CURSOR</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">-- Parameterized cursor</span>
+<span class="kw">CURSOR</span> c_dept(p_id <span class="type">NUMBER</span>) <span class="kw">IS</span>
+  <span class="kw">SELECT </span>* <span class="kw">FROM </span>employees <span class="kw">WHERE </span>dept_id = p_id;
+
+<span class="kw">OPEN</span> c_dept(<span class="num">20</span>);   <span class="cmt">-- pass argument at open time</span>
+
+<span class="cmt">-- SYS_REFCURSOR (weak REF CURSOR — no type checking)</span>
+<span class="kw">PROCEDURE</span> get_rows(p_cur <span class="kw">OUT SYS_REFCURSOR</span>) <span class="kw">IS</span>
+<span class="kw">BEGIN</span>
+  <span class="kw">OPEN</span> p_cur <span class="kw">FOR SELECT </span>* <span class="kw">FROM </span>employees;
+<span class="kw">END</span>;</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DATA DICTIONARY -->
+<div id="dict" class="section" data-title="Data dictionary">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>View prefix meanings</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Prefix</th><th>Scope</th></tr>
+        <tr><td><code>USER_</code></td><td class="muted">Objects owned by the current user</td></tr>
+        <tr><td><code>ALL_</code></td><td class="muted">Objects accessible to the current user (owned + granted) — e.g. <code>ALL_TABLES</code>, <code>ALL_TAB_COLS</code></td></tr>
+        <tr><td><code>DBA_</code></td><td class="muted">All objects in the database — requires DBA privilege</td></tr>
+        <tr><td><code>V$</code></td><td class="muted">Dynamic performance views (current instance state)</td></tr>
+        <tr><td><code>GV$</code></td><td class="muted">Global V$ views across all RAC instances</td></tr>
+      </table>
+      <div class="callout warn">
+        <strong>USER_TAB_COLUMNS vs. USER_TAB_COLS</strong>
+        <code>USER_TAB_COLS</code> includes Oracle's internal/hidden system-generated columns (e.g. for function-based indexes); <code>USER_TAB_COLUMNS</code> filters those out and only shows "real" user-visible columns. When in doubt for a clean column listing, prefer <code>*_TAB_COLUMNS</code> — but know <code>*_TAB_COLS</code> exists, it's an easy trick question.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>CONSTRAINT_TYPE codes</span></div>
+    <div class="card-content">
+      <p>Used in <code>USER_CONSTRAINTS.CONSTRAINT_TYPE</code> — translate with a <code>CASE</code> expression when a query needs to display readable labels.</p>
+      <table>
+        <tr><th>Code</th><th>Meaning</th></tr>
+        <tr><td><code>P</code></td><td class="muted">Primary Key</td></tr>
+        <tr><td><code>R</code></td><td class="muted">References (= Foreign Key)</td></tr>
+        <tr><td><code>C</code></td><td class="muted">Check (also covers NOT NULL, which is implemented as a CHECK internally)</td></tr>
+        <tr><td><code>U</code></td><td class="muted">Unique</td></tr>
+      </table>
+      <pre style="margin-top:12px"><span class="kw">SELECT</span>
+    TABLE_NAME,
+    CONSTRAINT_NAME,
+    <span class="kw">CASE</span> CONSTRAINT_TYPE
+        <span class="kw">WHEN</span> <span class="str">'P'</span> <span class="kw">THEN</span> <span class="str">'PK'</span>
+        <span class="kw">WHEN</span> <span class="str">'R'</span> <span class="kw">THEN</span> <span class="str">'FK'</span>
+        <span class="kw">WHEN</span> <span class="str">'C'</span> <span class="kw">THEN</span> <span class="str">'CK'</span>
+        <span class="kw">WHEN</span> <span class="str">'U'</span> <span class="kw">THEN</span> <span class="str">'UQ'</span>
+    <span class="kw">END</span> constraint_type,
+    STATUS    <span class="cmt">-- ENABLED / DISABLED</span>,
+    LAST_CHANGE
+<span class="kw">FROM</span> USER_CONSTRAINTS
+<span class="kw">ORDER BY</span> TABLE_NAME, CONSTRAINT_NAME;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Resolving foreign keys (incl. composite/multi-column)</span></div>
+    <div class="card-content">
+      <p>A foreign key in <code>USER_CONSTRAINTS</code> doesn't point at a table+column directly — it points at <strong>another constraint</strong> via <code>R_CONSTRAINT_NAME</code> (the referenced PK/UQ constraint). Get the actual columns from <code>USER_CONS_COLUMNS</code>, joined on that constraint name.</p>
+      <pre><span class="kw">SELECT</span>
+    fk.constraint_name <span class="kw">AS</span> fk_name,
+    fk.table_name       <span class="kw">AS</span> fk_table,
+    fkc.column_name      <span class="kw">AS</span> fk_column,
+    pkc.table_name       <span class="kw">AS</span> target_table,
+    pkc.column_name      <span class="kw">AS</span> target_column,
+    pkc.POSITION         <span class="kw">AS</span> column_position
+<span class="kw">FROM</span> USER_CONSTRAINTS fk
+<span class="kw">JOIN</span> USER_CONS_COLUMNS fkc
+    <span class="kw">ON</span> fkc.constraint_name = fk.constraint_name
+<span class="kw">JOIN</span> USER_CONS_COLUMNS pkc
+    <span class="kw">ON</span> pkc.constraint_name = fk.r_constraint_name
+   <span class="kw">AND</span> pkc.POSITION = fkc.POSITION       <span class="cmt">-- ← REQUIRED for multi-column FKs</span>
+<span class="kw">WHERE</span> fk.constraint_type = <span class="str">'R'</span>
+<span class="kw">ORDER BY</span> fk_name, fk_column;</pre>
+      <div class="callout warn">
+        <strong>The single most common mistake on this query type</strong>
+        Joining <code>USER_CONS_COLUMNS</code> only on <code>constraint_name</code> (without matching <code>POSITION</code>) works fine for single-column FKs, but silently produces a cross-product (wrong/duplicated rows) for multi-column FKs like <code>CommissionFromWarehouse (WarehouseId, ProductId)</code>. Always match <code>POSITION</code> on both sides when a FK could be composite.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Objects &amp; schema</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>View</th><th>Key columns</th></tr>
+          <tr><td><code>USER_OBJECTS</code></td><td class="muted">OBJECT_NAME, OBJECT_TYPE, STATUS</td></tr>
+          <tr><td><code>USER_TABLES</code></td><td class="muted">TABLE_NAME, NUM_ROWS, LAST_ANALYZED</td></tr>
+          <tr><td><code>USER_VIEWS</code></td><td class="muted">VIEW_NAME, TEXT</td></tr>
+          <tr><td><code>USER_SEQUENCES</code></td><td class="muted">SEQUENCE_NAME, LAST_NUMBER, INCREMENT_BY</td></tr>
+          <tr><td><code>USER_SYNONYMS</code></td><td class="muted">SYNONYM_NAME, TABLE_NAME</td></tr>
+          <tr><td><code>USER_INDEXES</code></td><td class="muted">INDEX_NAME, TABLE_NAME, UNIQUENESS</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Columns &amp; constraints</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>View</th><th>Key columns</th></tr>
+          <tr><td><code>USER_TAB_COLUMNS</code></td><td class="muted">TABLE_NAME, COLUMN_NAME, DATA_TYPE, NULLABLE</td></tr>
+          <tr><td><code>USER_CONSTRAINTS</code></td><td class="muted">CONSTRAINT_NAME, CONSTRAINT_TYPE, TABLE_NAME, R_CONSTRAINT_NAME, STATUS, LAST_CHANGE</td></tr>
+          <tr><td><code>USER_CONS_COLUMNS</code></td><td class="muted">CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, POSITION</td></tr>
+          <tr><td><code>USER_IND_COLUMNS</code></td><td class="muted">INDEX_NAME, TABLE_NAME, COLUMN_NAME, COLUMN_POSITION</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>PL/SQL source &amp; metadata</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>View</th><th>Use</th></tr>
+          <tr><td><code>USER_SOURCE</code></td><td class="muted">Source text of stored procedures, functions, packages</td></tr>
+          <tr><td><code>USER_PROCEDURES</code></td><td class="muted">Procedures and functions metadata</td></tr>
+          <tr><td><code>USER_ARGUMENTS</code></td><td class="muted">Parameters for all subprograms</td></tr>
+          <tr><td><code>USER_ERRORS</code></td><td class="muted">Compilation errors (line, text) — <strong>always check after CREATE OR REPLACE</strong></td></tr>
+          <tr><td><code>USER_TRIGGERS</code></td><td class="muted">Trigger name, type, triggering event, table</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Privileges &amp; session</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>View</th><th>Use</th></tr>
+          <tr><td><code>USER_SYS_PRIVS</code></td><td class="muted">System privileges granted to current user</td></tr>
+          <tr><td><code>USER_TAB_PRIVS</code></td><td class="muted">Object privileges granted or received</td></tr>
+          <tr><td><code>USER_ROLE_PRIVS</code></td><td class="muted">Roles granted to the current user</td></tr>
+          <tr><td><code>V$SESSION</code></td><td class="muted">Active sessions: SID, USERNAME, STATUS, SQL_ID</td></tr>
+          <tr><td><code>V$SQL</code></td><td class="muted">Cached SQL statements and execution statistics</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Useful queries</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">-- List all tables with columns & types (note: ALL_ scope, not USER_)</span>
+<span class="kw">SELECT</span> t.TABLE_NAME, tc.COLUMN_NAME, tc.DATA_TYPE
+<span class="kw">FROM   </span>ALL_TABLES t
+<span class="kw">JOIN   </span>ALL_TAB_COLS tc <span class="kw">ON</span> tc.TABLE_NAME = t.TABLE_NAME
+<span class="kw">ORDER BY</span> t.TABLE_NAME, tc.COLUMN_NAME;
+
+<span class="cmt">-- Find all tables containing a specific column name</span>
+<span class="kw">SELECT </span>table_name, column_name
+<span class="kw">FROM   </span>user_tab_columns
+<span class="kw">WHERE  </span>column_name <span class="kw">LIKE </span><span class="str">'%SALARY%'</span>;
+
+<span class="cmt">-- Check for invalid (compilation-failed) objects</span>
+<span class="kw">SELECT </span>object_name, object_type
+<span class="kw">FROM   </span>user_objects
+<span class="kw">WHERE  </span>status = <span class="str">'INVALID'</span>;
+
+<span class="cmt">-- View the source of a stored procedure</span>
+<span class="kw">SELECT </span>text
+<span class="kw">FROM   </span>user_source
+<span class="kw">WHERE  </span>name = <span class="str">'MY_PROC'</span>
+<span class="kw">AND    </span>type = <span class="str">'PROCEDURE'</span>
+<span class="kw">ORDER BY</span> line;</pre>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/plsql</span>
+  <span>Oracle 19c Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  // Initialize navigation with 'basics' as the default active tab
+  initTabNavigation('basics');
+</script>
+</body>
+</html>

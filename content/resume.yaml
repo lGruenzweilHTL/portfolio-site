@@ -1,0 +1,144 @@
+# Single source of truth for the portfolio site.
+# Consumed by:
+#   - backend/resume.py  -> resume PDF (WeasyPrint render)
+#   - backend/chat.py    -> chatbot system prompt
+# Validate with: backend/content.py::load_content (raises on schema errors)
+#
+# Keep this in sync with site/index.html for the project list. The site has
+# the rich narrative; this file has the structured facts.
+
+personal:
+  name: "Lukas Grünzweil"
+  title: "Student · Backend, AI tooling, Game dev, Robotics"
+  location: "Austria"
+  email_personal: "lukas.gruenzweil@liwest.at"
+  email_school: "l.gruenzweil@students.htl-leonding.ac.at"
+  github: "lGruenzweilHTL"
+  github_url: "https://github.com/lGruenzweilHTL"
+  github_org_url: "https://github.com/lGruenzweilHTL"  # for vektorgrid org if/when public
+  status: "Student, HTL Leonding"
+
+education:
+  - school: "HTL Leonding"
+    location: "Leonding, Austria"
+    # Dates omitted from public site copy; add when ready
+    # start: 2022-09
+    # end: 2027-06
+    notes: "Higher technical college (Höhere Technische Lehranstalt)"
+
+# Featured first, then chronological by prominence. The site controls display order;
+# this list feeds the resume PDF's project section and the chatbot's project awareness.
+projects:
+  - name: "vektorgrid"
+    summary: >
+      A self-hosted voice assistant built as a distributed system: edge relays capture
+      speech, a central orchestrator runs the model pipeline, and a phone app approves
+      anything risky.
+    role: "Architect & primary developer"
+    stack: ["C#", "C++", "Kotlin", "Python"]
+    repo_url: "https://github.com/vektorgrid-ai"
+    status: "active"   # active | shipped | in_progress | private
+    highlights:
+      - "Origin orchestrator in C#, Relay in C++ (wake-word), Gate in Kotlin (biometric)"
+      - "Scalar Python pipeline: STT → intent router → expert LLM → TTS, called in sequence"
+      - "Everything routes through Origin; no peer-to-peer node traffic"
+      - "Risky tool calls pause for biometric approval on Gate before execution"
+
+  - name: "SceneForge AI"
+    summary: >
+      An AI plugin for the Unity Editor. Describe a scene in plain text, get
+      GameObjects and components back. Cuts the manual setup out of level design.
+    role: "Author"
+    stack: ["C#", "Unity"]
+    repo_url: "https://github.com/lGruenzweilHTL/SceneForge-AI"
+    status: "shipped"
+
+  - name: "UniConsole"
+    summary: >
+      An in-game debug console for Unity. Mark a static method with [Command] and
+      call it from a terminal in the scene. A free, lightweight alternative to
+      QuantumConsole.
+    role: "Author"
+    stack: ["C#", "Unity"]
+    repo_url: "https://github.com/lGruenzweilHTL/UniConsole"
+    status: "shipped"
+
+  - name: "P.I.G.E.O.N. — Covert Ops"
+    summary: >
+      You play a pigeon on the government payroll, running covert ops. A satire
+      built around surveillance paranoia and the "birds aren't real" corner of the
+      internet.
+    role: "Author"
+    stack: ["C#", "Unity"]
+    repo_url: null  # TODO: swap for a GitHub link once the repo is public
+    status: "in_progress"
+
+  - name: "Forkcast"
+    summary: >
+      A meal-planning app. Find recipes through the Spoonacular API, drop them
+      into a calendar, get a combined ingredient list, rate recipes, add friends.
+      Vue frontend, TypeScript backend (most of which I wrote).
+    role: "Contributor · TypeScript backend"
+    stack: ["TypeScript", "Vue"]
+    repo_url: null  # private school project
+    status: "private"
+
+  - name: "RoboDucks — RescueMaze"
+    summary: >
+      RescueMaze competition work for the HTL Leonding robotics club. Built a
+      custom serial protocol for Raspberry Pi → Lego SPIKE communication, and a
+      maze-exploration controller running Trémaux's algorithm in a Webots
+      simulation.
+    role: "Contributor · HTL Leonding robotics club"
+    stack: ["Python", "C", "Webots"]
+    repo_url: "https://github.com/lGruenzweilHTL/lego-spike-serial"
+    status: "shipped"
+
+  - name: "Space Defenders"
+    summary: >
+      A mobile arcade game: destroy enemy spaceships, don't die. Escalating
+      waves, built for touchscreens.
+    role: "Author"
+    stack: ["C#", "Unity"]
+    repo_url: "https://github.com/lGruenzweilHTL/Space-Defenders"
+    status: "shipped"
+
+skills:
+  languages:
+    strong: ["C#", "Python", "TypeScript", "C"]
+    familiar: ["C++", "Java", "Kotlin", "HTML/CSS"]
+  tools_and_infra:
+    strong: ["Unity", "Docker"]
+    familiar:
+      - "Docker Compose"
+      - "Kubernetes"
+      - "Azure"
+      - "Proxmox"
+      - "Webots"
+      - "Cloudflare Tunnel"
+
+# Beyond-code is personal context for the chatbot. The site displays this
+# in the About section; the chatbot uses it to answer "what do you do outside code?"
+beyond_code:
+  - topic: "Homelab"
+    body: >
+      Three Proxmox nodes (repurposed desktops, with a fourth on the way) hosting
+      Nextcloud, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server,
+      Pi-hole, and this site, all exposed through Cloudflare tunnels.
+  - topic: "3D printing"
+    body: >
+      I 3D print functional parts for hardware projects and keep upgrading an
+      Ender 3 Pro. It runs Klipper off a Raspberry Pi and has been modded enough
+      that I call it the "Ender of Theseus."
+  - topic: "Motorbikes"
+    body: >
+      Currently on an Aprilia Tuono 125, with plans to move up to something bigger.
+
+# Recruiter-facing summary used in the resume PDF header and the chatbot's
+# "tell me about yourself" answer. Keep it first-person and specific.
+elevator_pitch: >
+  I'm a student in Austria. Most of my work is backend systems and AI tooling,
+  with games and occasional robotics on the side. I built vektorgrid, a
+  self-hosted voice assistant as a distributed system; SceneForge AI, a Unity
+  Editor plugin that builds scenes from text; and UniConsole, a free in-game
+  debug console for Unity. When something annoys me enough, I write code for it.

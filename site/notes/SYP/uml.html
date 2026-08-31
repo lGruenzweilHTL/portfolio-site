@@ -1,0 +1,395 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id">~/<b>study</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// modeling reference</div>
+  <h1 class="page-title">UML Cheatsheet</h1>
+  <p class="page-sub">Class diagrams · object diagrams · PlantUML syntax</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('class',this)">Class diagrams</button>
+  <button onclick="showTab('object',this)">Object diagrams</button>
+  <button onclick="showTab('plantuml',this)">PlantUML syntax</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ CLASS DIAGRAMS -->
+<div id="class" class="section visible" data-title="Class diagrams">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>What a class diagram models</span></div>
+    <div class="card-content">
+      <p>A class diagram describes the <strong>static structure</strong> of a system: classes, their attributes/operations, and the relationships between them — the type level, not any specific runtime state.</p>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Class box notation</span></div>
+      <div class="card-content">
+        <pre>┌─────────────────────┐
+│       Employee       │  <span class="cmt">← class name</span>
+├─────────────────────┤
+│ - id: int             │  <span class="cmt">← attributes</span>
+│ - name: String         │
+│ # salary: double       │
+├─────────────────────┤
+│ + raiseSalary(p: int) │  <span class="cmt">← operations</span>
+│ + getName(): String   │
+└─────────────────────┘</pre>
+        <p>Three compartments: name, attributes, operations. Either lower compartment may be omitted if not relevant.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Visibility modifiers</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Symbol</th><th>Visibility</th></tr>
+          <tr><td><code>+</code></td><td class="muted">public</td></tr>
+          <tr><td><code>-</code></td><td class="muted">private</td></tr>
+          <tr><td><code>#</code></td><td class="muted">protected</td></tr>
+          <tr><td><code>~</code></td><td class="muted">package / default</td></tr>
+        </table>
+        <div class="callout">
+          <strong>Underlined member</strong>
+          A member written with an underline denotes a <em>static</em> (class-level, not instance-level) attribute or operation.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Abstract classes &amp; interfaces</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Abstract class</th><th>Interface</th></tr>
+        <tr><td>Name styling</td><td class="muted">Italicized class name (e.g. <em>Fahrzeug</em>)</td><td class="muted">Labeled with the <code>«interface»</code> stereotype above the name</td></tr>
+        <tr><td>Can contain</td><td class="muted">Both implemented and unimplemented (abstract) methods, and state/attributes</td><td class="muted">Only method signatures (no state, no implementation)</td></tr>
+        <tr><td>Instantiable?</td><td class="muted">No — only via a concrete subclass</td><td class="muted">No — only via an implementing class</td></tr>
+        <tr><td>Subclass arrow</td><td class="muted">Solid line, hollow triangle</td><td class="muted">Dashed line, hollow triangle (realization)</td></tr>
+      </table>
+      <p>An abstract method itself is also written in italics within the method compartment.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Relationships at a glance</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Relationship</th><th>Meaning</th><th>Line / arrowhead</th></tr>
+        <tr><td>Association</td><td class="muted">General "knows about" / "uses"</td><td class="muted">Plain solid line</td></tr>
+        <tr><td>Aggregation</td><td class="muted">"Has-a", weak ownership — part can outlive the whole</td><td class="muted">Solid line, hollow diamond ◇ at the whole</td></tr>
+        <tr><td>Composition</td><td class="muted">"Owns-a", strong ownership — part destroyed with the whole</td><td class="muted">Solid line, filled diamond ◆ at the whole</td></tr>
+        <tr><td>Inheritance / Generalization</td><td class="muted">"Is-a" — subclass extends a (possibly abstract) superclass</td><td class="muted">Solid line, hollow triangle △ at the parent</td></tr>
+        <tr><td>Realization</td><td class="muted">A class implements an interface</td><td class="muted">Dashed line, hollow triangle △ at the interface</td></tr>
+        <tr><td>Dependency</td><td class="muted">One class temporarily uses another (e.g. as a method parameter)</td><td class="muted">Dashed line, open arrow</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Multiplicity</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Notation</th><th>Meaning</th></tr>
+          <tr><td><code>1</code></td><td class="muted">Exactly one</td></tr>
+          <tr><td><code>0..1</code></td><td class="muted">Zero or one (optional)</td></tr>
+          <tr><td><code>0..*</code> / <code>*</code></td><td class="muted">Zero or many</td></tr>
+          <tr><td><code>1..*</code></td><td class="muted">One or many</td></tr>
+          <tr><td><code>3..5</code></td><td class="muted">A bounded range</td></tr>
+        </table>
+        <p>Placed at each end of an association — e.g. <code>Team "1" ── "1..*" Player</code> means one Team has one or more Players.</p>
+        <div class="callout warn">
+          <strong>Read multiplicity at the FAR end</strong>
+          The number near a class describes how many instances of <em>that</em> class can be linked to <em>one</em> instance on the other end — not how many of itself it has. This is the single most common exam mistake.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Aggregation vs. composition example</span></div>
+      <div class="card-content">
+        <pre><span class="cmt">// Composition: Room cannot exist without House</span>
+House ◆────── Room
+
+<span class="cmt">// Aggregation: Player can exist without Team</span>
+Team  ◇────── Player</pre>
+        <div class="callout warn">
+          <strong>Test</strong>
+          Ask: "If the whole is deleted, must the part be deleted too?" Yes → composition. No, it can live on independently → aggregation.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Self-referencing (recursive) associations</span></div>
+    <div class="card-content">
+      <p>A class can have an association <strong>to itself</strong> — extremely common for modeling sequences, hierarchies, or networks without inventing extra helper classes. Watch for this pattern; it shows up constantly.</p>
+      <table>
+        <tr><th>Pattern</th><th>Multiplicity shape</th><th>Use case</th></tr>
+        <tr><td>Linked list</td><td class="muted"><code>1 ── 0..1</code> (e.g. <code>next</code>)</td><td class="muted">Ordered sequence — steps in a recipe, queue items</td></tr>
+        <tr><td>Tree</td><td class="muted"><code>0..1 parent ── 0..* children</code></td><td class="muted">File system, org chart, category tree</td></tr>
+        <tr><td>Graph / network</td><td class="muted"><code>0..* ── 0..*</code></td><td class="muted">Friend relationships, flight routes</td></tr>
+      </table>
+      <pre><span class="cmt">// Recursive sequence (e.g. Arbeitsschritt -> nextStep)</span>
+┌────────────────┐
+│  Arbeitsschritt  │
+├────────────────┤
+│ - beschreibung    │
+│ - dauer            │
+└────────────────┘
+        △
+        │ self-association
+        │
+   "1" ──────── "0..1"
+   (current)     (next)</pre>
+      <div class="callout">
+        <strong>Why use recursion instead of a fixed list of attributes</strong>
+        A self-reference (e.g. <code>nextStep: Arbeitsschritt</code>) models an <em>arbitrary-length, ordered</em> chain with a single relationship — no need for separate "step1, step2, step3..." attributes, and it naturally supports any number of steps without changing the model.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ OBJECT DIAGRAMS -->
+<div id="object" class="section" data-title="Object diagrams">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>What an object diagram models</span></div>
+    <div class="card-content">
+      <p>An object diagram is a <strong>snapshot of concrete instances</strong> at one point in time — actual objects with actual attribute values and actual links between them, rather than the general types and rules a class diagram defines.</p>
+      <div class="callout">
+        <strong>Class diagram vs. object diagram</strong>
+        Class diagram = the blueprint (what <em>can</em> exist and how it's allowed to relate). Object diagram = one concrete instantiation of that blueprint at runtime (what <em>does</em> exist right now).
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Object box notation</span></div>
+      <div class="card-content">
+        <pre>┌──────────────────────────┐
+│  anna : Employee           │  <span class="cmt">← objectName : ClassName, underlined</span>
+├──────────────────────────┤
+│ id = 7                     │  <span class="cmt">← attribute = concrete value</span>
+│ name = "Anna Berger"       │
+│ salary = 4200.0            │
+└──────────────────────────┘</pre>
+        <p>The header is always underlined. The object name is optional (an unnamed instance is written <code>:Employee</code>).</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Links between objects</span></div>
+      <div class="card-content">
+        <p>A <strong>link</strong> is an instance of an association — a concrete connection between two specific objects, drawn as a plain line.</p>
+        <pre>anna : Employee ────── teamX : Team</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Recursive associations as object instances</span></div>
+    <div class="card-content">
+      <p>A self-referencing class (e.g. <code>Arbeitsschritt.nextStep</code>) becomes a <strong>chain of linked objects</strong> in the object diagram — each instance pointing to the next, terminating where the link is absent.</p>
+      <pre>s1 : Arbeitsschritt          s2 : Arbeitsschritt          s3 : Arbeitsschritt
+beschreibung = "Sauce kochen"  beschreibung = "Schichten"     beschreibung = "Überbacken"
+dauer = 30                    dauer = 10                     dauer = 45
+
+   s1 ───nextStep──▶ s2 ───nextStep──▶ s3 ───nextStep──▶ (none)</pre>
+      <div class="callout warn">
+        <strong>Exam tip</strong>
+        When a scenario describes "steps in a fixed order" or "a person's manager" or anything chained/hierarchical, expect a self-referencing association in the class diagram — and a corresponding chain of linked objects here. This is your teacher's favorite trick, draw it explicitly rather than listing steps as separate attributes.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Multi-level fan-out example</span></div>
+    <div class="card-content">
+      <p>Object diagrams commonly fan out across several association levels from one root object — e.g. a rental company with customers, who each have contracts, which each reference a vehicle:</p>
+      <pre>v1 : Autovermietung
+name = "Antigravity Rental"
+        │
+        ▼
+   k1 : Kunde
+   name = "Max Mustermann"
+        │
+   ┌────┴────┐
+   ▼         ▼
+m1:Mietvertrag  m2:Mietvertrag
+   │                │
+   ▼                ▼
+p1 : Pkw         l1 : Lkw</pre>
+      <p>Each box is a concrete instance with concrete attribute values; the links mirror the associations from the class diagram, but now connect specific named objects instead of types.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>When to use an object diagram</span></div>
+    <div class="card-content">
+      <ul>
+        <li>To illustrate a complex or non-obvious class structure with a concrete, easy-to-follow example</li>
+        <li>To verify multiplicity constraints by walking through a real scenario</li>
+        <li>To document a specific system state at a particular moment (e.g. for debugging or test-case design)</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PLANTUML SYNTAX -->
+<div id="plantuml" class="section" data-title="PlantUML syntax">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Arrow types (class diagrams)</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Relationship</th><th>PlantUML syntax</th></tr>
+        <tr><td>Association</td><td class="muted"><code>ClassA -- ClassB</code></td></tr>
+        <tr><td>Directed association</td><td class="muted"><code>ClassA --> ClassB</code></td></tr>
+        <tr><td>Aggregation</td><td class="muted"><code>ClassA o-- ClassB</code></td></tr>
+        <tr><td>Composition</td><td class="muted"><code>ClassA *-- ClassB</code></td></tr>
+        <tr><td>Inheritance / Generalization</td><td class="muted"><code>ClassA --|> ClassB</code></td></tr>
+        <tr><td>Realization (implements interface)</td><td class="muted"><code>ClassA ..|> InterfaceB</code></td></tr>
+        <tr><td>Dependency</td><td class="muted"><code>ClassA ..> ClassB</code></td></tr>
+      </table>
+      <div class="callout">
+        <strong>Reading the arrow</strong>
+        The arrowhead/diamond always sits at the "target" side written after the arrow — e.g. in <code>ClassA --|> ClassB</code>, ClassA is the subclass and ClassB is the superclass (arrow points "up" toward the parent).
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Abstract classes &amp; interfaces</span></div>
+      <div class="card-content">
+        <pre><span class="kw">abstract class</span> Fahrzeug {
+  - fahrgestellnummer: String
+  - kennzeichen: String
+  <span class="kw">{abstract}</span> berechnePreis(): double
+}
+
+<span class="kw">interface</span> Zahlbar {
+  + berechnePreis(): double
+}
+
+class Pkw {
+  - sitzplaetze: int
+}
+
+Pkw --|> Fahrzeug
+Pkw ..|> Zahlbar</pre>
+        <p>Abstract classes use solid-line generalization; interfaces use dashed-line realization. Both arrowheads are hollow triangles.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Multiplicity &amp; labels</span></div>
+      <div class="card-content">
+        <pre>Team "1" -- "1..*" Player : verwaltet ></pre>
+        <p>Multiplicities in quotes sit at each end; the label after <code>:</code> names the relationship, and <code>&gt;</code>/<code>&lt;</code> at the end of the label hints the reading direction.</p>
+        <pre><span class="cmt">// layout direction hints, if auto-layout looks wrong</span>
+ClassA -u-> ClassB   <span class="cmt">// up</span>
+ClassA -d-> ClassB   <span class="cmt">// down</span>
+ClassA -l-> ClassB   <span class="cmt">// left</span>
+ClassA -r-> ClassB   <span class="cmt">// right</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot r"></span><span>Self-referencing association syntax</span></div>
+    <div class="card-content">
+      <p>Recursion is written exactly like any other association — both ends just happen to be the same class. Always give the association ends explicit role names so the diagram (and your explanation) stays unambiguous.</p>
+      <pre><span class="kw">class</span> Arbeitsschritt {
+  - beschreibung: String
+  - dauer: int
+}
+
+<span class="cmt">// linked-list style recursion</span>
+Arbeitsschritt <span class="str">"1"</span> -- <span class="str">"0..1"</span> Arbeitsschritt : nextStep ></pre>
+      <p>Tree-shaped recursion (e.g. a category hierarchy) follows the same idea with both a parent and children role:</p>
+      <pre><span class="kw">class</span> Kategorie {
+  - name: String
+}
+
+Kategorie <span class="str">"0..1"</span> -- <span class="str">"0..*"</span> Kategorie : parent / children ></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Full worked example</span></div>
+    <div class="card-content">
+      <pre><span class="kw">@startuml</span>
+<span class="kw">abstract class</span> Fahrzeug {
+  - fahrgestellnummer: String
+  - kennzeichen: String
+  - tagespreis: double
+}
+
+class Pkw {
+  - sitzplaetze: int
+  - kraftstoffart: String
+}
+
+class Lkw {
+  - ladekapazitaet: double
+  - zulassungGewicht: double
+}
+
+class Kunde {
+  - kundenNr: String
+  - name: String
+}
+
+class Mietvertrag {
+  - mietVertragsNr: String
+  - abholdatum: LocalDate
+  - rueckgabedatum: LocalDate
+  + berechneGesamtpreis(): double
+}
+
+Pkw --|> Fahrzeug
+Lkw --|> Fahrzeug
+
+Kunde <span class="str">"1"</span> -- <span class="str">"0..*"</span> Mietvertrag : schliesst ab >
+Mietvertrag <span class="str">"0..*"</span> -- <span class="str">"1"</span> Fahrzeug : bezieht sich auf >
+<span class="kw">@enduml</span></pre>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/uml</span>
+  <span>UML Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('class');
+</script>
+</body></html>

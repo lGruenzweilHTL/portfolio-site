@@ -1,0 +1,404 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaFX Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>javafx</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// gui framework reference</div>
+  <h1 class="page-title">JavaFX Cheatsheet</h1>
+  <p class="page-sub">Quick-reference notes — property bindings · Stream API · events · FXML · MVC controllers</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('bindings',this)">Property bindings</button>
+  <button onclick="showTab('streams',this)">Stream API</button>
+  <button onclick="showTab('events',this)">Event handlers</button>
+  <button onclick="showTab('fxml',this)">FXML basics</button>
+  <button onclick="showTab('mvc',this)">MVC controllers</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ BINDINGS -->
+<div id="bindings" class="section visible" data-title="Property bindings">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Properties &amp; basic binding</span></div>
+    <div class="card-content">
+      <p>JavaFX properties (<code>StringProperty</code>, <code>IntegerProperty</code>, <code>BooleanProperty</code>, ...) wrap a value and notify listeners on change. Binding ties one property's value to an expression of others — it updates automatically.</p>
+      <pre><span class="type">StringProperty</span> firstName = <span class="kw">new</span> <span class="type">SimpleStringProperty</span>(<span class="str">"Ada"</span>);
+<span class="type">StringProperty</span> lastName  = <span class="kw">new</span> <span class="type">SimpleStringProperty</span>(<span class="str">"Lovelace"</span>);
+
+<span class="cmt">// Low-level: bind() ties target to a single source (one-way)</span>
+label.textProperty().bind(firstName);
+
+<span class="cmt">// bindBidirectional: changes flow both ways</span>
+textField.textProperty().bindBidirectional(firstName);
+
+<span class="cmt">// unbind when no longer needed</span>
+label.textProperty().unbind();</pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Bindings class — combining values</span></div>
+      <div class="card-content">
+        <p>The <code>Bindings</code> utility class creates derived bindings from multiple properties without writing a listener by hand.</p>
+        <pre><span class="cmt">// Concatenate two properties</span>
+<span class="type">StringExpression</span> full =
+    <span class="type">Bindings</span>.<span class="fn">concat</span>(firstName, <span class="str">" "</span>, lastName);
+fullNameLabel.textProperty().bind(full);
+
+<span class="cmt">// Combine with a custom function</span>
+<span class="type">IntegerProperty</span> width  = <span class="kw">new</span> <span class="type">SimpleIntegerProperty</span>(<span class="num">10</span>);
+<span class="type">IntegerProperty</span> height = <span class="kw">new</span> <span class="type">SimpleIntegerProperty</span>(<span class="num">4</span>);
+
+<span class="type">IntegerBinding</span> area = <span class="type">Bindings</span>.<span class="fn">createIntegerBinding</span>(
+    () -&gt; width.get() * height.get(),
+    width, height
+);
+areaLabel.textProperty().bind(area.asString());</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Bindings.format() &amp; conditionals</span></div>
+      <div class="card-content">
+        <p><code>Bindings.format()</code> mirrors <code>String.format()</code> but stays reactive, re-evaluating whenever an argument property changes.</p>
+        <pre><span class="type">DoubleProperty</span> price = <span class="kw">new</span> <span class="type">SimpleDoubleProperty</span>(<span class="num">19.999</span>);
+
+<span class="type">StringBinding</span> priceText = <span class="type">Bindings</span>.<span class="fn">format</span>(
+    <span class="str">"Price: $%.2f"</span>, price
+);
+priceLabel.textProperty().bind(priceText);
+
+<span class="cmt">// Conditional binding ("when")</span>
+<span class="type">BooleanProperty</span> inStock = <span class="kw">new</span> <span class="type">SimpleBooleanProperty</span>(<span class="kw">true</span>);
+
+<span class="type">StringBinding</span> status = <span class="type">Bindings</span>.<span class="fn">when</span>(inStock)
+    .then(<span class="str">"Available"</span>)
+    .otherwise(<span class="str">"Out of stock"</span>);
+statusLabel.textProperty().bind(status);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Listeners (for non-bindable side effects)</span></div>
+    <div class="card-content">
+      <p>Use a <code>ChangeListener</code> when you need to react with arbitrary code rather than another bound value.</p>
+      <pre>firstName.addListener((obs, oldVal, newVal) -&gt; {
+    <span class="type">System</span>.out.println(<span class="str">"Changed from "</span> + oldVal + <span class="str">" to "</span> + newVal);
+});
+
+<span class="cmt">// InvalidationListener fires before the new value is computed</span>
+area.addListener(obs -&gt; <span class="type">System</span>.out.println(<span class="str">"Area is now invalid"</span>));</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ STREAMS -->
+<div id="streams" class="section" data-title="Stream API">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Creating &amp; transforming streams</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Method</th><th>Purpose</th></tr>
+        <tr><td><code>filter(Predicate)</code></td><td class="muted">Keep elements matching a condition</td></tr>
+        <tr><td><code>map(Function)</code></td><td class="muted">Transform each element to a new value</td></tr>
+        <tr><td><code>flatMap(Function)</code></td><td class="muted">Flatten nested streams/collections into one</td></tr>
+        <tr><td><code>sorted() / sorted(Comparator)</code></td><td class="muted">Sort elements, naturally or by comparator</td></tr>
+        <tr><td><code>distinct()</code></td><td class="muted">Remove duplicates (via equals())</td></tr>
+        <tr><td><code>limit(n) / skip(n)</code></td><td class="muted">Truncate or skip leading elements</td></tr>
+        <tr><td><code>peek(Consumer)</code></td><td class="muted">Inspect elements mid-pipeline (debugging)</td></tr>
+      </table>
+      <pre><span class="type">List</span>&lt;<span class="type">Person</span>&gt; adults = people.stream()
+    .filter(p -&gt; p.getAge() &gt;= <span class="num">18</span>)
+    .sorted(<span class="type">Comparator</span>.comparing(<span class="type">Person</span>::getLastName))
+    .collect(<span class="type">Collectors</span>.toList());</pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Terminal operations</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Method</th><th>Returns</th></tr>
+          <tr><td><code>collect(Collector)</code></td><td class="muted">List / Set / Map / String, etc.</td></tr>
+          <tr><td><code>forEach(Consumer)</code></td><td class="muted">void — side effects only</td></tr>
+          <tr><td><code>reduce(...)</code></td><td class="muted">Single accumulated value</td></tr>
+          <tr><td><code>count()</code></td><td class="muted">long</td></tr>
+          <tr><td><code>anyMatch / allMatch / noneMatch</code></td><td class="muted">boolean</td></tr>
+          <tr><td><code>findFirst() / findAny()</code></td><td class="muted">Optional&lt;T&gt;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Collecting into ObservableList</span></div>
+      <div class="card-content">
+        <p>Streams pair naturally with JavaFX's <code>ObservableList</code> when populating UI controls like <code>TableView</code> or <code>ListView</code>.</p>
+        <pre><span class="type">ObservableList</span>&lt;<span class="type">String</span>&gt; names =
+    people.stream()
+          .map(<span class="type">Person</span>::getName)
+          .collect(<span class="type">Collectors</span>.toCollection(
+              <span class="type">FXCollections</span>::observableArrayList
+          ));
+
+listView.setItems(names);</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Common collectors &amp; reduce</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">// joining</span>
+<span class="type">String</span> csv = names.stream()
+    .collect(<span class="type">Collectors</span>.joining(<span class="str">", "</span>, <span class="str">"["</span>, <span class="str">"]"</span>));
+
+<span class="cmt">// grouping</span>
+<span class="type">Map</span>&lt;<span class="type">Boolean</span>, <span class="type">List</span>&lt;<span class="type">Person</span>&gt;&gt; byAdult =
+    people.stream().collect(
+        <span class="type">Collectors</span>.partitioningBy(p -&gt; p.getAge() &gt;= <span class="num">18</span>)
+    );
+
+<span class="cmt">// reduce with identity + accumulator</span>
+<span class="kw">int</span> totalAge = people.stream()
+    .map(<span class="type">Person</span>::getAge)
+    .reduce(<span class="num">0</span>, <span class="type">Integer</span>::sum);</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ EVENTS -->
+<div id="events" class="section" data-title="Event handlers">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>EventHandler basics</span></div>
+      <div class="card-content">
+        <p>Most controls expose <code>setOnXxx()</code> convenience methods for the single most common event, backed by the general <code>addEventHandler</code>/<code>addEventFilter</code> mechanism.</p>
+        <pre>button.setOnAction(event -&gt; {
+    <span class="type">System</span>.out.println(<span class="str">"Button clicked!"</span>);
+});
+
+<span class="cmt">// Equivalent, explicit form</span>
+button.setOnAction(<span class="kw">new</span> <span class="type">EventHandler</span>&lt;<span class="type">ActionEvent</span>&gt;() {
+    <span class="kw">@Override</span>
+    <span class="kw">public void</span> <span class="fn">handle</span>(<span class="type">ActionEvent</span> event) {
+        <span class="type">System</span>.out.println(<span class="str">"Clicked"</span>);
+    }
+});</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>onAction — what fires it</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Control</th><th>Fires onAction when...</th></tr>
+          <tr><td><code>Button</code></td><td class="muted">Clicked, or Enter while focused</td></tr>
+          <tr><td><code>TextField</code></td><td class="muted">Enter pressed</td></tr>
+          <tr><td><code>MenuItem</code></td><td class="muted">Selected from a menu</td></tr>
+          <tr><td><code>ChoiceBox / ComboBox</code></td><td class="muted">Selected item changes</td></tr>
+          <tr><td><code>Timeline / Animation</code></td><td class="muted">Each KeyFrame's action fires</td></tr>
+        </table>
+        <div class="callout">
+          <strong>onAction vs addEventHandler</strong>
+          <code>setOnAction</code> can only hold one handler at a time (overwrites the previous one). <code>addEventHandler(ActionEvent.ACTION, ...)</code> lets you attach multiple handlers to the same node.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Listening to lower-level events</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">// Mouse events</span>
+node.setOnMouseClicked(e -&gt; <span class="type">System</span>.out.println(<span class="str">"clicked at "</span> + e.getX() + <span class="str">","</span> + e.getY()));
+node.setOnMouseEntered(e -&gt; node.setStyle(<span class="str">"-fx-opacity: 0.8;"</span>));
+node.setOnMouseExited(e -&gt; node.setStyle(<span class="str">"-fx-opacity: 1.0;"</span>));
+
+<span class="cmt">// Keyboard events</span>
+scene.setOnKeyPressed(e -&gt; {
+    <span class="kw">if</span> (e.getCode() == <span class="type">KeyCode</span>.<span class="num">ESCAPE</span>) primaryStage.close();
+});
+
+<span class="cmt">// Filters run during the capturing phase, before the target handler</span>
+root.addEventFilter(<span class="type">MouseEvent</span>.<span class="num">MOUSE_PRESSED</span>, e -&gt; {
+    <span class="type">System</span>.out.println(<span class="str">"Filter saw the press first"</span>);
+});</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ FXML -->
+<div id="fxml" class="section" data-title="FXML basics">
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Minimal FXML layout</span></div>
+      <div class="card-content">
+        <pre><span class="kw">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="kw">&lt;?import javafx.scene.control.*?&gt;</span>
+<span class="kw">&lt;?import javafx.scene.layout.VBox?&gt;</span>
+
+<span class="kw">&lt;VBox</span> <span class="type">fx:controller</span>=<span class="str">"app.MainController"</span>
+      <span class="type">xmlns:fx</span>=<span class="str">"http://javafx.com/fxml"</span>
+      <span class="type">spacing</span>=<span class="str">"10"</span><span class="kw">&gt;</span>
+    <span class="kw">&lt;Label</span> <span class="type">fx:id</span>=<span class="str">"titleLabel"</span> <span class="type">text</span>=<span class="str">"Hello"</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;TextField</span> <span class="type">fx:id</span>=<span class="str">"nameField"</span><span class="kw">/&gt;</span>
+    <span class="kw">&lt;Button</span> <span class="type">text</span>=<span class="str">"Greet"</span> <span class="type">onAction</span>=<span class="str">"#handleGreet"</span><span class="kw">/&gt;</span>
+<span class="kw">&lt;/VBox&gt;</span></pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Key attributes</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Attribute</th><th>Meaning</th></tr>
+          <tr><td><code>fx:controller</code></td><td class="muted">Fully-qualified controller class for the root element</td></tr>
+          <tr><td><code>fx:id</code></td><td class="muted">Injected into a matching <code>@FXML</code> field in the controller</td></tr>
+          <tr><td><code>onAction="#method"</code></td><td class="muted">Binds to a controller method (the # prefix is required)</td></tr>
+          <tr><td><code>xmlns:fx</code></td><td class="muted">Required namespace declaration for fx: attributes</td></tr>
+        </table>
+        <div class="callout warn">
+          <strong>Common pitfall</strong>
+          <code>fx:id</code> must match the controller field name exactly, and the field needs an <code>@FXML</code> annotation — otherwise injection silently fails at load time (NullPointerException later).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Loading FXML &amp; the matching controller</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">// In the Application's start() method</span>
+<span class="type">FXMLLoader</span> loader = <span class="kw">new</span> <span class="type">FXMLLoader</span>(getClass().getResource(<span class="str">"main.fxml"</span>));
+<span class="type">Parent</span> root = loader.load();
+primaryStage.setScene(<span class="kw">new</span> <span class="type">Scene</span>(root));
+primaryStage.show();
+
+<span class="cmt">// MainController.java</span>
+<span class="kw">public class</span> <span class="type">MainController</span> {
+
+    <span class="kw">@FXML</span> <span class="kw">private</span> <span class="type">Label</span> titleLabel;       <span class="cmt">// matches fx:id="titleLabel"</span>
+    <span class="kw">@FXML</span> <span class="kw">private</span> <span class="type">TextField</span> nameField;   <span class="cmt">// matches fx:id="nameField"</span>
+
+    <span class="kw">@FXML</span>
+    <span class="kw">public void</span> <span class="fn">initialize</span>() {
+        <span class="cmt">// called automatically after fields are injected</span>
+        titleLabel.setText(<span class="str">"Ready"</span>);
+    }
+
+    <span class="kw">@FXML</span>
+    <span class="kw">private void</span> <span class="fn">handleGreet</span>() {
+        titleLabel.setText(<span class="str">"Hello, "</span> + nameField.getText());
+    }
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MVC -->
+<div id="mvc" class="section" data-title="MVC controllers">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>How MVC maps onto JavaFX + FXML</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Role</th><th>JavaFX equivalent</th></tr>
+        <tr><td>Model</td><td class="muted">Plain Java classes / properties holding application state and business rules</td></tr>
+        <tr><td>View</td><td class="muted">The FXML file (declarative layout) — rendered by the FXMLLoader into a node tree</td></tr>
+        <tr><td>Controller</td><td class="muted">The <code>fx:controller</code> class — wires UI events to model updates</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Controller's job</strong>
+        Keep it thin: react to FXML-bound events (<code>onAction</code>, etc.), delegate real logic to the model/service layer, and push resulting state back to the view via bindings — don't put business logic directly in the controller.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Controller binding to a model</span></div>
+      <div class="card-content">
+        <pre><span class="kw">public class</span> <span class="type">CounterController</span> {
+
+    <span class="kw">private final</span> <span class="type">CounterModel</span> model = <span class="kw">new</span> <span class="type">CounterModel</span>();
+
+    <span class="kw">@FXML</span> <span class="kw">private</span> <span class="type">Label</span> countLabel;
+    <span class="kw">@FXML</span> <span class="kw">private</span> <span class="type">Button</span> incrementButton;
+
+    <span class="kw">@FXML</span>
+    <span class="kw">public void</span> <span class="fn">initialize</span>() {
+        <span class="cmt">// View binds directly to the model's property</span>
+        countLabel.textProperty().bind(
+            model.countProperty().asString()
+        );
+    }
+
+    <span class="kw">@FXML</span>
+    <span class="kw">private void</span> <span class="fn">onIncrement</span>() {
+        model.increment(); <span class="cmt">// controller delegates to model</span>
+    }
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Model exposing observable state</span></div>
+      <div class="card-content">
+        <pre><span class="kw">public class</span> <span class="type">CounterModel</span> {
+
+    <span class="kw">private final</span> <span class="type">IntegerProperty</span> count =
+        <span class="kw">new</span> <span class="type">SimpleIntegerProperty</span>(<span class="num">0</span>);
+
+    <span class="kw">public void</span> <span class="fn">increment</span>() {
+        count.set(count.get() + <span class="num">1</span>);
+    }
+
+    <span class="kw">public</span> <span class="type">IntegerProperty</span> <span class="fn">countProperty</span>() {
+        <span class="kw">return</span> count;
+    }
+}</pre>
+        <div class="callout warn">
+          <strong>Multiple views, one controller class</strong>
+          Each <code>FXMLLoader.load()</code> call creates a <em>new</em> controller instance — controllers are not singletons by default. Share state through an injected model/service instead of static fields.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/javafx</span>
+  <span>JavaFX Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('bindings');
+</script>
+</body></html>

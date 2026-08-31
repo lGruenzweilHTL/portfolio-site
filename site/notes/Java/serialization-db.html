@@ -1,0 +1,370 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serialization &amp; DB Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>serialization-db</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// persistence &amp; io reference</div>
+  <h1 class="page-title">Serialization &amp; DB Cheatsheet</h1>
+  <p class="page-sub">Quick-reference notes — H2 database · JDBC resources · prepared statements · Serializable · object streams</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('h2',this)">H2 database</button>
+  <button onclick="showTab('resources',this)">try-with-resources</button>
+  <button onclick="showTab('prepared',this)">Prepared statements</button>
+  <button onclick="showTab('serializable',this)">Serializable</button>
+  <button onclick="showTab('streams',this)">Object &amp; file streams</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ H2 -->
+<div id="h2" class="section visible" data-title="H2 database">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>What is H2</span></div>
+    <div class="card-content">
+      <p>H2 is a lightweight, pure-Java SQL database. It can run fully in-memory (data lost on JVM exit), as an embedded file-based database, or as a standalone server — making it popular for tests, prototypes, and small desktop apps.</p>
+      <table>
+        <tr><th>Mode</th><th>Connection URL</th></tr>
+        <tr><td>In-memory</td><td class="muted"><code>jdbc:h2:mem:testdb</code></td></tr>
+        <tr><td>In-memory (kept alive across connections)</td><td class="muted"><code>jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1</code></td></tr>
+        <tr><td>Embedded file</td><td class="muted"><code>jdbc:h2:./data/mydb</code></td></tr>
+        <tr><td>Server mode</td><td class="muted"><code>jdbc:h2:tcp://localhost/~/mydb</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Maven dependency</span></div>
+      <div class="card-content">
+        <pre><span class="kw">&lt;dependency&gt;</span>
+  <span class="kw">&lt;groupId&gt;</span>com.h2database<span class="kw">&lt;/groupId&gt;</span>
+  <span class="kw">&lt;artifactId&gt;</span>h2<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;version&gt;</span>2.2.224<span class="kw">&lt;/version&gt;</span>
+<span class="kw">&lt;/dependency&gt;</span></pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Opening a connection</span></div>
+      <div class="card-content">
+        <pre><span class="type">String</span> url = <span class="str">"jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"</span>;
+
+<span class="kw">try</span> (<span class="type">Connection</span> conn =
+         <span class="type">DriverManager</span>.getConnection(url, <span class="str">"sa"</span>, <span class="str">""</span>)) {
+    <span class="type">System</span>.out.println(<span class="str">"Connected: "</span> + !conn.isClosed());
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Schema setup with Statement</span></div>
+    <div class="card-content">
+      <pre><span class="kw">try</span> (<span class="type">Connection</span> conn = <span class="type">DriverManager</span>.getConnection(url, <span class="str">"sa"</span>, <span class="str">""</span>);
+     <span class="type">Statement</span> stmt = conn.createStatement()) {
+
+    stmt.execute(<span class="str">"""</span>
+        <span class="str">CREATE TABLE IF NOT EXISTS employee (</span>
+        <span class="str">  id    INT AUTO_INCREMENT PRIMARY KEY,</span>
+        <span class="str">  name  VARCHAR(100) NOT NULL,</span>
+        <span class="str">  email VARCHAR(150) UNIQUE</span>
+        <span class="str">)</span>
+    <span class="str">"""</span>);
+}</pre>
+      <div class="callout">
+        <strong>H2 Console</strong>
+        H2 ships with a browser-based admin UI (<code>org.h2.tools.Server.createWebServer().start()</code> or the bundled <code>h2-*.jar</code>) for inspecting an in-memory or file database visually while debugging.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TRY-WITH-RESOURCES -->
+<div id="resources" class="section" data-title="try-with-resources">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Why it matters for JDBC</span></div>
+    <div class="card-content">
+      <p><code>Connection</code>, <code>Statement</code>, <code>PreparedStatement</code>, and <code>ResultSet</code> all implement <code>AutoCloseable</code> and hold native/DB resources (sockets, cursors). Forgetting to close them leaks connections — try-with-resources closes them automatically, even if an exception is thrown.</p>
+      <pre><span class="kw">try</span> (<span class="type">Connection</span> conn = <span class="type">DriverManager</span>.getConnection(url, user, pass);
+     <span class="type">PreparedStatement</span> ps = conn.prepareStatement(
+         <span class="str">"SELECT * FROM employee WHERE id = ?"</span>);
+     ) {
+    ps.setInt(<span class="num">1</span>, <span class="num">42</span>);
+    <span class="kw">try</span> (<span class="type">ResultSet</span> rs = ps.executeQuery()) {
+        <span class="kw">while</span> (rs.next()) {
+            <span class="type">System</span>.out.println(rs.getString(<span class="str">"name"</span>));
+        }
+    }
+} <span class="kw">catch</span> (<span class="type">SQLException</span> e) {
+    e.printStackTrace();
+}</pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Close order</span></div>
+      <div class="card-content">
+        <p>Resources declared in a try-with-resources header are closed in <strong>reverse</strong> declaration order — last opened, first closed — mirroring manual nested try/finally blocks.</p>
+        <pre><span class="kw">try</span> (<span class="type">Connection</span> c = ...;     <span class="cmt">// closed 3rd</span>
+     <span class="type">PreparedStatement</span> ps = ...; <span class="cmt">// closed 2nd</span>
+     <span class="type">ResultSet</span> rs = ...) {        <span class="cmt">// closed 1st</span>
+    <span class="cmt">// use rs</span>
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Suppressed exceptions</span></div>
+      <div class="card-content">
+        <p>If the try block throws <em>and</em> a resource's <code>close()</code> also throws, the close-time exception is attached as a <strong>suppressed exception</strong> on the original — both are visible via <code>getSuppressed()</code>, nothing is silently lost.</p>
+        <pre><span class="kw">catch</span> (<span class="type">SQLException</span> e) {
+    <span class="kw">for</span> (<span class="type">Throwable</span> s : e.getSuppressed()) {
+        <span class="type">System</span>.out.println(<span class="str">"Suppressed: "</span> + s);
+    }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PREPARED STATEMENTS -->
+<div id="prepared" class="section" data-title="Prepared statements">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Why use PreparedStatement over Statement</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Statement</th><th>PreparedStatement</th></tr>
+        <tr><td class="muted">SQL built via string concatenation</td><td class="muted">SQL parsed once, with <code>?</code> placeholders</td></tr>
+        <tr><td class="muted">Vulnerable to SQL injection</td><td class="muted">Parameters are escaped/typed automatically — injection-safe</td></tr>
+        <tr><td class="muted">Re-parsed/re-planned every call</td><td class="muted">Can be precompiled and reused efficiently</td></tr>
+        <tr><td class="muted">No native binary/date handling</td><td class="muted">Type-safe setters (<code>setInt</code>, <code>setDate</code>, ...)</td></tr>
+      </table>
+      <div class="callout danger">
+        <strong>Never do this</strong>
+        <code>"SELECT * FROM users WHERE name = '" + userInput + "'"</code> — always use <code>?</code> placeholders with a PreparedStatement instead of concatenating user input into SQL.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>INSERT with parameters</span></div>
+      <div class="card-content">
+        <pre><span class="type">String</span> sql = <span class="str">"INSERT INTO employee (name, email) VALUES (?, ?)"</span>;
+
+<span class="kw">try</span> (<span class="type">PreparedStatement</span> ps = conn.prepareStatement(
+        sql, <span class="type">Statement</span>.<span class="num">RETURN_GENERATED_KEYS</span>)) {
+
+    ps.setString(<span class="num">1</span>, <span class="str">"Ada Lovelace"</span>);
+    ps.setString(<span class="num">2</span>, <span class="str">"ada@example.com"</span>);
+    ps.executeUpdate();
+
+    <span class="kw">try</span> (<span class="type">ResultSet</span> keys = ps.getGeneratedKeys()) {
+        <span class="kw">if</span> (keys.next()) {
+            <span class="kw">int</span> newId = keys.getInt(<span class="num">1</span>);
+        }
+    }
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Batch updates</span></div>
+      <div class="card-content">
+        <pre><span class="type">String</span> sql = <span class="str">"INSERT INTO employee (name, email) VALUES (?, ?)"</span>;
+
+<span class="kw">try</span> (<span class="type">PreparedStatement</span> ps = conn.prepareStatement(sql)) {
+    <span class="kw">for</span> (<span class="type">Employee</span> e : employees) {
+        ps.setString(<span class="num">1</span>, e.getName());
+        ps.setString(<span class="num">2</span>, e.getEmail());
+        ps.addBatch();
+    }
+    <span class="kw">int</span>[] results = ps.executeBatch();
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Querying &amp; mapping a ResultSet</span></div>
+    <div class="card-content">
+      <pre><span class="type">String</span> sql = <span class="str">"SELECT id, name, email FROM employee WHERE name LIKE ?"</span>;
+
+<span class="kw">try</span> (<span class="type">PreparedStatement</span> ps = conn.prepareStatement(sql)) {
+    ps.setString(<span class="num">1</span>, <span class="str">"A%"</span>);
+
+    <span class="kw">try</span> (<span class="type">ResultSet</span> rs = ps.executeQuery()) {
+        <span class="type">List</span>&lt;<span class="type">Employee</span>&gt; result = <span class="kw">new</span> <span class="type">ArrayList</span>&lt;&gt;();
+        <span class="kw">while</span> (rs.next()) {
+            result.add(<span class="kw">new</span> <span class="type">Employee</span>(
+                rs.getInt(<span class="str">"id"</span>),
+                rs.getString(<span class="str">"name"</span>),
+                rs.getString(<span class="str">"email"</span>)
+            ));
+        }
+    }
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ SERIALIZABLE -->
+<div id="serializable" class="section" data-title="Serializable">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>The Serializable marker interface</span></div>
+    <div class="card-content">
+      <p><code>java.io.Serializable</code> has no methods — it's a <strong>marker interface</strong> that tells the JVM a class's instances may be converted to/from a byte stream. Without it, <code>ObjectOutputStream</code> throws <code>NotSerializableException</code>.</p>
+      <pre><span class="kw">import</span> java.io.Serializable;
+
+<span class="kw">public class</span> <span class="type">Employee</span> <span class="kw">implements</span> <span class="type">Serializable</span> {
+
+    <span class="kw">private static final long</span> serialVersionUID = <span class="num">1</span>L;
+
+    <span class="kw">private</span> <span class="kw">int</span> id;
+    <span class="kw">private</span> <span class="type">String</span> name;
+    <span class="kw">private transient</span> <span class="type">String</span> cachedToken; <span class="cmt">// excluded from serialization</span>
+
+    <span class="cmt">// constructors, getters, setters ...</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>serialVersionUID</span></div>
+      <div class="card-content">
+        <p>A version identifier used to verify that a serialized object's sender and receiver agree on the class shape during deserialization.</p>
+        <ul>
+          <li>If omitted, the JVM computes one from the class's structure — fragile, changes if fields change</li>
+          <li>Mismatched UID on deserialization → <code>InvalidClassException</code></li>
+          <li>Always declare it explicitly for any class you intend to persist long-term</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>transient &amp; non-serializable fields</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Modifier / case</th><th>Effect</th></tr>
+          <tr><td><code>transient</code></td><td class="muted">Field is skipped during serialization, reset to default on deserialization</td></tr>
+          <tr><td><code>static</code></td><td class="muted">Belongs to the class, not the instance — never serialized</td></tr>
+          <tr><td>Non-serializable field</td><td class="muted">Throws <code>NotSerializableException</code> at runtime unless marked transient</td></tr>
+        </table>
+        <div class="callout warn">
+          <strong>Referenced objects</strong>
+          Every non-transient field's type must also be Serializable (recursively) — including collections' contents.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ STREAMS -->
+<div id="streams" class="section" data-title="Object &amp; file streams">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Stream class hierarchy at a glance</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Class</th><th>Role</th></tr>
+        <tr><td><code>FileOutputStream / FileInputStream</code></td><td class="muted">Raw bytes to/from a file</td></tr>
+        <tr><td><code>ObjectOutputStream</code></td><td class="muted">Wraps a stream to write whole Serializable objects</td></tr>
+        <tr><td><code>ObjectInputStream</code></td><td class="muted">Wraps a stream to read objects back, reconstructing them</td></tr>
+        <tr><td><code>BufferedOutputStream / BufferedInputStream</code></td><td class="muted">Optional wrapper to reduce I/O calls</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Writing objects (ObjectOutputStream)</span></div>
+      <div class="card-content">
+        <pre><span class="kw">try</span> (<span class="type">ObjectOutputStream</span> out = <span class="kw">new</span> <span class="type">ObjectOutputStream</span>(
+        <span class="kw">new</span> <span class="type">FileOutputStream</span>(<span class="str">"employees.dat"</span>))) {
+
+    out.writeObject(<span class="kw">new</span> <span class="type">Employee</span>(<span class="num">1</span>, <span class="str">"Ada Lovelace"</span>));
+    out.writeObject(employeeList); <span class="cmt">// any Serializable, incl. collections</span>
+
+} <span class="kw">catch</span> (<span class="type">IOException</span> e) {
+    e.printStackTrace();
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Reading objects (ObjectInputStream)</span></div>
+      <div class="card-content">
+        <pre><span class="kw">try</span> (<span class="type">ObjectInputStream</span> in = <span class="kw">new</span> <span class="type">ObjectInputStream</span>(
+        <span class="kw">new</span> <span class="type">FileInputStream</span>(<span class="str">"employees.dat"</span>))) {
+
+    <span class="type">Employee</span> e = (<span class="type">Employee</span>) in.readObject();
+    <span class="type">List</span>&lt;<span class="type">Employee</span>&gt; all =
+        (<span class="type">List</span>&lt;<span class="type">Employee</span>&gt;) in.readObject();
+
+} <span class="kw">catch</span> (<span class="type">IOException</span> | <span class="type">ClassNotFoundException</span> e) {
+    e.printStackTrace();
+}</pre>
+        <div class="callout">
+          <strong>Read order matters</strong>
+          Objects must be read back with <code>readObject()</code> calls in the <em>exact same order</em> they were written — the stream has no labels, only a sequence.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Plain file streams (non-object data)</span></div>
+    <div class="card-content">
+      <pre><span class="cmt">// Byte-level copy, no serialization involved</span>
+<span class="kw">try</span> (<span class="type">InputStream</span> in = <span class="kw">new</span> <span class="type">FileInputStream</span>(<span class="str">"source.bin"</span>);
+     <span class="type">OutputStream</span> out = <span class="kw">new</span> <span class="type">FileOutputStream</span>(<span class="str">"dest.bin"</span>)) {
+
+    <span class="kw">byte</span>[] buffer = <span class="kw">new</span> <span class="kw">byte</span>[<span class="num">4096</span>];
+    <span class="kw">int</span> bytesRead;
+    <span class="kw">while</span> ((bytesRead = in.read(buffer)) != -<span class="num">1</span>) {
+        out.write(buffer, <span class="num">0</span>, bytesRead);
+    }
+}
+
+<span class="cmt">// NIO convenience for whole-file text I/O</span>
+<span class="type">List</span>&lt;<span class="type">String</span>&gt; lines = <span class="type">Files</span>.readAllLines(<span class="type">Path</span>.of(<span class="str">"notes.txt"</span>));
+<span class="type">Files</span>.writeString(<span class="type">Path</span>.of(<span class="str">"out.txt"</span>), <span class="str">"done"</span>);</pre>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/serialization-db</span>
+  <span>Java Serialization &amp; DB Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('h2');
+</script>
+</body></html>

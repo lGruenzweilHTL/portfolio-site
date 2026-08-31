@@ -1,0 +1,349 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker &amp; Kubernetes Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id">~/<b>study</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// containerization &amp; orchestration reference</div>
+  <h1 class="page-title">Docker &amp; Kubernetes Cheatsheet</h1>
+  <p class="page-sub">Docker basics · Docker Compose · Kubernetes concepts · Docker vs. Kubernetes</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('docker',this)">Docker basics</button>
+  <button onclick="showTab('compose',this)">Docker Compose</button>
+  <button onclick="showTab('k8s',this)">Kubernetes concepts</button>
+  <button onclick="showTab('comparison',this)">Docker vs. Kubernetes</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ DOCKER BASICS -->
+<div id="docker" class="section visible" data-title="Docker basics">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Image vs. container</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Image</th><th>Container</th></tr>
+        <tr><td>What it is</td><td class="muted">Read-only template/blueprint, built in layers</td><td class="muted">A running (or stopped) instance of an image</td></tr>
+        <tr><td>Mutability</td><td class="muted">Immutable once built</td><td class="muted">Has its own writable layer on top of the image</td></tr>
+        <tr><td>Relationship</td><td class="muted">One image →</td><td class="muted">→ many containers can run from it</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Layers &amp; build cache</strong>
+        Each Dockerfile instruction creates a new image layer. Docker caches layers and reuses them on rebuild if nothing above that instruction changed — order instructions from least-to-most frequently changing (e.g. dependency install before source copy) for faster builds.
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Dockerfile instructions</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Instruction</th><th>Purpose</th></tr>
+        <tr><td><code>FROM</code></td><td class="muted">Base image to build on — every Dockerfile starts with this</td></tr>
+        <tr><td><code>ARG</code></td><td class="muted">Build-time-only variable, not available in the running container</td></tr>
+        <tr><td><code>ENV</code></td><td class="muted">Environment variable available at build time AND inside the running container</td></tr>
+        <tr><td><code>WORKDIR</code></td><td class="muted">Sets the working directory for subsequent instructions</td></tr>
+        <tr><td><code>COPY</code></td><td class="muted">Copies local files/dirs from the build context into the image</td></tr>
+        <tr><td><code>ADD</code></td><td class="muted">Like COPY, but also fetches from URLs and auto-extracts local tar archives</td></tr>
+        <tr><td><code>RUN</code></td><td class="muted">Executes a command at build time (e.g. install dependencies) — creates a new layer</td></tr>
+        <tr><td><code>USER</code></td><td class="muted">Switches to a non-root user for subsequent instructions / the running container</td></tr>
+        <tr><td><code>EXPOSE</code></td><td class="muted">Documents which port the app listens on (doesn't actually publish it)</td></tr>
+        <tr><td><code>VOLUME</code></td><td class="muted">Declares a mount point for persistent data</td></tr>
+        <tr><td><code>HEALTHCHECK</code></td><td class="muted">Defines how Docker checks container health</td></tr>
+        <tr><td><code>CMD</code></td><td class="muted">Default command/args when the container starts (overridable at <code>docker run</code>)</td></tr>
+        <tr><td><code>ENTRYPOINT</code></td><td class="muted">Fixed executable for the container — not normally overridden</td></tr>
+      </table>
+      <pre style="margin-top:12px"><span class="cmt"># Dockerfile</span>
+<span class="kw">FROM</span> node:18
+<span class="kw">ARG</span> BUILD_ENV=production
+<span class="kw">ENV</span> NODE_ENV=$BUILD_ENV
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> package*.json ./
+<span class="kw">RUN</span> npm install
+<span class="kw">COPY</span> . .
+<span class="kw">EXPOSE</span> 3000
+<span class="kw">USER</span> node
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"index.js"</span>]
+
+<span class="cmt"># build it</span>
+<span class="kw">docker build -t</span> my-app .</pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>CMD vs. ENTRYPOINT</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th></th><th>CMD</th><th>ENTRYPOINT</th></tr>
+          <tr><td>Role</td><td class="muted">Default command/arguments</td><td class="muted">Fixed executable the container always runs</td></tr>
+          <tr><td>Overridable?</td><td class="muted">Yes — replaced by args after <code>docker run image &lt;args&gt;</code></td><td class="muted">No — those args get appended to it instead</td></tr>
+        </table>
+        <pre><span class="cmt"># Combined: ENTRYPOINT fixed, CMD = default args</span>
+<span class="kw">ENTRYPOINT</span> [<span class="str">"python"</span>]
+<span class="kw">CMD</span> [<span class="str">"app.py"</span>]
+<span class="cmt"># docker run image        -> python app.py</span>
+<span class="cmt"># docker run image other.py -> python other.py</span></pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Bind mounts vs. named volumes</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th></th><th>Bind mount</th><th>Named volume</th></tr>
+          <tr><td>Maps to</td><td class="muted">An exact host filesystem path</td><td class="muted">A Docker-managed internal location</td></tr>
+          <tr><td>Visibility</td><td class="muted">Host changes appear instantly in container</td><td class="muted">Isolated from the host filesystem</td></tr>
+          <tr><td>Best for</td><td class="muted">Local dev / hot-reloading</td><td class="muted">Production data (DB storage etc.) — more portable &amp; performant</td></tr>
+        </table>
+        <pre><span class="kw">docker run -v</span> $(pwd):/app ...        <span class="cmt"># bind mount</span>
+<span class="kw">docker run -v</span> db_data:/var/lib/postgresql/data ...  <span class="cmt"># named volume</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Container lifecycle &amp; basic commands</span></div>
+    <div class="card-content">
+      <pre><span class="kw">docker build -t</span> &lt;name&gt; .   <span class="cmt"># build an image from a Dockerfile</span>
+<span class="kw">docker run</span> &lt;image&gt;        <span class="cmt"># start a NEW container</span>
+<span class="kw">docker start</span> &lt;name|id&gt;    <span class="cmt"># restart a stopped container</span>
+<span class="kw">docker stop</span> &lt;name|id&gt;     <span class="cmt"># gracefully stop a running container</span>
+<span class="kw">docker exec -it</span> &lt;id&gt; /bin/bash  <span class="cmt"># open a shell inside a running container</span>
+<span class="kw">docker container ls -a</span>   <span class="cmt"># list all containers (running + stopped)</span>
+<span class="kw">docker image ls</span>           <span class="cmt"># list local images</span></pre>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Pushing to a registry</span></div>
+      <div class="card-content">
+        <pre><span class="kw">docker tag</span> my-image ghcr.io/&lt;user&gt;/&lt;repo&gt;:latest
+<span class="kw">docker push</span> ghcr.io/&lt;user&gt;/&lt;repo&gt;:latest</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>.dockerignore</span></div>
+      <div class="card-content">
+        <p>Excludes files/folders from the build context (e.g. <code>.git/</code>, <code>node_modules/</code>, <code>*.log</code>) → faster builds, smaller images, no secrets leaking into the image.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ COMPOSE -->
+<div id="compose" class="section" data-title="Docker Compose">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Starting &amp; stopping</span></div>
+    <div class="card-content">
+      <pre><span class="kw">docker compose -f</span> compose.yaml <span class="kw">up</span>       <span class="cmt"># foreground, attached</span>
+<span class="kw">docker compose -f</span> compose.yaml <span class="kw">up -d</span>    <span class="cmt"># detached / background</span>
+<span class="kw">docker compose -f</span> compose.yaml <span class="kw">logs -f</span> <span class="cmt"># follow logs</span></pre>
+      <table>
+        <tr><th>Command</th><th>Effect</th></tr>
+        <tr><td><code>docker compose stop</code></td><td class="muted">Stops containers, keeps them + their volumes/data</td></tr>
+        <tr><td><code>docker compose down</code></td><td class="muted">Stops <em>and removes</em> containers, networks (volumes kept unless <code>-v</code>)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Environment variables</span></div>
+      <div class="card-content">
+        <p>Used to keep credentials/config out of the image and adjustable per-environment (dev/test/prod) without rebuilding.</p>
+        <pre>services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Health checks</span></div>
+      <div class="card-content">
+        <p>Lets dependent services wait until a container (e.g. a database) is actually ready, not just "started".</p>
+        <pre>db:
+  image: postgres:18
+  healthcheck:
+    test: [<span class="str">"CMD-SHELL"</span>, <span class="str">"pg_isready -U app"</span>]
+    interval: 5s
+    retries: 5
+app:
+  depends_on:
+    db:
+      condition: service_healthy</pre>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ K8S CONCEPTS -->
+<div id="k8s" class="section" data-title="Kubernetes concepts">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Core resource types</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th>Resource</th><th>Purpose</th></tr>
+        <tr><td><code>Pod</code></td><td class="muted">Smallest deployable unit — one or more containers sharing network &amp; storage</td></tr>
+        <tr><td><code>Deployment</code></td><td class="muted">Manages a Pod's lifecycle: desired replica count, container image, rollout/rollback strategy, health checks</td></tr>
+        <tr><td><code>ReplicaSet</code></td><td class="muted">Ensures N replicas of a Pod exist — usually managed indirectly via a Deployment, rarely created directly</td></tr>
+        <tr><td><code>Service</code></td><td class="muted">Stable network endpoint (IP/DNS name + port) that load-balances traffic across matching Pods</td></tr>
+        <tr><td><code>Ingress</code></td><td class="muted">Routes external HTTP(S) traffic into the cluster, to different Services based on host/path</td></tr>
+        <tr><td><code>Node</code></td><td class="muted">A physical or virtual machine in the cluster that runs Pods</td></tr>
+        <tr><td><code>Namespace</code></td><td class="muted">Logical partition for grouping/isolating resources (e.g. per team or environment)</td></tr>
+        <tr><td><code>ConfigMap</code></td><td class="muted">Non-secret configuration data, injectable as env vars or mounted files</td></tr>
+        <tr><td><code>Secret</code></td><td class="muted">Sensitive configuration data (credentials, keys) — base64-encoded at rest, not encrypted by default</td></tr>
+        <tr><td><code>Volume</code> / <code>PersistentVolumeClaim</code></td><td class="muted">Storage attached to a Pod; a PVC requests storage that persists independently of the Pod's own lifecycle</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Imperative vs. declarative management</span></div>
+    <div class="card-content">
+      <table>
+        <tr><th></th><th>Imperative</th><th>Declarative</th></tr>
+        <tr><td>How</td><td class="muted">Run commands directly, e.g. <code>kubectl create deployment ...</code></td><td class="muted">Define desired state in a YAML manifest, apply with <code>kubectl apply -f ...</code></td></tr>
+        <tr><td>Defines</td><td class="muted">The <em>path</em> to the goal state</td><td class="muted">Only the <em>target</em> state — Kubernetes figures out how to get there</td></tr>
+        <tr><td>Reproducibility</td><td class="muted">Harder to version / reproduce</td><td class="muted">Easy — manifest is the source of truth, version-controllable</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Annotated manifest example</span></div>
+    <div class="card-content">
+      <pre>apiVersion: apps/v1
+<span class="kw">kind:</span> Deployment
+metadata:
+  name: webshop-deployment
+spec:
+  <span class="kw">replicas:</span> 3                          <span class="cmt"># 3 Pod instances are started</span>
+  selector:
+    matchLabels:
+      app: webshop
+  template:
+    metadata:
+      <span class="kw">labels:</span>
+        <span class="kw">app: webshop</span>                  <span class="cmt"># label the Service will match on</span>
+    spec:
+      containers:
+      - name: webshop-app
+        <span class="kw">image:</span> ghcr.io/my-org/webshop:v1.2.0  <span class="cmt"># registry / org / image:tag</span>
+        ports:
+        - containerPort: 8080
+        <span class="kw">livenessProbe:</span>
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 15      <span class="cmt"># wait 15s after start before first check</span>
+          periodSeconds: 10            <span class="cmt"># then check every 10s</span>
+---
+apiVersion: v1
+<span class="kw">kind:</span> Service
+metadata:
+  name: webshop-service
+spec:
+  type: ClusterIP
+  <span class="kw">selector:</span>
+    <span class="kw">app: webshop</span>                      <span class="cmt"># <- must match the Deployment's Pod labels above</span>
+  ports:
+  - <span class="kw">port:</span> 80          <span class="cmt"># Service's own port, reachable by other apps in-cluster</span>
+    <span class="kw">targetPort:</span> 8080  <span class="cmt"># forwarded to this port on the matched Pods</span></pre>
+      <div class="callout">
+        <strong>How the Service finds its Pods</strong>
+        The Service's <code>spec.selector</code> is matched against the labels under the Deployment's <code>spec.template.metadata.labels</code> — <em>not</em> the Deployment's own top-level metadata. Any Pod carrying a matching label receives traffic from the Service, regardless of which Deployment created it.
+      </div>
+      <div class="callout warn">
+        <strong>Liveness probe failure</strong>
+        A check counts as healthy only if the HTTP response status is in the <strong>200–399</strong> range (or times out → unhealthy). On failure, the kubelet kills the container and restarts it — this is Kubernetes' self-healing in action.
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Pods &amp; containers within a pod</span></div>
+      <div class="card-content">
+        <p>Multiple containers in one Pod share the same network (localhost) and storage volumes.</p>
+        <ul>
+          <li><strong>Sidecar container</strong> — supports the main app (logging shipping, TLS termination, config sync) without modifying the app's code</li>
+          <li><strong>Init container</strong> — runs to completion <em>before</em> the main app container starts, e.g. to wait for a dependency or seed config</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Liveness vs. readiness probes</span></div>
+      <div class="card-content">
+        <table>
+          <tr><th>Probe</th><th>Checks</th><th>On failure</th></tr>
+          <tr><td>Liveness</td><td class="muted">Is the container still alive?</td><td class="muted">Kubelet kills &amp; restarts the container</td></tr>
+          <tr><td>Readiness</td><td class="muted">Is it ready to receive traffic?</td><td class="muted">Removed from Service endpoints — no restart</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ COMPARISON -->
+<div id="comparison" class="section" data-title="Docker vs. Kubernetes">
+
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Different layers, not competitors</span></div>
+    <div class="card-content">
+      <p>Docker / Docker Compose runs containers on a <strong>single server</strong> — if that server goes down, the whole app is offline, and there's no scaling across machine boundaries. Kubernetes is a <strong>container orchestration tool</strong> for distributed, multi-node clusters — it manages and monitors containers across many physical/virtual servers.</p>
+      <table>
+        <tr><th></th><th>Docker (+ Compose)</th><th>Kubernetes</th></tr>
+        <tr><td>Scope</td><td class="muted">Single host</td><td class="muted">Cluster of multiple nodes</td></tr>
+        <tr><td>Unit</td><td class="muted">Container</td><td class="muted">Pod (one or more containers)</td></tr>
+        <tr><td>Self-healing</td><td class="muted">Restart policies per container only</td><td class="muted"><strong>Self-Healing</strong>: failed containers/nodes are automatically rescheduled onto healthy nodes</td></tr>
+        <tr><td>Scaling</td><td class="muted">Manual / limited</td><td class="muted"><strong>Horizontal Autoscaling</strong>: Pod count auto-adjusts based on CPU/RAM load</td></tr>
+        <tr><td>Updates</td><td class="muted">Manual recreate, brief downtime</td><td class="muted"><strong>Rolling Updates &amp; Rollbacks</strong>: zero-downtime gradual updates, auto-rollback on failure</td></tr>
+        <tr><td>Config model</td><td class="muted">Mostly imperative CLI / Compose file</td><td class="muted">Declarative manifests as the standard approach</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Three key production advantages of Kubernetes</strong>
+        Self-Healing, Horizontal Autoscaling, and Rolling Updates &amp; Rollbacks — these are the headline reasons K8s is chosen over plain Docker for production workloads.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/docker-kubernetes</span>
+  <span>Docker &amp; Kubernetes Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('docker');
+</script>
+</body></html>

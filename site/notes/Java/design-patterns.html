@@ -1,0 +1,329 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Patterns Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/notes/notes.css">
+</head>
+<body>
+<nav class="study-nav">
+  <span class="nav-id" id="nav-id"><a href="/notes" style="color: inherit; text-decoration: none;">~/notes</a>/<b>design-patterns</b></span>
+  <a href="/notes" class="nav-back" id="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 2L4 7l5 5"></path>
+    </svg>
+    back
+  </a>
+</nav>
+
+<div class="page wrap">
+
+<header class="page-header">
+  <div class="page-label">// software architecture reference</div>
+  <h1 class="page-title">Design Patterns Cheatsheet</h1>
+  <p class="page-sub">Quick-reference notes for key design patterns, demonstrated in Java.</p>
+</header>
+
+<nav class="topic-nav">
+  <button class="active" onclick="showTab('creational',this)">Creational (Factory &amp; Singleton)</button>
+  <button onclick="showTab('behavioral',this)">Behavioral (Observer &amp; Pub-Sub)</button>
+  <button onclick="showTab('structural',this)">Structural &amp; Data (Repository)</button>
+  <button onclick="showTab('architectural',this)">Architectural (MVC)</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ CREATIONAL -->
+<div id="creational" class="section visible" data-title="Creational">
+
+  <div class="grid2">
+    <!-- Singleton -->
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Singleton Pattern</span></div>
+      <div class="card-content">
+        <p>Ensures that a class has only one instance and provides a global access point to it. Common use cases include managing database connection pools, global configuration settings, or hardware access controllers.</p>
+        <div class="callout">
+          <strong>Key Advantages &amp; Implementation Details</strong>
+          This implementation utilizes the <em>Bill Pugh Singleton</em> technique. It relies on the JVM's lazy class-loading mechanism: the static nested class <code>InstanceHolder</code> is not loaded into memory until <code>getInstance()</code> is invoked. This guarantees absolute thread safety without runtime overhead from <code>synchronized</code> blocks.
+        </div>
+        <pre><span class="kw">public class</span> <span class="type">DatabaseConnection</span> {
+    <span class="cmt">// Private constructor prevents instantiation from other classes</span>
+    <span class="kw">private</span> <span class="fn">DatabaseConnection</span>() {}
+
+    <span class="cmt">// Static helper class loaded only on-demand</span>
+    <span class="kw">private static class</span> <span class="type">InstanceHolder</span> {
+        <span class="kw">private static final</span> <span class="type">DatabaseConnection</span> <span class="num">INSTANCE</span> = 
+            <span class="kw">new</span> <span class="type">DatabaseConnection</span>();
+    }
+
+    <span class="kw">public static</span> <span class="type">DatabaseConnection</span> <span class="fn">getInstance</span>() {
+        <span class="kw">return</span> <span class="type">InstanceHolder</span>.<span class="num">INSTANCE</span>;
+    }
+
+    <span class="kw">public void</span> <span class="fn">query</span>(<span class="type">String</span> sql) {
+        <span class="type">System</span>.out.println(<span class="str">"Executing: "</span> + sql);
+    }
+}</pre>
+      </div>
+    </div>
+
+    <!-- Factory Method -->
+    <div class="card">
+      <div class="card-head"><span class="dot g"></span><span>Factory Method Pattern</span></div>
+      <div class="card-content">
+        <p>Defines an interface or abstract class for object instantiation, but defers the decision of which concrete class to instantiate to subclasses. This promotes loose coupling by eliminating direct instantiation calls like <code>new ConsoleLogger()</code> inside client code.</p>
+        <div class="callout warn">
+          <strong>When to use</strong>
+          Use this pattern when your system should be independent of how its products are created, or when you want to extend the framework by dynamically swapping concrete implementations without altering user-facing business logic.
+        </div>
+        <pre><span class="cmt">// Product Interface</span>
+<span class="kw">interface</span> <span class="type">Logger</span> { <span class="kw">void</span> <span class="fn">log</span>(<span class="type">String</span> msg); }
+
+<span class="cmt">// Concrete Products</span>
+<span class="kw">class</span> <span class="type">ConsoleLogger</span> <span class="kw">implements</span> <span class="type">Logger</span> {
+    <span class="kw">public void</span> <span class="fn">log</span>(<span class="type">String</span> msg) { <span class="type">System</span>.out.println(msg); }
+}
+<span class="kw">class</span> <span class="type">FileLogger</span> <span class="kw">implements</span> <span class="type">Logger</span> {
+    <span class="kw">public void</span> <span class="fn">log</span>(<span class="type">String</span> msg) { <span class="cmt">/* write to file */</span> }
+}
+
+<span class="cmt">// Creator (Factory)</span>
+<span class="kw">abstract class</span> <span class="type">LoggerFactory</span> {
+    <span class="kw">public abstract</span> <span class="type">Logger</span> <span class="fn">createLogger</span>();
+    <span class="kw">public void</span> <span class="fn">logMessage</span>(<span class="type">String</span> msg) {
+        <span class="type">Logger</span> logger = <span class="fn">createLogger</span>();
+        logger.log(msg);
+    }
+}
+<span class="kw">class</span> <span class="type">ConsoleLoggerFactory</span> <span class="kw">extends</span> <span class="type">LoggerFactory</span> {
+    <span class="kw">public</span> <span class="type">Logger</span> <span class="fn">createLogger</span>() { <span class="kw">return new</span> <span class="type">ConsoleLogger</span>(); }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abstract Factory -->
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Abstract Factory Pattern</span></div>
+    <div class="card-content">
+      <p>Provides an interface for creating families of related or dependent objects (e.g. Buttons, Checkboxes, Windows) without specifying their concrete classes. Ensures that the client code only interacts with interfaces and receives consistent component themes.</p>
+      <div class="callout">
+        <strong>Difference from Factory Method</strong>
+        While <em>Factory Method</em> delegates instantiation of a single product to subclass overrides, <em>Abstract Factory</em> aggregates multiple factory methods to produce a unified suite of related objects.
+      </div>
+      <pre><span class="cmt">// Abstract Products</span>
+<span class="kw">interface</span> <span class="type">Button</span> { <span class="kw">void</span> <span class="fn">paint</span>(); }
+<span class="kw">interface</span> <span class="type">Checkbox</span> { <span class="kw">void</span> <span class="fn">toggle</span>(); }
+
+<span class="cmt">// Abstract Factory Interface</span>
+<span class="kw">interface</span> <span class="type">GUIFactory</span> {
+    <span class="type">Button</span> <span class="fn">createButton</span>();
+    <span class="type">Checkbox</span> <span class="fn">createCheckbox</span>();
+}
+
+<span class="cmt">// Concrete Family 1 (Windows UI)</span>
+<span class="kw">class</span> <span class="type">WinFactory</span> <span class="kw">implements</span> <span class="type">GUIFactory</span> {
+    <span class="kw">public</span> <span class="type">Button</span> <span class="fn">createButton</span>() { <span class="kw">return new</span> <span class="type">WinButton</span>(); }
+    <span class="kw">public</span> <span class="type">Checkbox</span> <span class="fn">createCheckbox</span>() { <span class="kw">return new</span> <span class="type">WinCheckbox</span>(); }
+}
+
+<span class="cmt">// Concrete Family 2 (Mac UI)</span>
+<span class="kw">class</span> <span class="type">MacFactory</span> <span class="kw">implements</span> <span class="type">GUIFactory</span> {
+    <span class="kw">public</span> <span class="type">Button</span> <span class="fn">createButton</span>() { <span class="kw">return new</span> <span class="type">MacButton</span>(); }
+    <span class="kw">public</span> <span class="type">Checkbox</span> <span class="fn">createCheckbox</span>() { <span class="kw">return new</span> <span class="type">MacCheckbox</span>(); }
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ BEHAVIORAL -->
+<div id="behavioral" class="section" data-title="Behavioral">
+
+  <!-- Observer -->
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Observer Pattern</span></div>
+    <div class="card-content">
+      <p>Defines a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.</p>
+      <div class="callout">
+        <strong>Characteristics</strong>
+        Subject maintains a list of observers and notifies them directly. Great for reactive UIs or data-binding, but can lead to tight coupling where the subject knows about the interface of its observers.
+      </div>
+      <pre><span class="kw">import</span> java.util.ArrayList;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">interface</span> <span class="type">Observer</span> {
+    <span class="kw">void</span> <span class="fn">update</span>(<span class="type">String</span> state);
+}
+
+<span class="kw">class</span> <span class="type">Subject</span> {
+    <span class="kw">private final</span> <span class="type">List</span>&lt;<span class="type">Observer</span>&gt; observers = <span class="kw">new</span> <span class="type">ArrayList</span>&lt;&gt;();
+    <span class="kw">private</span> <span class="type">String</span> state;
+
+    <span class="kw">public void</span> <span class="fn">attach</span>(<span class="type">Observer</span> o) { observers.add(o); }
+    <span class="kw">public void</span> <span class="fn">detach</span>(<span class="type">Observer</span> o) { observers.remove(o); }
+
+    <span class="kw">public void</span> <span class="fn">setState</span>(<span class="type">String</span> state) {
+        <span class="kw">this</span>.state = state;
+        <span class="fn">notifyObservers</span>();
+    }
+
+    <span class="kw">private void</span> <span class="fn">notifyObservers</span>() {
+        <span class="kw">for</span> (<span class="type">Observer</span> o : observers) {
+            o.update(state);
+        }
+    }
+}</pre>
+    </div>
+  </div>
+
+  <!-- Pub-Sub -->
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Publisher-Subscriber Pattern</span></div>
+    <div class="card-content">
+      <p>An architectural variant of the Observer pattern. Introduces an intermediate <strong>Message Broker</strong> or Event Bus, decoupling publishers and subscribers completely.</p>
+      <div class="callout">
+        <strong>Key Differences</strong>
+        Publishers do not know who the subscribers are (and vice-versa). They only communicate through a specific topic or event channel on the bus, allowing for highly scalable and asynchronous distributed systems.
+      </div>
+      <pre><span class="kw">import</span> java.util.*;
+
+<span class="cmt">// Message Broker / Event Bus</span>
+<span class="kw">public class</span> <span class="type">EventBus</span> {
+    <span class="kw">private static final</span> <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">List</span>&lt;<span class="type">Subscriber</span>&gt;&gt; topics = <span class="kw">new</span> <span class="type">HashMap</span>&lt;&gt;();
+
+    <span class="kw">public static void</span> <span class="fn">subscribe</span>(<span class="type">String</span> topic, <span class="type">Subscriber</span> sub) {
+        topics.computeIfAbsent(topic, k -&gt; <span class="kw">new</span> <span class="type">ArrayList</span>&lt;&gt;()).add(sub);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">publish</span>(<span class="type">String</span> topic, <span class="type">Object</span> message) {
+        <span class="kw">List</span>&lt;<span class="type">Subscriber</span>&gt; subs = topics.get(topic);
+        <span class="kw">if</span> (subs != <span class="kw">null</span>) {
+            <span class="kw">for</span> (<span class="type">Subscriber</span> sub : subs) {
+                sub.onMessage(topic, message);
+            }
+        }
+    }
+}
+
+<span class="kw">interface</span> <span class="type">Subscriber</span> {
+    <span class="kw">void</span> <span class="fn">onMessage</span>(<span class="type">String</span> topic, <span class="type">Object</span> data);
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ STRUCTURAL -->
+<div id="structural" class="section" data-title="Structural &amp; Data">
+
+  <!-- Repository -->
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Repository Pattern</span></div>
+    <div class="card-content">
+      <p>Mediates between the domain and data mapping layers using a collection-like interface for accessing domain objects. It isolates the domain model from underlying data access technology (like SQL, NoSQL, or memory stores).</p>
+      <div class="callout">
+        <strong>Design Goal</strong>
+        By defining the Repository as an interface, the business logic remains mockable and independent of DB configurations. Mock databases can be easily substituted in unit tests.
+      </div>
+      <pre><span class="kw">import</span> java.util.Optional;
+<span class="kw">import</span> java.util.List;
+<span class="kw">import</span> java.util.ArrayList;
+<span class="kw">import</span> java.util.Map;
+<span class="kw">import</span> java.util.HashMap;
+
+<span class="cmt">// Entity representing Domain Model</span>
+<span class="kw">class</span> <span class="type">User</span> {
+    <span class="kw">private final</span> <span class="type">String</span> id;
+    <span class="kw">private</span> <span class="type">String</span> email;
+    <span class="kw">public</span> <span class="fn">User</span>(<span class="type">String</span> id, <span class="type">String</span> email) { <span class="kw">this</span>.id = id; <span class="kw">this</span>.email = email; }
+    <span class="kw">public</span> <span class="type">String</span> <span class="fn">getId</span>() { <span class="kw">return</span> id; }
+    <span class="kw">public</span> <span class="type">String</span> <span class="fn">getEmail</span>() { <span class="kw">return</span> email; }
+}
+
+<span class="cmt">// Repository Interface defining the storage contract</span>
+<span class="kw">interface</span> <span class="type">UserRepository</span> {
+    <span class="kw">void</span> <span class="fn">save</span>(<span class="type">User</span> user);
+    <span class="type">Optional</span>&lt;<span class="type">User</span>&gt; <span class="fn">findById</span>(<span class="type">String</span> id);
+    <span class="type">List</span>&lt;<span class="type">User</span>&gt; <span class="fn">findAll</span>();
+    <span class="kw">void</span> <span class="fn">deleteById</span>(<span class="type">String</span> id);
+}
+
+<span class="cmt">// In-Memory Repository Implementation for rapid prototyping / testing</span>
+<span class="kw">class</span> <span class="type">InMemoryUserRepository</span> <span class="kw">implements</span> <span class="type">UserRepository</span> {
+    <span class="kw">private final</span> <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">User</span>&gt; db = <span class="kw">new</span> <span class="type">HashMap</span>&lt;&gt;();
+
+    <span class="kw">public void</span> <span class="fn">save</span>(<span class="type">User</span> user) { db.put(user.getId(), user); }
+    <span class="kw">public</span> <span class="type">Optional</span>&lt;<span class="type">User</span>&gt; <span class="fn">findById</span>(<span class="type">String</span> id) { <span class="kw">return</span> <span class="type">Optional</span>.ofNullable(db.get(id)); }
+    <span class="kw">public</span> <span class="type">List</span>&lt;<span class="type">User</span>&gt; <span class="fn">findAll</span>() { <span class="kw">return new</span> <span class="type">ArrayList</span>&lt;&gt;(db.values()); }
+    <span class="kw">public void</span> <span class="fn">deleteById</span>(<span class="type">String</span> id) { db.remove(id); }
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ARCHITECTURAL -->
+<div id="architectural" class="section" data-title="Architectural">
+
+  <!-- MVC -->
+  <div class="card">
+    <div class="card-head"><span class="dot g"></span><span>Model-View-Controller (MVC) Pattern</span></div>
+    <div class="card-content">
+      <p>Splits user interface development into three distinct concerns: the Model (rules/data), the View (rendering visual layouts), and the Controller (handling user interactions and updates). This separation simplifies testing and increases code modularity.</p>
+      <div class="callout warn">
+        <strong>Flow of Control</strong>
+        User interacts with the View (or triggers an API endpoint) → Controller intercepts request → Controller updates the Model → Model alerts change or Controller coordinates feeding updated Model data back to the View.
+      </div>
+      <pre><span class="cmt">// Model: Represents raw state and business rules</span>
+<span class="kw">class</span> <span class="type">Task</span> {
+    <span class="kw">private</span> <span class="type">String</span> title;
+    <span class="kw">private boolean</span> completed;
+    <span class="kw">public</span> <span class="fn">Task</span>(<span class="type">String</span> t) { <span class="kw">this</span>.title = t; }
+    <span class="kw">public</span> <span class="type">String</span> <span class="fn">getTitle</span>() { <span class="kw">return</span> title; }
+    <span class="kw">public boolean</span> <span class="fn">isCompleted</span>() { <span class="kw">return</span> completed; }
+    <span class="kw">public void</span> <span class="fn">setCompleted</span>(<span class="kw">boolean</span> c) { <span class="kw">this</span>.completed = c; }
+}
+
+<span class="cmt">// View: Renders output for presentation</span>
+<span class="kw">class</span> <span class="type">TaskView</span> {
+    <span class="kw">public void</span> <span class="fn">displayTask</span>(<span class="type">Task</span> task) {
+        <span class="type">System</span>.out.println(<span class="str">"Task: "</span> + task.getTitle() + 
+                           <span class="str">" | Status: "</span> + (task.isCompleted() ? <span class="str">"Done"</span> : <span class="str">"Pending"</span>));
+    }
+}
+
+<span class="cmt">// Controller: Intermediary executing commands</span>
+<span class="kw">class</span> <span class="type">TaskController</span> {
+    <span class="kw">private final</span> <span class="type">Task</span> model;
+    <span class="kw">private final</span> <span class="type">TaskView</span> view;
+
+    <span class="kw">public</span> <span class="fn">TaskController</span>(<span class="type">Task</span> model, <span class="type">TaskView</span> view) {
+        <span class="kw">this</span>.model = model;
+        <span class="kw">this</span>.view = view;
+    }
+
+    <span class="kw">public void</span> <span class="fn">completeTask</span>() {
+        model.setCompleted(<span class="kw">true</span>);
+    }
+
+    <span class="kw">public void</span> <span class="fn">updateView</span>() {
+        view.displayTask(model);
+    }
+}</pre>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- .page -->
+
+<footer class="study-footer wrap">
+  <span>~/notes/design-patterns-java</span>
+  <span>Java Design Patterns Cheatsheet</span>
+</footer>
+
+<script src="/notes/cheatsheet.js"></script>
+<script>
+  initTabNavigation('creational');
+</script>
+</body></html>

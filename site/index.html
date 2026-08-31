@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lukas Grünzweil</title>
+<meta name="description" content="Lukas Grünzweil — student building backend systems, AI tooling, and games. C# / Unity / Python." />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="alternate icon" href="favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-id">Lukas Grünzweil</div>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+  <section id="hero">
+    <div class="hero-eyebrow">Student · <b>HTL Leonding</b> · Austria</div>
+    <h1 class="hero-name">Lukas Grünzweil</h1>
+    <div class="hero-roles">
+      <span class="role-tag">Backend</span>
+      <span class="role-tag">AI tooling</span>
+      <span class="role-tag">Game dev</span>
+      <span class="role-tag">Robotics</span>
+    </div>
+    <p class="hero-bio">
+      I build backend systems and AI tooling, and I make games. C# and Unity are
+      what I reach for first. Most of my work is developer tooling, so if a tool needs
+      a wiki to use it, I don't call it finished.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener" class="btn btn-solid">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
+        GitHub
+      </a>
+      <a href="/resume.pdf" target="_blank" rel="noopener" class="btn btn-outline">Résumé (PDF)</a>
+      <a href="#projects" class="btn btn-outline">See projects</a>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="section reveal">
+    <div class="section-label">Projects</div>
+
+    <!-- vektorgrid -->
+    <div class="featured">
+      <div class="featured-header">
+        <div>
+          <div class="featured-title">vektorgrid</div>
+          <div class="featured-sub">
+            A self-hosted voice assistant, built as a distributed system: edge relays capture
+            speech, a central orchestrator runs the model pipeline, and a phone app approves
+            anything risky.
+          </div>
+        </div>
+        <a class="card-link" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener" style="align-self:flex-start;">↗ repos</a>
+      </div>
+
+      <!-- Signature: interactive system architecture (hand-authored SVG, vanilla JS) -->
+      <div class="arch">
+        <div class="arch-cap">Architecture</div>
+        <div class="arch-steps" id="archSteps">
+          <button class="arch-step" data-step="1">1 · Capture</button>
+          <button class="arch-step" data-step="2">2 · STT</button>
+          <button class="arch-step" data-step="3">3 · Route</button>
+          <button class="arch-step" data-step="4">4 · Inference</button>
+          <button class="arch-step" data-step="5">5 · Approve</button>
+          <button class="arch-step" data-step="6">6 · TTS</button>
+          <button class="arch-step" data-step="7">7 · Reply</button>
+          <button class="arch-step arch-play" id="archPlay">▶ Auto</button>
+        </div>
+        <div class="arch-svg-wrap">
+        <svg id="archSvg" viewBox="0 0 740 380" role="img" aria-label="vektorgrid architecture: Relay and Gate connect through a central Origin orchestrator, which drives a sequential Scalar pipeline of STT, intent router, expert LLM, and TTS.">
+          <defs>
+            <marker id="arw" markerWidth="9" markerHeight="9" refX="6.5" refY="3.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+              <path d="M0,0 L7,3.5 L0,7 Z" style="fill:context-stroke"/>
+            </marker>
+          </defs>
+
+          <!-- edges: everything routes through Origin -->
+          <line id="e-relay" class="d-line" x1="200" y1="104" x2="286" y2="176" marker-start="url(#arw)" marker-end="url(#arw)"/>
+          <text class="d-lbl" x="206" y="150">audio &#8644; speech</text>
+          <line id="e-gate" class="d-line" x1="200" y1="290" x2="286" y2="222" marker-start="url(#arw)" marker-end="url(#arw)"/>
+          <text class="d-lbl" x="150" y="250">tool approval &#8644; &#10003;/&#10007;</text>
+          <line id="e-stt"    class="d-line" x1="440" y1="188" x2="548" y2="66"  marker-start="url(#arw)" marker-end="url(#arw)"/>
+          <line id="e-router" class="d-line" x1="440" y1="196" x2="548" y2="128" marker-start="url(#arw)" marker-end="url(#arw)"/>
+          <line id="e-llm"    class="d-line" x1="440" y1="204" x2="548" y2="190" marker-start="url(#arw)" marker-end="url(#arw)"/>
+          <line id="e-tts"    class="d-line" x1="440" y1="212" x2="548" y2="252" marker-start="url(#arw)" marker-end="url(#arw)"/>
+
+          <!-- Origin -->
+          <rect id="n-origin" class="d-box-origin" x="288" y="164" width="150" height="72" rx="8"/>
+          <text class="d-title d-title-o" x="363" y="196" text-anchor="middle">Origin</text>
+          <text class="d-sub" x="363" y="216" text-anchor="middle">orchestrator · <tspan class="d-lang-cs">C#</tspan></text>
+
+          <!-- Relay -->
+          <rect id="n-relay" class="d-box" x="50" y="74" width="152" height="58" rx="7"/>
+          <text class="d-title" x="126" y="98" text-anchor="middle">Relay</text>
+          <text class="d-sub" x="126" y="116" text-anchor="middle">wake-word · <tspan class="d-lang-cpp">C++</tspan></text>
+
+          <!-- Gate -->
+          <rect id="n-gate" class="d-box" x="50" y="262" width="152" height="58" rx="7"/>
+          <text class="d-title" x="126" y="286" text-anchor="middle">Gate</text>
+          <text class="d-sub" x="126" y="304" text-anchor="middle">biometric · <tspan class="d-lang-kt">Kotlin</tspan></text>
+
+          <!-- Scalars pipeline caption -->
+          <text class="d-sub" x="628" y="30" text-anchor="middle">SCALARS · <tspan class="d-lang-py">Python</tspan> · in sequence</text>
+
+          <!-- Scalar stages -->
+          <rect id="n-stt" class="d-box-scalar" x="548" y="44"  width="160" height="44" rx="7"/>
+          <text class="d-title" x="628" y="71"  text-anchor="middle" style="font-size:13px">STT</text>
+          <rect id="n-router" class="d-box-scalar" x="548" y="106" width="160" height="44" rx="7"/>
+          <text class="d-title" x="628" y="133" text-anchor="middle" style="font-size:13px">Intent router</text>
+          <rect id="n-llm" class="d-box-scalar" x="548" y="168" width="160" height="44" rx="7"/>
+          <text class="d-title" x="628" y="195" text-anchor="middle" style="font-size:13px">Expert LLM</text>
+          <rect id="n-tts" class="d-box-scalar" x="548" y="230" width="160" height="44" rx="7"/>
+          <text class="d-title" x="628" y="257" text-anchor="middle" style="font-size:13px">TTS</text>
+
+          <!-- sequence number badges -->
+          <g><circle id="b-stt"    class="d-numbg" cx="548" cy="66"  r="9"/><text class="d-num" x="548" y="69"  text-anchor="middle">1</text></g>
+          <g><circle id="b-router" class="d-numbg" cx="548" cy="128" r="9"/><text class="d-num" x="548" y="131" text-anchor="middle">2</text></g>
+          <g><circle id="b-llm"    class="d-numbg" cx="548" cy="190" r="9"/><text class="d-num" x="548" y="193" text-anchor="middle">3</text></g>
+          <g><circle id="b-tts"    class="d-numbg" cx="548" cy="252" r="9"/><text class="d-num" x="548" y="255" text-anchor="middle">4</text></g>
+        </svg>
+        </div>
+        <div class="arch-scroll-hint">drag to pan the full diagram &#8594;</div>
+        <div class="arch-note" id="archNote"></div>
+        <p class="arch-flow">
+          Everything routes through <b>Origin</b>; no two nodes talk directly. A <b>Relay</b>
+          catches the wake-word and streams audio to Origin, which drives the <b>Scalar</b>
+          pipeline in order (STT &#8594; intent router &#8594; expert LLM &#8594; TTS), calling each
+          worker and collecting its result before the next. The spoken reply returns through the
+          Relay. If the model requests a risky tool call, Origin pauses and asks <b>Gate</b> to
+          approve it with biometrics. Gate also runs standalone: it polls Origin for metrics and has
+          a Relay built in, so you can talk to the system from your phone.
+        </p>
+      </div>
+
+      <!-- Replace with: <div class="shot"><img src="img/vektorgrid.png" alt="vektorgrid dashboard"></div> -->
+      <div class="shot"><span class="shot-ph">Screenshot / demo</span></div>
+    </div>
+
+    <!-- other projects -->
+    <div class="cards">
+
+      <div class="card">
+        <div class="shot"><img src="img/sceneforge.png" alt="SceneForge AI building a scene from a text prompt"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">SceneForge AI</div>
+            <a href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+          </div>
+          <div class="card-desc">
+            An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and
+            components back. Cuts the manual setup out of level design.
+          </div>
+          <div class="card-tags">
+            <span class="tag">Unity</span><span class="tag">C#</span>
+            <span class="tag">AI</span><span class="tag">Editor tooling</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="shot"><img src="img/uniconsole.png" alt="UniConsole running in the Unity game view"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">UniConsole</div>
+            <a href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+          </div>
+          <div class="card-desc">
+            An in-game debug console for Unity. Mark a static method with <code>[Command]</code> and
+            call it from a terminal in the scene. A free, lightweight alternative to QuantumConsole.
+          </div>
+          <div class="card-tags">
+            <span class="tag">Unity</span><span class="tag">C#</span>
+            <span class="tag">DX</span><span class="tag">Tooling</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Replace with: <div class="shot"><img src="img/pigeon.png" alt="..."></div> -->
+        <div class="shot"><span class="shot-ph">Screenshot</span></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">P.I.G.E.O.N. — Covert Ops</div>
+            <!-- TODO: swap for a GitHub link once the repo is public -->
+            <span class="card-status">In progress</span>
+          </div>
+          <div class="card-desc">
+            You play a pigeon on the government payroll, running covert ops. A satire built around
+            surveillance paranoia and the "birds aren't real" corner of the internet.
+          </div>
+          <div class="card-tags">
+            <span class="tag">Unity</span><span class="tag">C#</span>
+            <span class="tag">Game</span><span class="tag">Satire</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="shot"><img src="img/forkcast.png" alt="Forkcast app screenshot"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">Forkcast</div>
+            <span class="card-status">Private · school project</span>
+          </div>
+          <div class="card-note">Contributed · TypeScript backend</div>
+          <div class="card-desc">
+            A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar,
+            get a combined ingredient list, rate recipes, add friends. Vue frontend,
+            TypeScript backend, most of which I wrote.
+          </div>
+          <div class="card-tags">
+            <span class="tag">TypeScript</span><span class="tag">Vue</span>
+            <span class="tag">REST API</span><span class="tag">School project</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Replace with: <div class="shot"><img src="img/roboducks.png" alt="..."></div> -->
+        <div class="shot"><span class="shot-ph">Screenshot</span></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">RoboDucks — RescueMaze</div>
+            <a href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+          </div>
+          <div class="card-note">Contributed · HTL Leonding robotics club</div>
+          <div class="card-desc">
+            RescueMaze competition work for the school robotics club. I built a custom serial protocol
+            for Raspberry Pi → Lego SPIKE communication, and a maze-exploration controller
+            running Trémaux's algorithm in a Webots simulation.
+          </div>
+          <div class="card-tags">
+            <span class="tag">Python</span><span class="tag">C</span>
+            <span class="tag">Webots</span><span class="tag">Robotics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="shot"><img src="img/space-defenders.png" alt="Space Defenders gameplay"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-name">Space Defenders</div>
+            <a href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+          </div>
+          <div class="card-desc">
+            A mobile arcade game: destroy enemy spaceships, don't die. Escalating waves, built for touchscreens.
+          </div>
+          <div class="card-tags">
+            <span class="tag">Unity</span><span class="tag">C#</span>
+            <span class="tag">Mobile</span><span class="tag">Game</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- ABOUT -->
+  <section id="about" class="section reveal">
+    <div class="section-label">About</div>
+    <div class="about-wrap">
+      <div class="about-text">
+        <p>
+          I'm Lukas, a student in Austria. Backend systems and AI tooling are most of
+          what I do, plus games, and every so often a Raspberry Pi bolted to a Lego robot
+          for a competition.
+        </p>
+        <p>
+          Most of my projects started because something annoyed me. I built <strong>SceneForge</strong>
+          because setting up scenes by hand is tedious, and <strong>lego-spike-serial</strong> because there
+          was no clean way to drive a SPIKE over serial.
+        </p>
+
+        <div class="tech-section">
+          <div class="tech-section-label">Languages</div>
+          <div class="tech-row">
+            <span class="tech-pill strong">C#</span>
+            <span class="tech-pill strong">Python</span>
+            <span class="tech-pill strong">TypeScript</span>
+            <span class="tech-pill strong">C</span>
+            <span class="tech-pill">C++</span>
+            <span class="tech-pill">Java</span>
+            <span class="tech-pill">Kotlin</span>
+            <span class="tech-pill">HTML/CSS</span>
+          </div>
+          <div class="tech-section-label" style="margin-top:18px;">Tools &amp; infra</div>
+          <div class="tech-row">
+            <span class="tech-pill strong">Unity</span>
+            <span class="tech-pill strong">Docker</span>
+            <span class="tech-pill">Docker Compose</span>
+            <span class="tech-pill">Kubernetes</span>
+            <span class="tech-pill">Azure</span>
+            <span class="tech-pill">Proxmox</span>
+            <span class="tech-pill">Webots</span>
+          </div>
+        </div>
+
+        <div class="tech-section">
+          <div class="tech-section-label">Beyond code</div>
+          <p class="about-aside">
+            Outside project work I run a small <strong>homelab</strong>: three Proxmox nodes
+            (repurposed desktops, with a fourth on the way) hosting Nextcloud, Vaultwarden,
+            Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site, all exposed
+            through Cloudflare tunnels.
+          </p>
+          <p class="about-aside">
+            I 3D print functional parts for my hardware projects and keep upgrading an
+            <strong>Ender 3 Pro</strong>. It runs Klipper off a Raspberry Pi and has been modded
+            enough that I call it the
+            <a href="https://en.wikipedia.org/wiki/Ship_of_Theseus" target="_blank" rel="noopener">Ender of Theseus</a>.
+          </p>
+          <p class="about-aside">
+            Away from screens, I ride motorbikes. Currently on an Aprilia Tuono 125, with plans to
+            move up to something bigger.
+          </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <table class="info-table">
+          <tr><td class="k">Name</td><td class="v">Lukas Grünzweil</td></tr>
+          <tr><td class="k">Location</td><td class="v">Austria</td></tr>
+          <tr><td class="k">Status</td><td class="v">Student, HTL Leonding</td></tr>
+          <tr><td class="k">Email</td><td class="v"><a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a></td></tr>
+          <tr><td class="k">School</td><td class="v"><a href="mailto:l.gruenzweil@students.htl-leonding.ac.at">l.gruenzweil@students.htl-leonding.ac.at</a></td></tr>
+          <tr><td class="k">GitHub</td><td class="v"><a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">lGruenzweilHTL</a></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider" aria-hidden="true"></div>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section reveal">
+    <div class="section-label">Contact</div>
+    <p class="contact-lead">
+      Email is the fastest way to reach me. I'm open to internships and interesting projects, and I answer anything that isn't spam.
+    </p>
+    <div class="hero-actions">
+      <a href="mailto:lukas.gruenzweil@liwest.at" class="btn btn-solid">email me</a>
+      <a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
+        GitHub
+      </a>
+    </div>
+    <div class="contact-emails">
+      <span class="lbl">Personal</span><a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a>
+      <span class="lbl">School</span><a href="mailto:l.gruenzweil@students.htl-leonding.ac.at">l.gruenzweil@students.htl-leonding.ac.at</a>
+    </div>
+
+    <!-- Feedback form (POSTs to /api/feedback, gated by Turnstile) -->
+    <div class="section-divider" aria-hidden="true"></div>
+    <div class="feedback-header">
+      <div class="feedback-eyebrow">Feedback</div>
+      <h3 class="feedback-title">Spotted a typo? Have a thought?</h3>
+      <p class="feedback-sub">Quick note, bug report, idea — drop it here and it lands straight in my inbox.</p>
+    </div>
+    <form id="feedback-form" class="feedback-form" autocomplete="off">
+      <div class="feedback-row">
+        <label class="feedback-field">
+          <span>Name (optional)</span>
+          <input type="text" name="name" maxlength="120" />
+        </label>
+        <label class="feedback-field">
+          <span>Email (optional, if you want a reply)</span>
+          <input type="email" name="email" maxlength="254" />
+        </label>
+      </div>
+      <label class="feedback-field">
+        <span>Message</span>
+        <textarea name="message" required minlength="1" maxlength="4000" rows="4" placeholder="What did you think of the site? Spot a typo? Want to talk about a project?"></textarea>
+      </label>
+      <div class="feedback-actions">
+        <!-- Turnstile widget mount point -->
+        <div class="cf-turnstile" data-sitekey="__TURNSTILE_SITEKEY__" data-callback="__feedbackTurnstileCallback"></div>
+        <button type="submit" class="btn btn-solid" id="feedback-submit">Send feedback</button>
+      </div>
+      <p class="feedback-status" id="feedback-status" role="status"></p>
+    </form>
+  </section>
+</div>
+
+<footer>
+  <span class="footer-note">© 2026 Lukas Grünzweil</span>
+  <span class="footer-note"><a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">github.com/lGruenzweilHTL ↗</a></span>
+</footer>
+
+<script src="main.js" defer></script>
+
+<!-- Cloudflare Turnstile (chatbot captcha + feedback form). The sitekey
+     below is the documented "always passes" test key. Replace with your real
+     sitekey on the live server. If the script fails to load, the backend
+     still works in dev (TURNSTILE_DEV_BYPASS=1) and falls back to a
+     captcha-failed message in production if the sitekey is wrong. -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__chatTurnstileOnload" async defer></script>
+<script>
+window.__chatTurnstileOnload = function () { window.__chatTurnstileReady = true; };
+window.__feedbackTurnstileCallback = function (token) { window.__feedbackTurnstileToken = token; };
+</script>
+<script src="chat.js" defer></script>
+<script src="feedback.js" defer></script>
+</body>
+</html>
