@@ -125,10 +125,25 @@ class TurnstileSitekeyMiddleware(BaseHTTPMiddleware):
         # Buffer the body. index.html is small; this is fine. If the file
         # ever grows large enough for this to matter, switch to a streaming
         # transform.
+        #
+        # Important: reading body_iterator consumes it. Once we've done that,
+        # the original `response` is no longer streamable — returning it
+        # would cause uvicorn to see a Content-Length header with a body of
+        # zero bytes ("Response content shorter than Content-Length"). So
+        # we always reconstruct the response from the buffered body, even
+        # when no token replacement happened.
         chunks = [chunk async for chunk in response.body_iterator]
         body = b"".join(chunks) if chunks else b""
         if self._TOKEN.encode("utf-8") not in body:
-            return response
+            # No rewrite needed, but the body has been consumed. Return a
+            # new Response with the same body so the outer middleware can
+            # stream it normally.
+            return Response(
+                content=body,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.media_type,
+            )
         new_body = body.replace(
             self._TOKEN.encode("utf-8"),
             settings.turnstile_sitekey.encode("utf-8"),
