@@ -1,0 +1,63 @@
+[Unit]
+Description=Portfolio backend (FastAPI / uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+# If the deploy webhook restarts us while we're still serving, we want a
+# clean stop — not a SIGKILL mid-request. 90s is generous for in-flight
+# SSE streams; raise it if you have slower endpoints.
+KillMode=mixed
+TimeoutStopSec=90s
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/portfolio
+EnvironmentFile=/opt/portfolio/.env
+
+# The app reads .env on its own, but EnvironmentFile= lets systemd log the
+# values at startup if you point journalctl at it. Remove if you'd rather
+# not have secrets visible to `journalctl -u backend`.
+
+# Single uvicorn worker — the deploy webhook and the chat SSE both need
+# in-process state (rate-limit buckets, the /content cache), so multiple
+# workers would cause subtle drift. Scale vertically first.
+ExecStart=/opt/portfolio/.venv/bin/uvicorn backend.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --no-access-log
+ExecReload=/bin/kill -HUP $MAINPID
+
+# The deploy webhook does `systemctl restart backend`, which sends SIGTERM
+# to uvicorn, waits TimeoutStopSec, then SIGKILL. uvicorn handles SIGTERM
+# cleanly and closes connections. The deploy handler's `_run(["systemctl",
+# "restart", ...])` returns once systemd has scheduled the stop — so the
+# webhook's 200 OK goes out before this unit is fully down, which is what
+# we want.
+Restart=on-failure
+RestartSec=2s
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+# Hardening: drop everything we don't need.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/portfolio /opt/portfolio/static/generated
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+# WeasyPrint dlopens libpango/etc. on startup; don't let NoNewPrivileges
+# or the namespace restrictions stop that. (They shouldn't, but explicit
+# is cheaper than debugging.)
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

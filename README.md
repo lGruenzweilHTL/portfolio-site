@@ -212,6 +212,52 @@ GitHub webhook → `POST /webhook/deploy` with header
 The whole process takes ~5–10 seconds end-to-end. Return value is a
 single-line summary suitable for logging.
 
+### systemd unit
+
+The deploy webhook's step 4 assumes a unit called `backend` exists (the
+name is configurable via `DEPLOY_SYSTEMD_UNIT`). A reference unit lives
+at `deploy/backend.service`. Install it with:
+
+```bash
+sudo cp deploy/backend.service /etc/systemd/system/backend.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now backend.service
+```
+
+Adjust `User=`, `Group=`, `WorkingDirectory=`, and `EnvironmentFile=`
+to match the server layout. The unit is deliberately written to restart
+cleanly when the webhook cycles it — the two design choices that matter
+are:
+
+- **`Type=simple` + `Restart=on-failure` + `RestartSec=2s`.** uvicorn
+  doesn't speak `sd_notify` natively, so `Type=notify` would need an
+  extra shim for no real gain here. `on-failure` + a 2s delay gives the
+  old process time to release :8000 before the new one tries to bind,
+  so a second-startup `EADDRINUSE` is avoided. `StartLimitBurst=5` over
+  `StartLimitIntervalSec=60s` keeps a broken unit (e.g. missing env
+  var) from looping forever and filling the journal.
+- **`KillMode=mixed` + `TimeoutStopSec=90s`.** `systemctl restart` sends
+  SIGTERM, waits 90s, then SIGKILLs the cgroup. 90s is generous for
+  in-flight SSE streams on `/api/chat`; raise it if you add slower
+  endpoints. `mixed` is the same as `process` for a single-worker
+  service but future-proofs the unit if you ever switch to
+  `uvicorn --workers N`.
+
+#### Why the webhook returns 200 before the new instance is up
+
+`_run(["systemctl", "restart", "backend"])` in `backend/routes/deploy.py`
+returns as soon as systemd has *scheduled* the restart — before the new
+uvicorn process has bound :8000. So GitHub sees `200 · systemd:
+restarted backend` while the new instance may still be starting. In
+practice the 2s `RestartSec` plus uvicorn's own startup time means the
+new process is up within a second or two of the response going out.
+
+If you need a stronger guarantee — e.g. you want the deploy to fail
+loudly if the new instance never comes up — change `_run` to fire
+`systemctl restart` detached, then poll `systemctl is-active backend`
+for a few seconds before returning. That's a code change, not a unit
+change, so it's not done by default.
+
 ## What's not in this repo
 
 - The `html/` and `study/` directories from the nginx era are gone —
