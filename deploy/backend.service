@@ -29,12 +29,15 @@ ExecStart=/opt/portfolio/.venv/bin/uvicorn backend.main:app \
     --no-access-log
 ExecReload=/bin/kill -HUP $MAINPID
 
-# The deploy webhook does `systemctl restart backend`, which sends SIGTERM
-# to uvicorn, waits TimeoutStopSec, then SIGKILL. uvicorn handles SIGTERM
-# cleanly and closes connections. The deploy handler's `_run(["systemctl",
-# "restart", ...])` returns once systemd has scheduled the stop — so the
-# webhook's 200 OK goes out before this unit is fully down, which is what
-# we want.
+# The deploy webhook can't call `systemctl restart backend` directly —
+# it runs as www-data and polkit rejects non-root callers. Instead the
+# handler writes /run/backend.restart, and backend-restart.path +
+# backend-restart.service (also in deploy/) run the restart as root.
+# The path unit's service does `systemctl restart backend` here, which
+# sends SIGTERM to uvicorn, waits TimeoutStopSec, then SIGKILL. uvicorn
+# handles SIGTERM cleanly and closes connections. The deploy handler
+# returns once the flag is written — well before this unit is fully
+# down — which is what we want.
 Restart=on-failure
 RestartSec=2s
 StartLimitIntervalSec=60s

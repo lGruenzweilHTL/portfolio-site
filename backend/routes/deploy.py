@@ -140,14 +140,34 @@ async def deploy(request: Request) -> PlainTextResponse:
     else:
         steps.append("git: skipped (no .git dir)")
 
+    # Restart strategy: the app process runs as www-data (no sudo), so it
+    # can't call `systemctl restart` directly — polkit rejects non-root
+    # callers. Instead we touch a flag file under /run; a separate systemd
+    # .path unit (deploy/backend-restart.path) watches the file and runs
+    # the restart as root when it appears. The .service unit also removes
+    # the flag in ExecStartPre so the next deploy triggers a fresh
+    # PathExists= event.
+    #
+    # The flag file must be pre-created root-owned with mode 0664 and
+    # group=www-data (see deploy/backend-restart.conf + the README
+    # install section). /run/ is mode 0755 owned by root, so touch()ing
+    # a root-owned file there as www-data returns EACCES otherwise.
+    #
+    # Why not signal uvicorn directly: the unit runs in a hardened
+    # sandbox (ProtectSystem=strict, ReadWritePaths=/opt/portfolio), so
+    # sending a signal to $MAINPID from outside isn't reliable across
+    # versions — letting systemd do the restart through a .path unit is
+    # the supported path.
     systemd_unit = getattr(settings, "deploy_systemd_unit", "backend")
+    restart_flag = Path(getattr(settings, "deploy_restart_flag", "/run/backend.restart"))
     if systemd_unit and Path("/run/systemd/system").exists():
-        rc, out, err = _run(["systemctl", "--no-pager", "restart", systemd_unit], timeout=30)
-        if rc == 0:
-            steps.append(f"systemd: restarted {systemd_unit}")
-        else:
-            steps.append(f"systemd: FAILED ({err.strip()[:200]})")
-            log.error("systemctl restart failed: %s", err)
+        try:
+            restart_flag.parent.mkdir(parents=True, exist_ok=True)
+            restart_flag.touch(exist_ok=True)
+            steps.append(f"systemd: restart flag set ({restart_flag})")
+        except OSError as e:
+            steps.append(f"systemd: FAILED ({e})")
+            log.error("could not write restart flag %s: %s", restart_flag, e)
     else:
         steps.append("systemd: skipped (no systemd)")
 

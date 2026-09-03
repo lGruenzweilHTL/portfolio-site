@@ -1,0 +1,20 @@
+[Unit]
+Description=Restart backend.service when the deploy webhook sets the restart flag
+Documentation=man:systemd.service(5)
+
+# Triggered by backend-restart.path when /run/backend.restart appears.
+# Runs as root (no User=), so it can call `systemctl restart backend`
+# on behalf of the unprivileged app process that touched the flag.
+
+[Service]
+Type=oneshot
+# Consume the flag before the restart so a second deploy during this
+# run still leaves the file present and triggers a fresh
+# PathExists= event on the next path reload. Without this, a deploy
+# that lands while a restart is mid-flight would be silently dropped
+# until something else touches the file.
+ExecStartPre=/bin/rm -f /run/backend.restart
+ExecStart=/bin/systemctl restart backend.service
+# Cosmetic for a oneshot; makes `systemctl status` show "active
+# (exited)" instead of "active (running) forever" which is misleading.
+RemainAfterExit=yes

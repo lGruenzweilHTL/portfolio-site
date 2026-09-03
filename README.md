@@ -207,27 +207,61 @@ GitHub webhook → `POST /webhook/deploy` with header
 1. Reload `/content` in-process
 2. Regenerate resume PDFs
 3. `git pull --ff-only` in the project root
-4. `systemctl restart backend` (skipped if no systemd)
+4. Touch a flag file at `/run/backend.restart` (skipped if no systemd)
 
-The whole process takes ~5–10 seconds end-to-end. Return value is a
-single-line summary suitable for logging.
+A separate systemd `.path` unit watches the flag and triggers
+`backend.service` to restart *as root*. The whole process takes ~5–10
+seconds end-to-end. Return value is a single-line summary suitable for
+logging.
 
-### systemd unit
+### Why a flag file instead of `systemctl restart` from the webhook
 
-The deploy webhook's step 4 assumes a unit called `backend` exists (the
-name is configurable via `DEPLOY_SYSTEMD_UNIT`). A reference unit lives
-at `deploy/backend.service`. Install it with:
+The app process runs as `www-data` (or whatever user the systemd unit
+declares), which has no privilege to call `systemctl restart` — polkit
+rejects non-root callers, and the unit's `ProtectSystem=strict` sandbox
+makes sending a signal to `$MAINPID` from outside unreliable across
+systemd versions. The supported path is a `.path` unit that watches a
+file `www-data` is allowed to write to, and a watcher service that
+runs the restart as root. The `ExecStartPre=` on the watcher service
+removes the flag, so a second deploy within the same restart window
+still triggers a fresh `PathExists=` event after the flag is recreated.
+
+### systemd units
+
+Three units + one tmpfiles snippet work together. Reference files live in `deploy/`:
+
+| File | Role |
+|------|------|
+| `backend.service` | The uvicorn process. Configurable name (`DEPLOY_SYSTEMD_UNIT`). |
+| `backend-restart.path` | Watches `/run/backend.restart`, triggers the service below. |
+| `backend-restart.service` | Removes the flag, then `systemctl restart backend`. |
+| `backend-restart.conf` | tmpfiles.d drop-in: recreates the flag file on every boot, root-owned, mode 0664, group=www-data. Required — without it, a boot with a missing flag file makes the next deploy fail with `EACCES` until something else touches the file. |
+
+Install and enable all four (order matters — the `.path` unit only
+watches once both it and the service it points at are present):
 
 ```bash
-sudo cp deploy/backend.service /etc/systemd/system/backend.service
+# 1. Copy the unit files
+sudo cp deploy/backend.service            /etc/systemd/system/backend.service
+sudo cp deploy/backend-restart.path       /etc/systemd/system/backend-restart.path
+sudo cp deploy/backend-restart.service    /etc/systemd/system/backend-restart.service
+# 2. Install the tmpfiles drop-in so the flag file is recreated on every
+#    boot with the right ownership (root:www-data, 0664). Adjust
+#    `www-data` to match the User= in backend.service if it differs.
+sudo cp deploy/backend-restart.conf       /etc/tmpfiles.d/backend-restart.conf
+sudo systemd-tmpfiles --create
+# 3. Reload + enable
 sudo systemctl daemon-reload
-sudo systemctl enable --now backend.service
+sudo systemctl enable --now backend.service backend-restart.path
 ```
 
-Adjust `User=`, `Group=`, `WorkingDirectory=`, and `EnvironmentFile=`
-to match the server layout. The unit is deliberately written to restart
-cleanly when the webhook cycles it — the two design choices that matter
-are:
+If you skip the tmpfiles drop-in, the *first* deploy after a reboot will
+fail with `PermissionError: '/run/backend.restart'` until something
+else (a stray touch, a re-install) recreates the file. The drop-in is
+the durable fix.
+
+`backend.service` is deliberately written to restart cleanly when the
+watcher cycles it — the two design choices that matter are:
 
 - **`Type=simple` + `Restart=on-failure` + `RestartSec=2s`.** uvicorn
   doesn't speak `sd_notify` natively, so `Type=notify` would need an
@@ -245,18 +279,21 @@ are:
 
 #### Why the webhook returns 200 before the new instance is up
 
-`_run(["systemctl", "restart", "backend"])` in `backend/routes/deploy.py`
-returns as soon as systemd has *scheduled* the restart — before the new
-uvicorn process has bound :8000. So GitHub sees `200 · systemd:
-restarted backend` while the new instance may still be starting. In
-practice the 2s `RestartSec` plus uvicorn's own startup time means the
-new process is up within a second or two of the response going out.
+The handler in `backend/routes/deploy.py` returns as soon as the flag
+file is written — before the `.path` unit has fired, before
+`systemctl restart` has scheduled the stop, and before the new uvicorn
+process has bound :8000. So GitHub sees `200 · systemd: restart flag
+set (/run/backend.restart)` while the new instance may still be
+starting. In practice the 2s `RestartSec` plus uvicorn's own startup
+time means the new process is up within a second or two of the
+response going out.
 
 If you need a stronger guarantee — e.g. you want the deploy to fail
-loudly if the new instance never comes up — change `_run` to fire
-`systemctl restart` detached, then poll `systemctl is-active backend`
-for a few seconds before returning. That's a code change, not a unit
-change, so it's not done by default.
+loudly if the new instance never comes up — change the deploy handler
+to poll `systemctl is-active backend` (or to wait on a
+`/run/backend.restart.done` sibling flag set by the watcher service's
+`ExecStartPost=`) for a few seconds before returning. That's a code
+change, not a unit change, so it's not done by default.
 
 ## What's not in this repo
 

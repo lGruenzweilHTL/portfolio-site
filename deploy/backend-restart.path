@@ -1,0 +1,23 @@
+[Unit]
+Description=Watch /run/backend.restart and trigger a backend.service restart
+Documentation=man:systemd.path(5)
+
+# This unit + backend-restart.service exist so the deploy webhook
+# (running as www-data) can ask for a restart without needing to call
+# `systemctl` itself. The webhook writes /run/backend.restart, we
+# see PathExists= fire, and the service runs the restart as root.
+# backend-restart.service's ExecStartPre= removes the flag so a second
+# deploy within the same window still triggers a fresh event after
+# the flag is recreated.
+After=backend.service
+
+[Path]
+# PathExists= fires on the leading edge — once the file appears, the
+# service is started and the flag is consumed in ExecStartPre=.
+# PathChanged= would also work and would re-fire on any future touch,
+# but that's wasted work for a one-shot restart.
+PathExists=/run/backend.restart
+Unit=backend-restart.service
+
+[Install]
+WantedBy=multi-user.target
