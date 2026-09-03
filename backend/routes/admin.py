@@ -76,12 +76,17 @@ def _aggregate(conn) -> dict:
         ),
     }
 
-    # Top paths — only real routes, no static assets. The exclude regex
-    # mirrors the middleware's _is_static_asset so historical rows that
-    # slipped through before the rule existed don't pollute the list.
+    # Top paths — only accepted (2xx/3xx) routes, no static assets, no
+    # 404/5xx noise. The status filter excludes bot probes that miss
+    # every page; the GLOB exclusions are a belt-and-braces guard for
+    # historical asset rows that pre-date the middleware's
+    # _is_static_asset rule. Pre-migration rows have status = NULL and
+    # fall through the filter (treated as not-successful) so they
+    # don't silently reappear after the change.
     _ROUTE_PATH_SQL = """
         SELECT path, COUNT(*) as count FROM events
         WHERE kind = 'pageview' AND created_at >= ?
+          AND status >= 200 AND status < 400
           AND path NOT GLOB '*.[cC][sS][sS]'
           AND path NOT GLOB '*.[jJ][sS]'
           AND path NOT GLOB '*.[mM][aA][pP]'

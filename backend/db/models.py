@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS events (
     referrer TEXT,
     user_agent TEXT,
     visitor_hash TEXT NOT NULL,         -- sha256(ip + ua + date)[:16], pseudo-unique per day
+    status INTEGER,                     -- HTTP response status (pageview only); NULL for events and for pre-migration rows
     created_at TEXT NOT NULL            -- ISO-8601 UTC
 );
 CREATE INDEX IF NOT EXISTS idx_events_created_at ON events(created_at);
@@ -104,12 +105,40 @@ CREATE INDEX IF NOT EXISTS idx_secure_link_events_created_at ON secure_link_even
 
 
 def init_db() -> None:
-    """Create tables if they don't exist. Safe to call repeatedly."""
+    """Create tables if they don't exist, then run additive migrations.
+    Safe to call repeatedly."""
     db_path = Path(settings.database_path)
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with _connect() as conn:
         conn.executescript(SCHEMA)
+        _migrate(conn)
     log.info("DB initialized at %s", db_path)
+
+
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str, decl: str) -> None:
+    """Idempotent ALTER TABLE ADD COLUMN. SQLite has no IF NOT EXISTS for
+    columns, so we ask the schema via PRAGMA table_info and skip if the
+    column is already present. `decl` is the full column declaration
+    after the name, e.g. 'INTEGER' or 'TEXT NOT NULL DEFAULT \"\"'."""
+    existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+    if column in existing:
+        return
+    conn.execute(f'ALTER TABLE {table} ADD COLUMN {column} {decl}')
+    log.info("migration: added %s.%s %s", table, column, decl)
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Additive migrations applied after the base schema. Each step is
+    idempotent so the function is safe to call on every boot."""
+    # events.status — added so the admin "Top paths" view can filter
+    # out 404s/5xx. Nullable on purpose: pre-migration rows stay valid
+    # (NULL = unknown, treated as not-successful by the filter).
+    _add_column_if_missing(conn, "events", "status", "INTEGER")
+    # Index added in the same step so the filtered admin query stays
+    # fast even on a few years of accumulated pageviews. The CREATE
+    # INDEX IF NOT EXISTS in SCHEMA covers fresh DBs; this is the
+    # belt-and-braces for DBs that existed before the column landed.
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_events_status ON events(status)")
 
 
 @contextmanager

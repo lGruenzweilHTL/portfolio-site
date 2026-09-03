@@ -192,20 +192,23 @@ class AnalyticsMiddleware(BaseHTTPMiddleware):
         if _is_static_asset(path):
             return
         # Even 404s get logged — someone trying to reach /foo is signal.
+        # The status code is captured so the admin "Top paths" view can
+        # filter to accepted (2xx/3xx) responses only.
         ip = request.client.host if request.client else ""
         ua = request.headers.get("user-agent", "")
         referrer = request.headers.get("referer", "")
         conn = sqlite3.connect(settings.database_path, timeout=5.0)
         try:
             conn.execute(
-                "INSERT INTO events (kind, path, name, referrer, user_agent, visitor_hash, created_at) "
-                "VALUES (?, ?, NULL, ?, ?, ?, ?)",
+                "INSERT INTO events (kind, path, name, referrer, user_agent, visitor_hash, status, created_at) "
+                "VALUES (?, ?, NULL, ?, ?, ?, ?, ?)",
                 (
                     "pageview",
                     path,
                     (referrer[:512]) if referrer else None,
                     (ua[:512]) if ua else None,
                     _visitor_hash(ip, ua),
+                    response.status_code,
                     datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 ),
             )
