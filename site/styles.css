@@ -322,6 +322,125 @@ nav {
 .contact-emails a:hover { text-decoration: underline; }
 .contact-emails .lbl { color: var(--muted); }
 
+/* EXPERIENCE */
+.xp-list { display: flex; flex-direction: column; gap: 14px; }
+.xp {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.xp::before {
+  /* accent rail — appears on hover, hints at the entry being clickable/active */
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.25s ease;
+}
+.xp:hover { border-color: var(--line2); transform: translateY(-2px); }
+.xp:hover::before { transform: scaleY(1); }
+
+.xp-head {
+  padding: 20px 22px 18px;
+  border-right: 1px solid var(--line);
+  background: var(--bg2);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.xp-org {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 600;
+  color: var(--white);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.xp-role {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--hi);
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+.xp-meta {
+  font-family: var(--font-mono);
+  font-size: 11px; color: var(--muted);
+  margin-top: 6px;
+}
+
+.xp-body {
+  padding: 18px 22px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  min-width: 0;
+}
+.xp-summary {
+  color: var(--dim);
+  line-height: 1.7;
+  font-size: 14px;
+  margin: 0;
+}
+.xp-summary strong { color: var(--text); font-weight: 600; }
+
+/* pull-quote — only on the SlideLizard card */
+.xp-quote {
+  margin: 0;
+  padding: 10px 14px 10px 18px;
+  border-left: 2px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft) 0%, transparent 70%);
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--hi);
+  line-height: 1.55;
+}
+.xp-quote-mark {
+  position: absolute;
+  left: 12px; top: 4px;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.15;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.xp-quote cite {
+  display: block;
+  margin-top: 6px;
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.xp-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+
+/* Staggered entrance: cards slide up sequentially when the section reveals. */
+#experience.reveal .xp {
+  opacity: 0;
+  transform: translateY(14px);
+}
+#experience.reveal.in .xp {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+#experience.reveal.in .xp:nth-child(1) { transition-delay: 0ms; }
+#experience.reveal.in .xp:nth-child(2) { transition-delay: 150ms; }
+
+@media (max-width: 720px) {
+  .xp { grid-template-columns: 1fr; }
+  .xp-head { border-right: none; border-bottom: 1px solid var(--line); }
+}
+
 /* SECTION DIVIDER (used between major sections, incl. feedback) */
 .section-divider {
   margin: 52px 0 28px;
@@ -438,6 +557,7 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
+  #experience.reveal .xp { opacity: 1; transform: none; }
 }
 
 @media (max-width: 720px) {

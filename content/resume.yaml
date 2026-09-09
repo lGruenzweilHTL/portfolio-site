@@ -26,6 +26,49 @@ education:
     # end: 2027-06
     notes: "Higher technical college (Höhere Technische Lehranstalt)"
 
+# Professional experience, most-recent first.
+# Renders into the resume PDF in full; the public HTML site surfaces a
+# short summary + tags via site/index.html. public_summary is the
+# ~2-sentence version the site uses; public_tags are the small pill row.
+experience:
+  - org: "SlideLizard Software GmbH"
+    role: "Software Engineering Intern"
+    location: "Linz, Austria"
+    start: 2026-08
+    end: 2026-08
+    summary: >
+      One-month internship on a small product team. Shipped a PWA against
+      Microsoft Dynamics 365 Sales with speech-to-text meeting notes and an
+      Azure OpenAI assistant, plus a small scheduled GEO-visibility tracker
+      on the side.
+    highlights:
+      - "Built an Angular PWA around Dynamics 365 Sales: meeting-notes workflow with Azure Speech dictation, plus an Azure OpenAI assistant that talks to Dataverse (hand-rolled against the MCP server to skip per-call MCP billing)"
+      - "Side project: a GEO (Generative Engine Optimization) tracker over OpenRouter, scheduled once a day to log visibility metrics for a fixed prompt set"
+      - "Head of development called it one of the best projects to come out of an internship there"
+    public_summary: >
+      Built a PWA on top of Dynamics 365 Sales with speech-to-text meeting
+      notes and an Azure OpenAI assistant wired into Dataverse, plus a
+      small daily GEO-visibility tracker on the side. The head of
+      development called it one of the best projects to come out of an
+      internship there.
+    public_tags: ["Angular", "TypeScript", "Azure Speech", "Azure OpenAI", "Dataverse", "OpenRouter"]
+
+  - org: "Caritas Upper Austria"
+    role: "Intern — Office & IT Assistant"
+    location: "Leonding, Austria"
+    start: 2025-07
+    end: 2025-08
+    summary: >
+      General office and IT support. Handled accounting assistance and
+      quarterly billing, plus first-level IT and infrastructure tasks.
+    highlights:
+      - "Administrative and clerical support"
+      - "Accounting assistance and quarterly billing (Quartalsabrechnung)"
+      - "First-level IT support and infrastructure"
+    public_summary: >
+      Office and IT support: admin, accounting assistance, first-level IT.
+    public_tags: ["Admin", "IT support", "Billing"]
+
 # Featured first, then chronological by prominence. The site controls display order;
 # this list feeds the resume PDF's project section and the chatbot's project awareness.
 projects:

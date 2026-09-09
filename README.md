@@ -4,8 +4,6 @@ Lukas Grünzweil's portfolio site, served by a single FastAPI process that
 also runs the recruiter chatbot, analytics, feedback, study notes, file
 downloads, and admin dashboard.
 
-See `portfolio-backend-architecture.md` for the design rationale.
-
 ## What runs where
 
 - **Main site:** `/` — hand-written HTML/CSS/JS, served as static files
