@@ -1,22 +1,24 @@
 """Loads and validates /content (YAML) at startup.
 
-Two files:
-  - resume.yaml           : structured facts (personal, projects, skills, etc.)
-  - chatbot_personality.yaml : chatbot voice + system prompt template
+Three files make up the content bundle:
+  - resume.yaml                : structured facts (personal, projects, etc.)
+  - chatbot_personality.yaml   : chatbot voice + system prompt template
+  - services.yaml              : public/internal self-hosted service catalog
 
-Validation is shallow by design — Pydantic isn't used here because the schema
-is evolving and over-modeling it upfront is friction. We check the required
-top-level keys exist and the types make sense; deeper validation happens at
-the point of use (PDF render, chat prompt render).
+Validation is intentionally kept close to the data. The service catalog is
+normalized into small dataclasses so templates never have to interpret raw YAML
+or decide whether a link is public or home-network-only.
 
 Reload: call load_content() again. Used by /webhook/deploy after a git pull.
 """
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -49,9 +51,56 @@ REQUIRED_PERSONAL_KEYS = {
 
 REQUIRED_SKILLS_KEYS = {"languages", "tools_and_infra"}
 
+VALID_VISIBILITIES = frozenset({"public", "internal"})
+SERVICE_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
 
 class ContentError(ValueError):
     """Raised when /content is missing required keys or has wrong types."""
+
+
+@dataclass(frozen=True)
+class ServiceLink:
+    """One clickable URL in a category or service."""
+
+    label: str
+    url: str
+    visibility: str
+
+    @property
+    def visibility_label(self) -> str:
+        return "Home network only" if self.visibility == "internal" else "Public"
+
+
+@dataclass(frozen=True)
+class Service:
+    """A named service with one or more direct URLs."""
+
+    id: str
+    name: str
+    description: str
+    visibility: str
+    urls: tuple[ServiceLink, ...]
+
+    @property
+    def visibility_label(self) -> str:
+        return "Home network only" if self.visibility == "internal" else "Public"
+
+
+@dataclass(frozen=True)
+class ServiceCategory:
+    """A service type/category, such as portfolio or media."""
+
+    id: str
+    name: str
+    description: str
+    visibility: str
+    urls: tuple[ServiceLink, ...]
+    services: tuple[Service, ...]
+
+    @property
+    def visibility_label(self) -> str:
+        return "Home network only" if self.visibility == "internal" else "Public"
 
 
 @dataclass
@@ -59,6 +108,7 @@ class Content:
     resume: dict[str, Any]
     persona: dict[str, Any]
     system_prompt_template: str
+    services: tuple[ServiceCategory, ...]
 
     @property
     def chatbot_system_prompt(self) -> str:
@@ -174,12 +224,192 @@ def _check_required(data: dict, required: set, where: str) -> None:
         raise ContentError(f"{where} missing required keys: {sorted(missing)}")
 
 
-def load_content(content_dir: str | Path | None = None) -> Content:
-    """Load resume.yaml + chatbot_personality.yaml, validate, return Content.
+def _require_mapping(value: Any, where: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ContentError(f"{where} must be a mapping, got {type(value).__name__}")
+    return value
 
-    Also populates the module-level `_content` singleton so get_content() can
-    serve it. Raises ContentError on any problem. Caller decides whether to
-    fail startup (we do) — the chatbot and PDF generator both assume content
+
+def _required_string(mapping: dict[str, Any], key: str, where: str) -> str:
+    if key not in mapping:
+        raise ContentError(f"{where} missing required key: {key}")
+    value = mapping[key]
+    if not isinstance(value, str):
+        raise ContentError(f"{where}.{key} must be a string")
+    value = value.strip()
+    if not value:
+        raise ContentError(f"{where}.{key} must not be empty")
+    return value
+
+
+def _optional_string(mapping: dict[str, Any], key: str, where: str) -> str:
+    if key not in mapping or mapping[key] is None:
+        return ""
+    value = mapping[key]
+    if not isinstance(value, str):
+        raise ContentError(f"{where}.{key} must be a string")
+    return value.strip()
+
+
+def _parse_visibility(value: Any, where: str) -> str:
+    if not isinstance(value, str):
+        raise ContentError(f"{where} must be a string")
+    visibility = value.strip().lower()
+    if visibility not in VALID_VISIBILITIES:
+        allowed = ", ".join(sorted(VALID_VISIBILITIES))
+        raise ContentError(f"{where} must be one of: {allowed}")
+    return visibility
+
+
+def _parse_url(value: Any, where: str) -> str:
+    """Validate a direct link without resolving or fetching its destination."""
+    if not isinstance(value, str):
+        raise ContentError(f"{where} must be a string")
+    url = value.strip()
+    if not url:
+        raise ContentError(f"{where} must not be empty")
+    if any(ch.isspace() or ord(ch) < 32 or ord(ch) == 127 for ch in url):
+        raise ContentError(f"{where} contains whitespace or control characters")
+    if "\\" in url:
+        raise ContentError(f"{where} contains a backslash")
+
+    try:
+        parsed = urlsplit(url)
+    except ValueError as e:
+        raise ContentError(f"{where} is not a valid URL: {e}") from e
+
+    if parsed.scheme.lower() not in {"http", "https"}:
+        raise ContentError(f"{where} must use http:// or https://")
+    if parsed.username is not None or parsed.password is not None:
+        raise ContentError(f"{where} must not contain userinfo or credentials")
+    try:
+        hostname = parsed.hostname
+        _ = parsed.port
+    except ValueError as e:
+        raise ContentError(f"{where} has an invalid port or host: {e}") from e
+    if not hostname:
+        raise ContentError(f"{where} must include a host")
+    return url
+
+
+def _parse_links(raw: Any, parent_visibility: str, where: str) -> tuple[ServiceLink, ...]:
+    if not isinstance(raw, list):
+        raise ContentError(f"{where} must be a list")
+
+    links: list[ServiceLink] = []
+    for index, item in enumerate(raw):
+        item_where = f"{where}[{index}]"
+        link = _require_mapping(item, item_where)
+        label = _required_string(link, "label", item_where)
+        url = _parse_url(link.get("url"), f"{item_where}.url")
+        visibility = _parse_visibility(
+            link.get("visibility", parent_visibility),
+            f"{item_where}.visibility",
+        )
+        links.append(ServiceLink(label=label, url=url, visibility=visibility))
+    return tuple(links)
+
+
+def _parse_service(raw: Any, index: int, where: str) -> Service:
+    service_where = f"{where}[{index}]"
+    service = _require_mapping(raw, service_where)
+    service_id = _required_string(service, "id", service_where)
+    if not SERVICE_ID_RE.fullmatch(service_id):
+        raise ContentError(
+            f"{service_where}.id must be lowercase letters, numbers, or single hyphens"
+        )
+    name = _required_string(service, "name", service_where)
+    visibility = _parse_visibility(service.get("visibility"), f"{service_where}.visibility")
+    description = _optional_string(service, "description", service_where)
+    urls = _parse_links(service.get("urls"), visibility, f"{service_where}.urls")
+    if not urls:
+        raise ContentError(f"{service_where}.urls must contain at least one link")
+    return Service(
+        id=service_id,
+        name=name,
+        description=description,
+        visibility=visibility,
+        urls=urls,
+    )
+
+
+def _parse_services(raw: Any, where: str) -> tuple[Service, ...]:
+    if not isinstance(raw, list):
+        raise ContentError(f"{where} must be a list")
+
+    services: list[Service] = []
+    seen_ids: set[str] = set()
+    for index, item in enumerate(raw):
+        service = _parse_service(item, index, where)
+        if service.id in seen_ids:
+            raise ContentError(f"{where} contains duplicate service id: {service.id}")
+        seen_ids.add(service.id)
+        services.append(service)
+    return tuple(services)
+
+
+def _parse_categories(raw: Any) -> tuple[ServiceCategory, ...]:
+    if not isinstance(raw, list):
+        raise ContentError("services.yaml categories must be a list")
+
+    categories: list[ServiceCategory] = []
+    seen_ids: set[str] = set()
+    for index, item in enumerate(raw):
+        category_where = f"services.yaml categories[{index}]"
+        category = _require_mapping(item, category_where)
+        category_id = _required_string(category, "id", category_where)
+        if not SERVICE_ID_RE.fullmatch(category_id):
+            raise ContentError(
+                f"{category_where}.id must be lowercase letters, numbers, or single hyphens"
+            )
+        name = _required_string(category, "name", category_where)
+        visibility = _parse_visibility(category.get("visibility"), f"{category_where}.visibility")
+        description = _optional_string(category, "description", category_where)
+        urls = _parse_links(category.get("urls", []), visibility, f"{category_where}.urls")
+        services = _parse_services(category.get("services", []), f"{category_where}.services")
+        if not urls and not services:
+            raise ContentError(f"{category_where} must contain at least one url or service")
+
+        if category_id in seen_ids:
+            raise ContentError(f"services.yaml categories contains duplicate id: {category_id}")
+        seen_ids.add(category_id)
+        categories.append(
+            ServiceCategory(
+                id=category_id,
+                name=name,
+                description=description,
+                visibility=visibility,
+                urls=urls,
+                services=services,
+            )
+        )
+    return tuple(categories)
+
+
+def load_services(content_dir: str | Path | None = None) -> tuple[ServiceCategory, ...]:
+    """Load and normalize content/services.yaml."""
+    base = Path(content_dir or settings.content_dir)
+    services_path = base / "services.yaml"
+    if not services_path.exists():
+        raise ContentError(f"services.yaml not found at {services_path}")
+
+    try:
+        with services_path.open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        raise ContentError(f"services.yaml contains invalid YAML: {e}") from e
+
+    root = _require_mapping(data, "services.yaml")
+    if "categories" not in root:
+        raise ContentError("services.yaml missing required key: categories")
+    return _parse_categories(root["categories"])
+
+
+def load_content(content_dir: str | Path | None = None) -> Content:
+    """Load the content bundle, validate it, and populate the singleton.
+
+    Raises ContentError on any problem. Caller decides whether to fail startup
+    (we do) — the chatbot, PDF generator, and services page all assume content
     is loaded.
     """
     base = Path(content_dir or settings.content_dir)
@@ -210,16 +440,25 @@ def load_content(content_dir: str | Path | None = None) -> Content:
     if "system_prompt_template" not in persona:
         raise ContentError("chatbot_personality.yaml missing 'system_prompt_template' key")
 
-    log.info("Content loaded: %d projects, %d skills, %d beyond-code items",
-             len(resume.get("projects", [])),
-             len(resume.get("skills", {}).get("languages", {}).get("strong", [])) +
-             len(resume.get("skills", {}).get("languages", {}).get("familiar", [])),
-             len(resume.get("beyond_code", [])))
+    services = load_services(base)
+    service_count = sum(1 + len(category.services) for category in services)
+    link_count = sum(len(category.urls) + sum(len(service.urls) for service in category.services) for category in services)
+    log.info(
+        "Content loaded: %d projects, %d skills, %d beyond-code items, %d service categories, %d services, %d links",
+        len(resume.get("projects", [])),
+        len(resume.get("skills", {}).get("languages", {}).get("strong", []))
+        + len(resume.get("skills", {}).get("languages", {}).get("familiar", [])),
+        len(resume.get("beyond_code", [])),
+        len(services),
+        service_count,
+        link_count,
+    )
 
     content = Content(
         resume=resume,
         persona=persona["persona"],
         system_prompt_template=persona["system_prompt_template"],
+        services=services,
     )
     # Populate the module-level singleton so get_content() can serve it.
     # Reload after /webhook/deploy also routes through this function.

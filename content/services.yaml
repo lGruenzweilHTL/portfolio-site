@@ -1,0 +1,116 @@
+# Public directory for self-hosted services.
+categories:
+  - id: portfolio
+    name: Portfolio
+    description: Public sites for this portfolio and its administration.
+    visibility: public
+    urls:
+      - label: Main site
+        url: https://gruenzweil.cc
+      - label: Admin
+        url: https://gruenzweil.cc/admin
+
+  - id: identity
+    name: Identity and access
+    description: Central authentication and single sign-on.
+    visibility: public
+    urls:
+      - label: Authentik
+        url: https://auth.gruenzweil.cc
+
+  - id: cloud-communication
+    name: Cloud and communication
+    description: File storage, feeds, notifications, and family communication.
+    visibility: public
+    urls:
+      - label: Nextcloud
+        url: https://cloud.gruenzweil.cc
+      - label: Ntfy
+        url: https://ntfy.gruenzweil.cc
+    services:
+      - id: freshrss
+        name: FreshRSS
+        description: Self-hosted RSS and Atom feed reader.
+        visibility: internal
+        urls:
+          - label: Open FreshRSS
+            url: https://freshrss.internal.gruenzweil.cc
+
+  - id: gaming
+    name: Gaming
+    description: Minecraft server management.
+    visibility: public
+    urls:
+      - label: Discopanel
+        url: https://discopanel.gruenzweil.cc
+
+  - id: home-family
+    name: Home and family
+    description: Smart-home control and family-facing applications.
+    visibility: public
+    urls:
+      - label: Home Assistant
+        url: https://hass.gruenzweil.cc
+      - label: Sprachlaute
+        url: https://sprachlaute.gruenzweil.cc
+
+  - id: media
+    name: Media
+    description: Media playback and download automation.
+    visibility: public
+    services:
+      - id: jellyfin
+        name: Jellyfin
+        description: Public media streaming.
+        visibility: public
+        urls:
+          - label: Open Jellyfin
+            url: https://media.gruenzweil.cc
+
+      - id: media-automation
+        name: Automation and downloads
+        description: Internal Arr applications, qBittorrent, and SABnzbd.
+        visibility: internal
+        urls:
+          - label: Sonarr
+            url: https://sonarr.internal.gruenzweil.cc
+          - label: Radarr
+            url: https://radarr.internal.gruenzweil.cc
+          - label: qBittorrent
+            url: https://qbittorrent.internal.gruenzweil.cc
+          - label: SABnzbd
+            url: https://sabnzbd.internal.gruenzweil.cc
+
+  - id: network-infrastructure
+    name: Network and infrastructure
+    description: DNS filtering, reverse proxies, and virtualization.
+    visibility: internal
+    urls:
+      - label: Pi-hole 1
+        url: https://dns.internal.gruenzweil.cc
+      - label: Pi-hole 2
+        url: https://dns2.internal.gruenzweil.cc
+      - label: Nginx Proxy Manager
+        url: https://proxy.internal.gruenzweil.cc
+      - label: Proxmox 1
+        url: https://pve1.internal.gruenzweil.cc
+      - label: Proxmox 2
+        url: https://pve2.internal.gruenzweil.cc
+      - label: Proxmox 3
+        url: https://pve3.internal.gruenzweil.cc
+
+  - id: security
+    name: Security
+    description: Centralized secrets management.
+    visibility: internal
+    urls:
+      - label: Infisical
+        url: https://secrets.internal.gruenzweil.cc
+
+  - id: monitoring
+    name: Monitoring
+    description: Service availability and response-time monitoring.
+    visibility: internal
+    urls:
+      - label: Uptime Kuma
+        url: https://uptime.internal.gruenzweil.cc

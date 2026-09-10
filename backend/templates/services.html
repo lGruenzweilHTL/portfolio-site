@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Services · Portfolio</title>
+<meta name="description" content="Public and home-network services hosted by Lukas Grünzweil." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-id">Lukas Grünzweil</div>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/notes/">Notes</a></li>
+    <li><a href="/files/">Files</a></li>
+  </ul>
+</nav>
+
+<main class="wrap services-page">
+  <section class="section services-intro">
+    <div class="section-label">Services</div>
+    <h1 class="services-title">Self-hosted services</h1>
+    <p class="services-subtitle">
+      A small directory of the services running on this server. Public links work
+      from anywhere; home-network links are listed for convenience and only work
+      while you are connected to the LAN.
+    </p>
+    <p class="services-note">
+      Links open directly at their configured address. This page does not proxy,
+      health-check, or enforce access to any service.
+    </p>
+  </section>
+
+  {% if categories %}
+    {% for category in categories %}
+    <section class="service-category" aria-labelledby="category-{{ category.id }}">
+      <header class="service-category-head">
+        <div class="service-category-copy">
+          <div class="service-kicker">{{ category.id }}</div>
+          <h2 class="service-category-title" id="category-{{ category.id }}">{{ category.name }}</h2>
+          {% if category.description %}
+          <p class="service-category-description">{{ category.description }}</p>
+          {% endif %}
+        </div>
+        <span class="visibility-badge visibility-{{ category.visibility }}">
+          {{ category.visibility_label }}
+        </span>
+      </header>
+
+      {% if category.urls %}
+      <div class="service-links">
+        {% for link in category.urls %}
+        <a class="service-link" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+          <span class="service-link-label">{{ link.label }}</span>
+          <span class="service-link-meta">
+            <span class="visibility-badge visibility-{{ link.visibility }}">
+              {{ link.visibility_label }}
+            </span>
+            <span class="service-link-arrow" aria-hidden="true">↗</span>
+          </span>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if category.services %}
+      <div class="service-grid">
+        {% for service in category.services %}
+        <article class="service-card" aria-labelledby="service-{{ category.id }}-{{ service.id }}">
+          <header class="service-card-head">
+            <div>
+              <div class="service-kicker">{{ service.id }}</div>
+              <h3 class="service-card-title" id="service-{{ category.id }}-{{ service.id }}">{{ service.name }}</h3>
+            </div>
+            <span class="visibility-badge visibility-{{ service.visibility }}">
+              {{ service.visibility_label }}
+            </span>
+          </header>
+          {% if service.description %}
+          <p class="service-card-description">{{ service.description }}</p>
+          {% endif %}
+          <div class="service-links">
+            {% for link in service.urls %}
+            <a class="service-link" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+              <span class="service-link-label">{{ link.label }}</span>
+              <span class="service-link-meta">
+                <span class="visibility-badge visibility-{{ link.visibility }}">
+                  {{ link.visibility_label }}
+                </span>
+                <span class="service-link-arrow" aria-hidden="true">↗</span>
+              </span>
+            </a>
+            {% endfor %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    {% endfor %}
+  {% else %}
+    <div class="services-empty">No services configured yet.</div>
+  {% endif %}
+</main>
+
+<footer>
+  <span class="footer-note">Hosted services · <a href="/">back to portfolio</a></span>
+  <span class="footer-note">Direct links only</span>
+</footer>
+
+</body>
+</html>

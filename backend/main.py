@@ -6,13 +6,14 @@ Run locally:
 
 Architecture:
     /site           -> StaticFiles mount, served as the portfolio site
+    /services       -> server-rendered self-hosted service directory
     /api/...        -> JSON API routes (chat, feedback, track)
     /resume.pdf     -> generated on demand (with on-disk cache)
     /webhook/...    -> deploy trigger
     /admin          -> combined feedback + analytics view (Cloudflare Access gated)
 
-The static mount must come AFTER API routes so /api/*, /resume.pdf, /admin,
-and /webhook/* resolve to handlers rather than 404s from the file server.
+The static mount must come AFTER API routes so /api/*, /services, /resume.pdf,
+/admin, and /webhook/* resolve to handlers rather than 404s from the file server.
 """
 from __future__ import annotations
 
@@ -286,6 +287,7 @@ def create_app() -> FastAPI:
     from .routes import chat, feedback, track, deploy, admin, resume, files
     from .routes import secure_links_admin
     from .routes import notes
+    from .routes import services
     app.include_router(chat.router)
     app.include_router(feedback.router)
     app.include_router(track.router)
@@ -295,6 +297,7 @@ def create_app() -> FastAPI:
     app.include_router(files.router)
     app.include_router(secure_links_admin.router)
     app.include_router(notes.router)
+    app.include_router(services.router)
 
     # --- Exception handlers: styled HTML for browsers, JSON for API clients ---
     _install_error_handlers(app)

@@ -7,6 +7,7 @@ downloads, and admin dashboard.
 ## What runs where
 
 - **Main site:** `/` — hand-written HTML/CSS/JS, served as static files
+- **Services directory:** `/services` — server-rendered catalog of public and home-network services
 - **Study notes:** `/notes/` — `site/notes/`, hand-written cheatsheets for SYP/Java/NSCS/PL/SQL
 - **Public files:** `/files/` — auto-generated listing of `site/files/`
 - **Secure files:** `/files/secure/` — token-gated downloads of `site/files/secure/` (no listing; access only via signed URL generated from `/admin`)
@@ -33,12 +34,13 @@ the only ingress; the tunnel's `config.yml` just repointed from
   chat.py                  OpenRouter streaming + fallback policy
   turnstile.py             siteverify helper with dev bypass
   resume.py                WeasyPrint PDF render (cache + invalidate)
-  routes/                  One file per route group
+  routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers
-  templates/               Resume PDF templates (light + dark), admin.html, error.html
+  templates/               Resume PDF templates (light + dark), admin.html, error.html, services.html
 /content                   Single source of truth (YAML)
   resume.yaml              Personal, projects, skills, beyond_code
   chatbot_personality.yaml Persona + system prompt template
+  services.yaml            Public/home-network service catalog
 /static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
 .env.example               Copy to .env; all required env vars documented
 requirements.txt           Pinned Python dependencies
@@ -69,6 +71,7 @@ uvicorn backend.main:app --reload --port 8000
 ```
 
 - Main site: <http://localhost:8000/>
+- Services: <http://localhost:8000/services>
 - Notes: <http://localhost:8000/notes/>
 - Files: <http://localhost:8000/files/>
 - Admin: <http://localhost:8000/admin> (dev bypass on by default — see `.env.example`)
@@ -83,6 +86,8 @@ endpoint without real keys. **Never set those in production.**
 | Path | Method | Notes |
 | --- | --- | --- |
 | `/` | GET | Static site (main portfolio page) |
+| `/services` | GET | Server-rendered public/home-network service directory |
+| `/services/` | GET | Same service directory with a trailing slash |
 | `/notes/` | GET | Static study cheatsheets, served as files |
 | `/files/` | GET | Auto-generated HTML listing of public files |
 | `/files/<name>` | GET | Stream a public file |
@@ -121,12 +126,54 @@ doesn't reveal whether the file exists or just the link is bad.
 
 ## Content updates
 
-Edit `content/resume.yaml` (or `chatbot_personality.yaml`) and push to
-`main`. The deploy webhook reloads content + regenerates PDFs automatically.
+Edit `content/resume.yaml`, `content/chatbot_personality.yaml`, or
+`content/services.yaml` and push to `main`. The deploy webhook reloads the
+content bundle automatically; resume PDFs are regenerated as before.
+
+The services catalog uses ordered categories. A category can own multiple URLs
+and/or nested services, and each nested service can own multiple URLs:
+
+```yaml
+categories:
+  - id: portfolio
+    name: Portfolio
+    visibility: public
+    urls:
+      - label: Main site
+        url: https://gruenzweil.cc
+      - label: Admin
+        url: https://gruenzweil.cc/admin
+  - id: media
+    name: Media
+    visibility: internal
+    services:
+      - id: jellyfin
+        name: Jellyfin
+        visibility: public
+        urls:
+          - label: Open Jellyfin
+            url: https://media.gruenzweil.cc
+      - id: media-automation
+        name: Automation and downloads
+        visibility: internal
+        urls:
+          - label: Sonarr
+            url: http://sonarr.home.arpa:8989
+          - label: Radarr
+            url: http://radarr.home.arpa:7878
+```
+
+`visibility` is `public` or `internal`; URL entries inherit their parent value
+unless they provide their own visibility. Links must be absolute `http://` or
+`https://` URLs with a host and no embedded credentials. Internal links are
+shown publicly with a **Home network only** badge, but open directly at their
+configured URL: the page does not proxy, health-check, or enforce network
+access. Keep secrets out of the file.
 
 If you change the schema, also update:
 - `backend/content.py` validation
 - `backend/templates/resume_light.html` and `resume_dark.html`
+- `backend/templates/services.html` when changing the service page markup
 - `site/index.html` (the rich project cards there are not driven by `/content`)
 
 ## Study notes
