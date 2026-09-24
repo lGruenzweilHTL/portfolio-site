@@ -93,8 +93,8 @@ endpoint without real keys. **Never set those in production.**
 | `/files/<name>` | GET | Stream a public file |
 | `/files/secure/` | GET | 404 by design (no listing) |
 | `/files/secure/<name>` | GET | Stream a protected file (requires `?t=<token>`) |
-| `/resume.pdf` | GET | Cached PDF, regenerated on startup + deploy |
-| `/resume-themed.pdf` | GET | Dark/branded variant |
+| `/resume.pdf` | GET | Cached PDF, two-column styled version. Regenerated on startup + deploy |
+| `/resume-ats.pdf` | GET | Single-column ATS-friendly version |
 | `/api/chat` | POST | SSE stream from OpenRouter. Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
@@ -172,7 +172,7 @@ access. Keep secrets out of the file.
 
 If you change the schema, also update:
 - `backend/content.py` validation
-- `backend/templates/resume_light.html` and `resume_dark.html`
+- `backend/templates/resume.html` and `resume_ats.html`
 - `backend/templates/services.html` when changing the service page markup
 - `site/index.html` (the rich project cards there are not driven by `/content`)
 

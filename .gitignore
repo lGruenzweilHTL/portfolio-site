@@ -24,7 +24,10 @@ env/
 *.key
 
 # Generated resume PDF — rebuilt from /content on deploy
-static/resume.pdf
+static/generated/
+
+# Résumé template previews from scripts/render_resume_preview.py
+backend/templates/_preview_*.html
 
 # Cloudflare tunnel credentials
 .cloudflared/

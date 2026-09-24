@@ -1,0 +1,488 @@
+{# Styled résumé PDF — two-column, the default served at /resume.pdf.
+
+   Scoped to backend roles: education, work experience, two featured projects,
+   skills, spoken languages. No intro/summary and no beyond-code section — both
+   live on the site instead, and the elevator_pitch stays in resume.yaml purely
+   for the chatbot.
+
+   Layout: full-height grey sidebar (photo, name, contact, skills, languages)
+   beside a white main column where every section is a timeline with hollow ring
+   markers. The ATS-friendly twin lives in resume_ats.html and renders the same
+   content in the same order, single column, nothing decorative.
+
+   Data source: /content/resume.yaml — every field used here is guarded, so the
+   template renders fine before the optional slots are filled in.
+   See resume.yaml for the "fill later" fields: personal.photo, personal.phone,
+   personal.linkedin, personal.website, and per-entry date_label overrides.
+   Projects reach the PDF only if flagged `cv: true`.
+
+   The icon font is vendored (scripts/build_devicon_subset.py), not loaded from a
+   CDN — a CDN outage would fail silently as blank gaps in the PDF. #}
+{% set p = r.personal %}
+{% set icons = r.skills.get('icons', {}) %}
+{% set name_parts = p.name.split() %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ p.name }} — Résumé</title>
+<link rel="stylesheet" href="assets/devicon/devicon.min.css">
+<style>
+  /* Palette: the site's dark-theme tokens (site/styles.css) inverted for paper.
+     Only the gold accent is shared with the site; everything else is a light
+     counterpart so the two PDFs still read as the same document. */
+  :root {
+    --page:   #ffffff;
+    --panel:  #e7e6e3;  /* sidebar, and the section heading bars */
+    --line:   #e3e0d8;  /* hairlines */
+    --accent: #eba53a;
+    --text:   #2e2c28;
+    --muted:  #918c7f;
+    --dim:    #6f6a5e;
+  }
+
+  /* Print rendering: browsers drop every background fill unless the user ticks
+     "Background graphics" in the print dialog, which silently costs us the
+     sidebar band, the heading pills, the gold underlines and the hairlines.
+     print-color-adjust: exact is inherited, so setting it on the root covers
+     every descendant and the page box. WeasyPrint ignores the property and
+     paints backgrounds unconditionally, so this is browser-only in effect. */
+  :root { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
+  /* margin: 0 so the sidebar band can bleed to the left paper edge and the
+     heading bars can sit flush against it.
+     The band is painted here as well as on .side: WeasyPrint doesn't repaint a
+     fragmented flex child's background, so without this the grey would stop at
+     the bottom of page 1. Colours are literal rather than var() because
+     custom properties aren't reliably resolved inside @page. */
+  @page {
+    size: A4;
+    margin: 0;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    background-image: linear-gradient(to right, #e7e6e3 0, #e7e6e3 62mm, #ffffff 62mm, #ffffff 100%);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    font-size: 9pt;
+    line-height: 1.55;
+  }
+
+  /* Full-height sidebar band in the browser's print output. .side only stretches
+     as far as its flex content, so a short résumé would leave the band stopping
+     mid-page; a background on the root element propagates to the page canvas and
+     fills all of it, on every page. Print-only on purpose — on screen the canvas
+     is the whole window, so this would tint far below the résumé. */
+  @media print {
+    html {
+      background-image: linear-gradient(to right, #e7e6e3 0, #e7e6e3 62mm, #ffffff 62mm, #ffffff 100%);
+    }
+  }
+
+  .page { display: flex; align-items: stretch; }
+
+  /* ---------- SIDEBAR ---------- */
+  .side {
+    flex: 0 0 62mm;
+    width: 62mm;
+    padding: 13mm 9mm 10mm 9mm;
+    background: var(--panel);
+  }
+  .photo {
+    display: block;
+    width: 26mm; height: 26mm;
+    margin: 0 auto 5mm auto;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .name {
+    margin: 0;
+    font-size: 19.5pt;
+    font-weight: 300;
+    line-height: 1.18;
+    /* Tracking is what pushes the last name toward the sidebar edge, so it gets
+       the tightest setting here. Raise it once the name is comfortably short. */
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .rule { height: 0.6pt; background: #d8d4cb; margin: 3.4mm 0 2.6mm 0; }
+  .role {
+    margin: 0;
+    font-size: 7.5pt;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .availability {
+    margin: 0;
+    font-size: 8pt;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .side-block { margin-top: 6.5mm; }
+  /* Sidebar heading: gold, wide-tracked, with a short gold underline. */
+  .side-h {
+    margin: 0 0 3mm 0;
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .side-h::after {
+    content: "";
+    display: block;
+    width: 9mm;
+    height: 0.9pt;
+    background: var(--accent);
+    margin-top: 1.4mm;
+  }
+
+  .contact { list-style: none; margin: 0; padding: 0; }
+  .contact li {
+    display: flex;
+    align-items: center;
+    gap: 2.2mm;
+    margin-bottom: 2mm;
+    font-size: 8.5pt;
+    line-height: 1.35;
+  }
+  .contact svg { flex: none; width: 3.2mm; height: 3.2mm; }
+  .contact a { color: var(--dim); text-decoration: none; word-break: break-all; }
+
+  /* Skill chips: devicon glyph + label. A skill with no devicon class falls back
+     to a neutral dot rather than leaving a hole in the row. */
+  .chips { list-style: none; margin: 0 0 3mm 0; padding: 0; }
+  .chip { display: flex; align-items: center; gap: 2.2mm; margin-bottom: 1.5mm; }
+  /* min-width, not width: a label like "HTML/CSS" maps to two glyphs and a fixed
+     3.6mm box pushed the second one under the label text. */
+  .chip-ic {
+    flex: none;
+    min-width: 3.6mm;
+    text-align: center;
+    font-size: 10.5pt;
+    line-height: 1;
+    color: var(--dim);
+  }
+  .chip-ic .devicon-plain:not(:first-child) { margin-left: 0.6mm; }
+  .chip-dot {
+    display: inline-block;
+    width: 1.5mm; height: 1.5mm;
+    border-radius: 50%;
+    background: #c4bfb4;
+    vertical-align: middle;
+  }
+  .chip-label { color: var(--dim); }
+
+  /* Spoken languages: dark label, muted level, separated by a middle dot. */
+  .spoken { list-style: none; margin: 0; padding: 0; }
+  .spoken li { margin-bottom: 1.4mm; font-size: 8.5pt; line-height: 1.35; }
+  .spoken-lang { color: var(--text); }
+  .spoken-lang::after { content: " ·"; color: var(--muted); }
+  .spoken-level { color: var(--muted); }
+
+  /* ---------- MAIN COLUMN ---------- */
+  /* No right padding, so the heading bars run to the paper edge. Text blocks
+     below re-add it. */
+  .main { flex: 1 1 auto; min-width: 0; padding: 13mm 0 12mm 10mm; }
+
+  .section { margin-bottom: 5.5mm; }
+  .section:last-child { margin-bottom: 0; }
+
+  /* Section heading on a bar the same grey as the sidebar, so the two read as
+     one surface: square where it meets the panel, rounded on the right where it
+     stops. The bar shrink-wraps the heading and stops shortly after it, rather
+     than running to the paper edge.
+
+     `display: table` is the shrink-to-fit that keeps margin-bottom working —
+     inline-block would drop it, since vertical margins on an inline-block don't
+     push the following block, and the heading would sit flush on the timeline.
+     The cost is that a screen reader may announce the heading as a table cell;
+     irrelevant for a PDF, and the ATS twin uses its own markup. */
+  .sec {
+    display: table;
+    /* -10mm cancels .main's left padding so the bar starts flush against the
+       sidebar.
+
+       min-width is the length control. Shrink-wrapping alone made the bar as
+       short as its heading, so EXPERIENCE, PROJECTS and EDUCATION each got a
+       different width and the set read as accidental. The floor makes all three
+       identical. It's a floor rather than a fixed width so a longer future
+       heading still grows the bar instead of wrapping. box-sizing: border-box,
+       so this includes the padding.
+
+       Text is centred in that fixed box: left-aligned, the slack from the
+       min-width all landed on the right and the bar looked lopsided. Padding is
+       symmetric so the centring is true. */
+    min-width: 66mm;
+    margin: 0 0 3.4mm -10mm;
+    padding: 1.7mm 8mm;
+    text-align: center;
+    background: var(--panel);
+    border-radius: 0 2mm 2mm 0;
+    font-size: 9.5pt;
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* Timeline: hollow ring per entry joined by a thin gold connector, whitespace-
+     only separation. No cards, no boxes.
+
+     The connector is a per-entry pseudo-element, not a border. A border always
+     spans the entry top-to-bottom, so with the ring sitting below the date line
+     it would leave a stub of line above the first ring and a gap before the last.
+     Measuring the line from one ring's centre to the next makes it start and end
+     exactly on the markers, however far down the ring sits.
+
+     Rings sit on the entry titles, not the dates. --ring-top is how far down the
+     entry the ring sits, and it differs by entry shape: dated entries
+     (experience, education) push past the date onto the title, while projects
+     have no date so the title is already at the top. */
+  .tl {
+    position: relative;
+    margin: 0;
+    padding: 0 12mm 0 0;
+  }
+  .entry {
+    position: relative;
+    padding: 0 0 4.6mm 7mm;
+    /* Ring top, centred on the 11pt/1.3 title line box. With a date above it:
+       4.37 (.when height) + 0.6 (title margin) + 2.52 (half title line)
+       - 1.55 (ring radius). Retune if .when or .entry-title change size. */
+    --ring-top: 5.9mm;
+  }
+  /* Projects have no date, so no 4.37mm date line to clear. Not 0 either:
+     .entry-title has a 0.6mm top margin, so a zero offset left the ring that far
+     proud of the title — obvious on a lowercase name like "vektorgrid", which
+     has no cap height to visually anchor it. Half the title margin lands the ring
+     on the x-height of both lowercase and uppercase names. */
+  .section-plain .entry { --ring-top: 0.8mm; }
+  .entry:last-child { padding-bottom: 0; }
+
+  /* Connector: this ring's centre down to the next ring's centre. height:100% is
+     the entry's padding box (its full height), so the far end lands on the next
+     ring; both ends tuck under a ring's opaque fill. */
+  .entry::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(var(--ring-top) + 1.55mm);   /* ring centre */
+    width: 0.7pt;
+    height: 100%;
+    background: var(--accent);
+  }
+  .entry:last-child::before { content: none; }   /* line ends at the last ring */
+
+  /* Ring: opaque white fill so it interrupts the line and reads hollow. Drawn as
+     ::after so it paints over the ::before connector, and centred on it. */
+  .entry::after {
+    content: "";
+    position: absolute;
+    left: calc(0.35pt - 1.55mm);
+    top: var(--ring-top);
+    width: 3.1mm; height: 3.1mm;
+    border: 0.9pt solid var(--accent);
+    border-radius: 50%;
+    background: var(--page);
+  }
+
+  .when {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .entry-title { font-size: 11pt; font-weight: 700; line-height: 1.3; margin-top: 0.6mm; }
+  .entry-meta { font-size: 8.5pt; font-style: italic; color: var(--muted); }
+  .entry-body { margin: 1.4mm 0 0 0; color: var(--dim); }
+  .entry ul { margin: 1.4mm 0 0 0; padding-left: 3.6mm; color: var(--dim); }
+  .entry li { margin-bottom: 0.6mm; }
+  .entry li::marker { color: var(--accent); font-size: 0.8em; }
+  .stack { color: var(--muted); font-size: 8pt; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+
+{% macro contact_icon(kind) -%}
+  {%- if kind == 'mail' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="#eba53a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 7 9 6.5L21 7"/></svg>
+  {%- elif kind == 'phone' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="#eba53a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h3l1.8 4.4-2.3 1.5a12.5 12.5 0 0 0 5.6 5.6l1.5-2.3 4.4 1.8v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4 5.7 2 2 0 0 1 6 3.5z"/></svg>
+  {%- elif kind == 'pin' -%}
+    <svg viewBox="0 0 24 24" fill="none" stroke="#eba53a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s7-6.4 7-11.2a7 7 0 1 0-14 0c0 4.8 7 11.2 7 11.2z"/><circle cx="12" cy="10" r="2.6"/></svg>
+  {%- elif kind == 'github' -%}
+    <svg viewBox="0 0 24 24" fill="#eba53a"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
+  {%- elif kind == 'linkedin' -%}
+    <svg viewBox="0 0 24 24" fill="#eba53a"><path d="M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76V21h-4v-5.6c0-1.34-.03-3.06-1.9-3.06-1.9 0-2.2 1.45-2.2 2.96V21h-4z"/></svg>
+  {%- else -%}
+    {# website / anything else: a globe #}
+    <svg viewBox="0 0 24 24" fill="none" stroke="#eba53a" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+  {%- endif -%}
+{%- endmacro %}
+
+{# A skill label plus its devicon glyphs. A YAML value may name several classes
+   ("HTML/CSS" -> "html5 css3"). An unmapped name gets a neutral dot. #}
+{% macro chip(name) -%}
+  <li class="chip">
+    <span class="chip-ic">
+      {%- set slugs = icons.get(name, '')|trim -%}
+      {%- if slugs -%}
+        {%- for slug in slugs.split() -%}
+          <i class="devicon-{{ slug }}-plain"></i>
+        {%- endfor -%}
+      {%- else -%}
+        <i class="chip-dot"></i>
+      {%- endif -%}
+    </span>
+    <span class="chip-label">{{ name }}</span>
+  </li>
+{%- endmacro %}
+
+<div class="page">
+
+  <aside class="side">
+    {% if p.photo %}
+      {# Relative paths resolve against templates_dir (WeasyPrint base_url),
+         so "assets/photo.jpg" means backend/templates/assets/photo.jpg. #}
+      <img class="photo" src="{{ p.photo }}" alt="Portrait of {{ p.name }}">
+    {% endif %}
+
+    <h1 class="name">{{ name_parts[0] }}<br>{{ name_parts[1:]|join(' ') }}</h1>
+    <div class="rule"></div>
+    <p class="role">{{ p.title }}</p>
+    <div class="rule"></div>
+    {% if p.availability %}
+      <p class="availability">{{ p.availability }}</p>
+    {% endif %}
+
+    <section class="side-block">
+      <h2 class="side-h">Contact</h2>
+      <ul class="contact">
+        {% if p.phone %}
+          <li>{{ contact_icon('phone') }}<a href="tel:{{ p.phone }}">{{ p.phone }}</a></li>
+        {% endif %}
+        <li>{{ contact_icon('mail') }}<a href="mailto:{{ p.email_personal }}">{{ p.email_personal }}</a></li>
+        <li>{{ contact_icon('pin') }}<span>{{ p.location }}</span></li>
+        <li>{{ contact_icon('github') }}<a href="{{ p.github_url }}">{{ p.github }}</a></li>
+        {% if p.linkedin %}
+          <li>{{ contact_icon('linkedin') }}<a href="{{ p.linkedin_url }}">{{ p.linkedin }}</a></li>
+        {% endif %}
+        {% if p.website %}
+          <li>{{ contact_icon('website') }}<a href="{{ p.website }}">{{ p.website }}</a></li>
+        {% endif %}
+      </ul>
+    </section>
+
+    <section class="side-block">
+      <h2 class="side-h">Languages</h2>
+      <ul class="chips">
+        {% for s in r.skills.languages %}{{ chip(s) }}{% endfor %}
+      </ul>
+    </section>
+
+    <section class="side-block">
+      <h2 class="side-h">Tools &amp; Infra</h2>
+      <ul class="chips">
+        {% for t in r.skills.tools_and_infra %}{{ chip(t) }}{% endfor %}
+      </ul>
+    </section>
+
+    {% if r.skills.spoken %}
+    <section class="side-block">
+      <h2 class="side-h">Spoken</h2>
+      <ul class="spoken">
+        {% for sp in r.skills.spoken %}
+          <li><span class="spoken-lang">{{ sp.language }}</span><span class="spoken-level">{{ sp.level }}</span></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </aside>
+
+  <main class="main">
+
+    <section class="section">
+      <h2 class="sec">Experience</h2>
+      <div class="tl">
+        {% for ex in r.experience %}
+          {% set start = ex.start|fmt_date %}
+          {% set end = ex.end|fmt_date %}
+          <div class="entry">
+            {% if ex.date_label %}
+              <div class="when">{{ ex.date_label }}</div>
+            {% elif start %}
+              <div class="when">{{ start }}{% if end %} – {{ end }}{% else %} – Present{% endif %}</div>
+            {% elif end %}
+              <div class="when">{{ end }}</div>
+            {% endif %}
+            <div class="entry-title">{{ ex.role }}</div>
+            <div class="entry-meta">{{ ex.org }}{% if ex.location %} · {{ ex.location }}{% endif %}</div>
+            {% if ex.summary %}<p class="entry-body">{{ ex.summary|trim|replace('\n', ' ') }}</p>{% endif %}
+            {% if ex.highlights %}
+              <ul>{% for h in ex.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="section section-plain">
+      <h2 class="sec">Projects</h2>
+      <div class="tl">
+        {# Only projects flagged `cv: true` — picked to support the backend angle.
+           The rest stay in resume.yaml for the site and the chatbot. #}
+        {% for pr in r.projects if pr.cv %}
+          <div class="entry">
+            <div class="entry-title">{{ pr.name }}</div>
+            <div class="entry-meta">
+              {{ pr.role }}{% if pr.status %} · {{ pr.status|replace('_', ' ') }}{% endif %}
+            </div>
+            {% if pr.stack %}<div class="stack">{{ pr.stack|join(' · ') }}</div>{% endif %}
+            {% if pr.summary %}<p class="entry-body">{{ pr.summary|trim|replace('\n', ' ') }}</p>{% endif %}
+            {% if pr.highlights %}
+              <ul>{% for h in pr.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="sec">Education</h2>
+      <div class="tl">
+        {% for ed in r.education %}
+          {% set start = ed.start|fmt_date %}
+          {% set end = ed.end|fmt_date %}
+          <div class="entry">
+            {% if ed.date_label %}
+              <div class="when">{{ ed.date_label }}</div>
+            {% elif start %}
+              <div class="when">{{ start }}{% if end %} – {{ end }}{% else %} – Present{% endif %}</div>
+            {% elif end %}
+              <div class="when">{{ end }}</div>
+            {% endif %}
+            <div class="entry-title">{{ ed.school }}</div>
+            <div class="entry-meta">{{ ed.location }}</div>
+            {% if ed.notes %}<p class="entry-body">{{ ed.notes|trim|replace('\n', ' ') }}</p>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

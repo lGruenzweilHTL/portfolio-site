@@ -1,0 +1,126 @@
+{# ATS-friendly résumé PDF — served at /resume-ats.pdf.
+
+   The machine-readable twin of resume.html: same content, same source
+   (/content/resume.yaml), same order, presented as a plain single column.
+
+   Scoped to backend roles, same as the styled version: education, experience,
+   the `cv: true` projects, skills, spoken languages. No intro, no beyond-code.
+
+   Everything that can trip an applicant tracking system is deliberately absent:
+   no flex/grid layout, no background fills, no icon font, no inline SVG, no
+   absolutely positioned markers, no colour signalling. Plain headings and lists
+   in document order, so a parser sees name, title, contact, then sections.
+
+   Synced fields with /content/resume.yaml — every change there must be
+   reflected here. If you add a section to resume.html, add it here too. #}
+{% set p = r.personal %}
+{% set name_parts = p.name.split() %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ p.name }} — Résumé</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 16mm 16mm 16mm;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+  h1 { font-size: 20pt; margin: 0 0 2pt 0; font-weight: 700; }
+  h2 {
+    font-size: 11pt; margin: 16pt 0 6pt 0;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 700; border-bottom: 1px solid #999; padding-bottom: 2pt;
+  }
+  h3 { font-size: 10.5pt; margin: 10pt 0 1pt 0; font-weight: 700; }
+  p { margin: 3pt 0; }
+  .subtitle { font-size: 10.5pt; margin: 0 0 6pt 0; }
+  .contact { font-size: 10pt; margin: 0 0 10pt 0; }
+  .contact a { color: #000; text-decoration: none; }
+  .meta { font-size: 10pt; margin: 0 0 3pt 0; }
+  ul { margin: 3pt 0 0 0; padding-left: 18pt; }
+  li { margin-bottom: 1pt; }
+  .skills-label { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>{{ p.name }}</h1>
+<p class="subtitle">{{ p.title }}</p>
+{% if p.availability %}<p class="subtitle">{{ p.availability }}</p>{% endif %}
+<p class="contact">
+  {{ p.location }} ·
+  <a href="mailto:{{ p.email_personal }}">{{ p.email_personal }}</a> ·
+  <a href="{{ p.github_url }}">{{ p.github }}</a>
+  {%- if p.phone %} · <a href="tel:{{ p.phone }}">{{ p.phone }}</a>{% endif %}
+  {%- if p.linkedin %} · <a href="{{ p.linkedin_url }}">{{ p.linkedin }}</a>{% endif %}
+  {%- if p.website %} · <a href="{{ p.website }}">{{ p.website }}</a>{% endif %}
+</p>
+
+<h2>Experience</h2>
+{% for ex in r.experience %}
+  {% set start = ex.start|fmt_date %}
+  {% set end = ex.end|fmt_date %}
+  {% if ex.date_label %}
+    <p class="meta">{{ ex.date_label }}</p>
+  {% elif start %}
+    <p class="meta">{{ start }}{% if end %} – {{ end }}{% else %} – Present{% endif %}</p>
+  {% elif end %}
+    <p class="meta">{{ end }}</p>
+  {% endif %}
+  <h3>{{ ex.role }}</h3>
+  <p class="meta">{{ ex.org }}{% if ex.location %}, {{ ex.location }}{% endif %}</p>
+  {% if ex.summary %}<p>{{ ex.summary|trim|replace('\n', ' ') }}</p>{% endif %}
+  {% if ex.highlights %}
+    <ul>{% for h in ex.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+  {% endif %}
+{% endfor %}
+
+<h2>Projects</h2>
+{# Only projects flagged `cv: true`; the rest stay for the site and chatbot. #}
+{% for pr in r.projects if pr.cv %}
+  <h3>{{ pr.name }}</h3>
+  <p class="meta">
+    {{ pr.role }}{% if pr.status %}, {{ pr.status|replace('_', ' ') }}{% endif %}{% if pr.stack %} — {{ pr.stack|join(', ') }}{% endif %}
+  </p>
+  {% if pr.summary %}<p>{{ pr.summary|trim|replace('\n', ' ') }}</p>{% endif %}
+  {% if pr.highlights %}
+    <ul>{% for h in pr.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+  {% endif %}
+{% endfor %}
+
+<h2>Education</h2>
+{% for ed in r.education %}
+  {% set start = ed.start|fmt_date %}
+  {% set end = ed.end|fmt_date %}
+  {% if ed.date_label %}
+    <p class="meta">{{ ed.date_label }}</p>
+  {% elif start %}
+    <p class="meta">{{ start }}{% if end %} – {{ end }}{% else %} – Present{% endif %}</p>
+  {% elif end %}
+    <p class="meta">{{ end }}</p>
+  {% endif %}
+  <h3>{{ ed.school }}</h3>
+  <p class="meta">{{ ed.location }}{% if ed.notes %} — {{ ed.notes }}{% endif %}</p>
+{% endfor %}
+
+<h2>Skills</h2>
+<p><span class="skills-label">Languages:</span> {{ r.skills.languages|join(', ') }}</p>
+<p><span class="skills-label">Tools &amp; infra:</span> {{ r.skills.tools_and_infra|join(', ') }}</p>
+
+{% if r.skills.spoken %}
+<h2>Spoken Languages</h2>
+{% for sp in r.skills.spoken %}
+  <p><span class="skills-label">{{ sp.language }}:</span> {{ sp.level }}</p>
+{% endfor %}
+{% endif %}
+
+</body>
+</html>

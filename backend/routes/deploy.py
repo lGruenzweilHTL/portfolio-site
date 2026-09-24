@@ -118,8 +118,8 @@ async def deploy(request: Request) -> PlainTextResponse:
 
     # 2) Regenerate resume PDFs
     try:
-        light, dark = regenerate_resume_pdfs()
-        steps.append(f"resume: regenerated ({light.stat().st_size} + {dark.stat().st_size} bytes)")
+        designed, ats = regenerate_resume_pdfs()
+        steps.append(f"resume: regenerated ({designed.stat().st_size} + {ats.stat().st_size} bytes)")
     except Exception as e:
         log.exception("Resume regeneration failed")
         steps.append(f"resume: FAILED ({e})")

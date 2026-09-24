@@ -119,7 +119,9 @@
     <div class="who">Signed in as <b>{{ user }}</b>{% if dev_bypass %} <span class="pill accent">DEV BYPASS</span>{% endif %}</div>
   </div>
   <div class="actions">
-    <a href="/admin/regenerate-resume" onclick="event.preventDefault(); fetch(this.href, {method:'POST'}).then(r=>r.text()).then(t=>alert(t));">Regenerate résumé PDF</a>
+    <a href="/admin/regenerate-resume" onclick="event.preventDefault(); fetch(this.href, {method:'POST'}).then(r=>r.text()).then(t=>alert(t));">Regenerate résumé PDFs</a>
+    <a href="/resume.pdf" target="_blank" rel="noopener">↗ Classic</a>
+    <a href="/resume-ats.pdf" target="_blank" rel="noopener">↗ ATS</a>
     <a href="/">↗ View site</a>
   </div>
 </div>
