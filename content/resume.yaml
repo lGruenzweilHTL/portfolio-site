@@ -20,9 +20,11 @@ personal:
   # Shown under the name on both résumé PDFs and as the hero line on the site.
   # A short availability statement reads better than an empty slot here.
   availability: "Graduating June 2027 · open to a backend internship or thesis project"
+  # Relative to backend/templates/, drawn as a circle. Swap in a real portrait
+  # (assets/photo.jpg) when you have one.
+  photo: "assets/placeholder.webp"
   # Optional — both résumé templates render fine without these; they simply
   # leave the slot out. Uncomment when you have them.
-  # photo: "assets/photo.jpg"   # relative to backend/templates/, drawn as a circle
   # phone: "+43 ..."
   # linkedin: "lukas-gruenzweil"
   # linkedin_url: "https://linkedin.com/in/lukas-gruenzweil"

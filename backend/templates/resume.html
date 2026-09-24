@@ -12,8 +12,9 @@
 
    Data source: /content/resume.yaml — every field used here is guarded, so the
    template renders fine before the optional slots are filled in.
-   See resume.yaml for the "fill later" fields: personal.photo, personal.phone,
-   personal.linkedin, personal.website, and per-entry date_label overrides.
+   See resume.yaml for the "fill later" fields: personal.phone, personal.linkedin,
+   and per-entry date_label overrides. personal.website and personal.photo are
+   both set.
    Projects reach the PDF only if flagged `cv: true`.
 
    The icon font is vendored (scripts/build_devicon_subset.py), not loaded from a
@@ -355,7 +356,7 @@
   <aside class="side">
     {% if p.photo %}
       {# Relative paths resolve against templates_dir (WeasyPrint base_url),
-         so "assets/photo.jpg" means backend/templates/assets/photo.jpg. #}
+         so "assets/placeholder.webp" means backend/templates/assets/placeholder.webp. #}
       <img class="photo" src="{{ p.photo }}" alt="Portrait of {{ p.name }}">
     {% endif %}
 

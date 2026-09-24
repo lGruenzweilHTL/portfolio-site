@@ -1,0 +1,191 @@
+"""Vendor the devicon icon font used by backend/templates/resume.html.
+
+Why this exists: the résumé PDF is rendered by WeasyPrint on the deploy webhook and
+at app startup. Pulling the icon font from a CDN at render time makes every deploy
+depend on that CDN being up, and a failure is silent — you just get a PDF with blank
+gaps where the icons were. So the font is vendored instead.
+
+The upstream devicon.ttf is 1.5 MB, which is too much to commit for the ~14 glyphs we
+actually use. This script downloads the full font, subsets it down to just the icons
+listed in content/resume.yaml under skills.icons, and rewrites devicon's @font-face to
+point at the local subset. Re-run it whenever you add a skill icon:
+
+    python scripts/build_devicon_subset.py
+
+Only the subset is committed; the full upstream TTF is never written to the repo.
+
+Licence: devicon icons are CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/),
+the icon font itself is MIT. See the README written next to the assets.
+"""
+from __future__ import annotations
+
+import re
+import sys
+from io import BytesIO
+from pathlib import Path
+
+import httpx
+import yaml
+from fontTools import subset
+from fontTools.ttLib import TTFont
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+TEMPLATE_DIR = REPO_ROOT / "backend" / "templates"
+OUT_DIR = TEMPLATE_DIR / "assets" / "devicon"
+RESUME_YAML = REPO_ROOT / "content" / "resume.yaml"
+
+CSS_URL = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+TTF_URL = "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/fonts/devicon.ttf"
+
+# devicon's monochrome variants are the `-plain` classes; they inherit `color` so a
+# single gold accent tints every icon. The full-colour classes are hardcoded and
+# would fight the palette, so the template always wants `-plain`.
+PLAIN_SUFFIX = "-plain"
+
+
+def parse_icon_codepoints(css: str) -> dict[str, str]:
+    """Map devicon class name -> the character its :before rule renders.
+
+    devicon's stylesheet groups selectors heavily (`.devicon-a:before,.devicon-b:before
+    {content:"X"}`), so a rule has to be split on `}` and every selector in the group
+    mapped to the group's single content value.
+    """
+    found: dict[str, str] = {}
+    for rule in css.split("}"):
+        if "{" not in rule:
+            continue
+        selector, body = rule.split("{", 1)
+        content = re.search(r'content:"(.)"', body)
+        if not content:
+            continue
+        for cls in re.findall(r"\.([A-Za-z0-9_-]+):before", selector):
+            found[cls] = content.group(1)
+    return found
+
+
+def collect_used_icons() -> list[str]:
+    """Every devicon class referenced by content/resume.yaml -> skills.icons.
+
+    A YAML value may hold several space-separated classes for one label, e.g.
+    "HTML/CSS": "html5 css3" renders both glyphs.
+    """
+    data = yaml.safe_load(RESUME_YAML.read_text(encoding="utf-8"))
+    icons = data.get("skills", {}).get("icons", {}) or {}
+    used: list[str] = []
+    for value in icons.values():
+        used.extend(str(value).split())
+    # Preserve order, drop duplicates.
+    return list(dict.fromkeys(used))
+
+
+def resolve(name: str, codepoints: dict[str, str]) -> tuple[str, str] | None:
+    """Resolve a YAML icon name to (devicon class, character).
+
+    Accepts either the bare name or the explicit -plain form, so the YAML can stay
+    readable ("csharp") while the template always gets the monochrome glyph.
+    """
+    for candidate in (f"devicon-{name}{PLAIN_SUFFIX}", f"devicon-{name}"):
+        if candidate in codepoints:
+            return candidate, codepoints[candidate]
+    return None
+
+
+def build_font(ttf_bytes: bytes, chars: list[str]) -> bytes:
+    """Subset the icon font to just `chars`, keeping the metrics and glyph names."""
+    font = TTFont(BytesIO(ttf_bytes))
+    options = subset.Options()
+    options.drop_tables += ["DSIG"]
+    options.layout_features = []
+    options.notdef_outline = True
+    options.recommended_glyphs = True
+
+    subsetter = subset.Subsetter(options=options)
+    subsetter.populate(unicodes=[ord(ch) for ch in chars])
+    subsetter.subset(font)
+
+    out = BytesIO()
+    font.save(out)
+    return out.getvalue()
+
+
+def rewrite_css(css: str) -> str:
+    """Point devicon's @font-face at the local subset.
+
+    Upstream declares eot/ttf/woff/svg with a `?qd25fp` cache-buster. Only the
+    TrueType source is kept: Pango reads TTF most reliably, and the other three
+    formats would be three more files in the repo for no benefit.
+    """
+    face = re.search(r"@font-face\{[^}]*\}", css)
+    if not face:
+        raise SystemExit("could not find @font-face in upstream devicon CSS")
+
+    replacement = (
+        "@font-face{"
+        'font-family:"devicon";'
+        'src:url("devicon-subset.ttf") format("truetype");'
+        "font-weight:normal;font-style:normal;font-display:block}"
+    )
+    return css[: face.start()] + replacement + css[face.end() :]
+
+
+README = """# Vendored devicon subset
+
+Generated by `scripts/build_devicon_subset.py` — do not edit by hand.
+
+- Upstream: https://github.com/devicons/devicon
+- `devicon.min.css` and `devicon-subset.ttf` are fetched from
+  https://cdn.jsdelivr.net/gh/devicons/devicon@latest/
+- The `.ttf` is subset to only the glyphs referenced by `skills.icons` in
+  `content/resume.yaml`, so adding a skill icon means re-running the script.
+
+Licence: devicon icons are CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/).
+The icon font is MIT licensed (https://github.com/devicons/devicon/blob/master/LICENSE).
+"""
+
+
+def main() -> int:
+    used = collect_used_icons()
+    if not used:
+        raise SystemExit("no skills.icons entries found in content/resume.yaml")
+
+    with httpx.Client(follow_redirects=True, timeout=60.0) as client:
+        css = client.get(CSS_URL).text
+        ttf = client.get(TTF_URL).content
+
+    codepoints = parse_icon_codepoints(css)
+
+    resolved: list[tuple[str, str]] = []
+    missing: list[str] = []
+    for name in used:
+        hit = resolve(name, codepoints)
+        if hit:
+            resolved.append(hit)
+        else:
+            missing.append(name)
+
+    # De-duplicate characters in case two names share a glyph.
+    chars = list(dict.fromkeys(ch for _, ch in resolved))
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / "devicon.min.css").write_text(rewrite_css(css), encoding="utf-8")
+    (OUT_DIR / "devicon-subset.ttf").write_bytes(build_font(ttf, chars))
+    (OUT_DIR / "README.md").write_text(README, encoding="utf-8")
+
+    print(f"vendored {len(resolved)} icons -> {len(chars)} glyphs")
+    for cls, _ in resolved:
+        print(f"  ok  {cls}")
+    for name in missing:
+        print(f"  MISSING  {name} (no devicon class; will render the fallback dot)")
+    print(f"\nwrote {OUT_DIR}")
+
+    if missing:
+        print(
+            "\nSome icons have no devicon class. Either drop them from skills.icons "
+            "or leave them mapped — the template falls back to a neutral dot.",
+            file=sys.stderr,
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

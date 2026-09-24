@@ -26,7 +26,7 @@ env/
 # Generated resume PDF — rebuilt from /content on deploy
 static/generated/
 
-# Résumé template previews from scripts/render_resume_preview.py
+# Locally rendered résumé template previews
 backend/templates/_preview_*.html
 
 # Cloudflare tunnel credentials
