@@ -151,10 +151,12 @@ class Content:
             proj_lines.append(line)
         out = _render_simple_for(out, "p in resume.projects", proj_lines)
 
-        # Skills: strong langs, then familiar langs
-        lang_lines = [f"- {l} (strong)" for l in self.resume["skills"]["languages"].get("strong", [])]
-        lang_lines += [f"- {l} (familiar)" for l in self.resume["skills"]["languages"].get("familiar", [])]
-        out = _render_simple_for_lang(out, lang_lines)
+        # Skills: languages then tools, both flat lists.
+        lang_lines = [f"- {l}" for l in self.resume["skills"].get("languages", [])]
+        out = _render_simple_for(out, "lang in resume.skills.languages", lang_lines)
+
+        tool_lines = [f"- {t}" for t in self.resume["skills"].get("tools_and_infra", [])]
+        out = _render_simple_for(out, "tool in resume.skills.tools_and_infra", tool_lines)
 
         # Beyond code
         bc_lines = []
@@ -192,30 +194,6 @@ def _render_simple_for(template: str, iter_expr: str, lines: list[str]) -> str:
     indent = pre[len(pre.rstrip("\n")):]  # whitespace at start of for-line
     rendered = "\n".join(indent + line for line in lines)
     return pre + rendered + post
-
-
-def _render_simple_for_lang(template: str, lines: list[str]) -> str:
-    """The language template has two consecutive for-loops we generated; handle
-    them in one pass to keep _render_simple_for simple.
-    """
-    # First loop: resume.skills.languages.strong
-    marker_open = "{% for lang in resume.skills.languages.strong %}"
-    marker_close = "{% endfor %}"
-    if marker_open in template:
-        pre, rest = template.split(marker_open, 1)
-        body, post = rest.split(marker_close, 1)
-        indent = pre[len(pre.rstrip("\n")):]
-        strong_block = "\n".join(indent + l for l in lines if l.endswith("(strong)"))
-        template = pre + strong_block + post
-    # Second loop: resume.skills.languages.familiar
-    marker_open = "{% for lang in resume.skills.languages.familiar %}"
-    if marker_open in template:
-        pre, rest = template.split(marker_open, 1)
-        body, post = rest.split(marker_close, 1)
-        indent = pre[len(pre.rstrip("\n")):]
-        familiar_block = "\n".join(indent + l for l in lines if l.endswith("(familiar)"))
-        template = pre + familiar_block + post
-    return template
 
 
 def _check_required(data: dict, required: set, where: str) -> None:
@@ -446,8 +424,8 @@ def load_content(content_dir: str | Path | None = None) -> Content:
     log.info(
         "Content loaded: %d projects, %d skills, %d beyond-code items, %d service categories, %d services, %d links",
         len(resume.get("projects", [])),
-        len(resume.get("skills", {}).get("languages", {}).get("strong", []))
-        + len(resume.get("skills", {}).get("languages", {}).get("familiar", [])),
+        len(resume.get("skills", {}).get("languages", []))
+        + len(resume.get("skills", {}).get("tools_and_infra", [])),
         len(resume.get("beyond_code", [])),
         len(services),
         service_count,

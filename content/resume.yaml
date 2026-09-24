@@ -9,41 +9,63 @@
 
 personal:
   name: "Lukas Grünzweil"
-  title: "Student · Backend, AI tooling, Game dev, Robotics"
+  title: "Student · Backend, AI, Game dev"
   location: "Austria"
   email_personal: "lukas.gruenzweil@liwest.at"
   email_school: "l.gruenzweil@students.htl-leonding.ac.at"
   github: "lGruenzweilHTL"
   github_url: "https://github.com/lGruenzweilHTL"
-  github_org_url: "https://github.com/lGruenzweilHTL"  # for vektorgrid org if/when public
+  github_org_url: "https://github.com/vektorgrid-ai"  # the vektorgrid org
   status: "Student, HTL Leonding"
+  # Shown under the name on both résumé PDFs and as the hero line on the site.
+  # A short availability statement reads better than an empty slot here.
+  availability: "Graduating June 2027 · open to a backend internship or thesis project"
+  # Optional — both résumé templates render fine without these; they simply
+  # leave the slot out. Uncomment when you have them.
+  # photo: "assets/photo.jpg"   # relative to backend/templates/, drawn as a circle
+  # phone: "+43 ..."
+  # linkedin: "lukas-gruenzweil"
+  # linkedin_url: "https://linkedin.com/in/lukas-gruenzweil"
+  website: "https://gruenzweil.cc"
 
 education:
   - school: "HTL Leonding"
     location: "Leonding, Austria"
-    # Dates omitted from public site copy; add when ready
-    # start: 2022-09
-    # end: 2027-06
+    start: 2022-09
+    end: 2027-06
     notes: "Higher technical college (Höhere Technische Lehranstalt)"
+    # Set date_label instead if you'd rather write the range by hand.
+    # Worth adding here if you have them — they carry more signal than
+    # another school would:
+    # prak_where: "..."
+    # thesis: "Diplomarbeit topic"
 
 # Professional experience, most-recent first.
-# Renders into the resume PDF in full; the public HTML site surfaces a
-# short summary + tags via site/index.html. public_summary is the
-# ~2-sentence version the site uses; public_tags are the small pill row.
+# Rendered by both résumé PDFs. The public HTML site has its own richer copy
+# in site/index.html; public_summary and public_tags below are the reference
+# for it, kept here so the facts have one home, but nothing reads them.
+#
+# Keep `summary` to one line of context the bullets can't carry (team, scope,
+# duration) — bullets are the part people actually read. Prose that repeats the
+# bullets is the main reason a résumé gets skimmed.
+#
+# Dates: start/end take "2026-08" (rendered "08 / 2026") or a bare year.
+# Leave end empty, or set it to "present", for a current role. Set
+# date_label to override the formatted range entirely — do that for a
+# single-month role, or the range prints the same month twice.
 experience:
   - org: "SlideLizard Software GmbH"
     role: "Software Engineering Intern"
     location: "Linz, Austria"
+    date_label: "08 / 2026"
     start: 2026-08
     end: 2026-08
     summary: >
-      One-month internship on a small product team. Shipped a PWA against
-      Microsoft Dynamics 365 Sales with speech-to-text meeting notes and an
-      Azure OpenAI assistant, plus a small scheduled GEO-visibility tracker
-      on the side.
+      One-month internship on a small product team shipping a customer-facing PWA.
     highlights:
-      - "Built an Angular PWA around Dynamics 365 Sales: meeting-notes workflow with Azure Speech dictation, plus an Azure OpenAI assistant that talks to Dataverse (hand-rolled against the MCP server to skip per-call MCP billing)"
-      - "Side project: a GEO (Generative Engine Optimization) tracker over OpenRouter, scheduled once a day to log visibility metrics for a fixed prompt set"
+      - "Angular PWA on Microsoft Dynamics 365 Sales: Azure Speech meeting notes plus an Azure OpenAI assistant wired to Dataverse"
+      - "Called Dataverse through the MCP server directly to avoid per-call MCP billing"
+      - "Side project: a daily GEO-visibility tracker over OpenRouter for a fixed prompt set"
       - "Head of development called it one of the best projects to come out of an internship there"
     public_summary: >
       Built a PWA on top of Dynamics 365 Sales with speech-to-text meeting
@@ -59,20 +81,20 @@ experience:
     start: 2025-07
     end: 2025-08
     summary: >
-      General office and IT support. Handled accounting assistance and
-      quarterly billing, plus first-level IT and infrastructure tasks.
+      Two-month internship in office administration and IT support.
     highlights:
-      - "Administrative and clerical support"
-      - "Accounting assistance and quarterly billing (Quartalsabrechnung)"
-      - "First-level IT support and infrastructure"
+      - "Administrative support and accounting assistance, including quarterly billing (Quartalsabrechnung)"
+      - "First-level IT support and infrastructure tasks"
     public_summary: >
       Office and IT support: admin, accounting assistance, first-level IT.
     public_tags: ["Admin", "IT support", "Billing"]
 
-# Featured first, then chronological by prominence. The site controls display order;
-# this list feeds the resume PDF's project section and the chatbot's project awareness.
+# All projects, for the site and the chatbot. Only the ones marked `cv: true`
+# appear on the résumé PDFs — those are picked to support the backend angle, and
+# the résumé has room for two. Add the flag to a project to promote it.
 projects:
   - name: "vektorgrid"
+    cv: true
     summary: >
       A self-hosted voice assistant built as a distributed system: edge relays capture
       speech, a central orchestrator runs the model pipeline, and a phone app approves
@@ -82,12 +104,12 @@ projects:
     repo_url: "https://github.com/vektorgrid-ai"
     status: "active"   # active | shipped | in_progress | private
     highlights:
-      - "Origin orchestrator in C#, Relay in C++ (wake-word), Gate in Kotlin (biometric)"
-      - "Scalar Python pipeline: STT → intent router → expert LLM → TTS, called in sequence"
-      - "Everything routes through Origin; no peer-to-peer node traffic"
-      - "Risky tool calls pause for biometric approval on Gate before execution"
+      - "Origin orchestrator in C#, edge relays in C++ (wake-word), biometric approval app in Kotlin"
+      - "Python pipeline chains STT → intent router → expert LLM → TTS; every call routes through Origin, never peer-to-peer"
+      - "Risky tool calls pause for biometric approval on the phone before execution"
 
   - name: "SceneForge AI"
+    cv: true
     summary: >
       An AI plugin for the Unity Editor. Describe a scene in plain text, get
       GameObjects and components back. Cuts the manual setup out of level design.
@@ -130,10 +152,9 @@ projects:
     summary: >
       RescueMaze competition work for the HTL Leonding robotics club. Built a
       custom serial protocol for Raspberry Pi → Lego SPIKE communication, and a
-      maze-exploration controller running Trémaux's algorithm in a Webots
-      simulation.
+      maze-exploration controller running Trémaux's algorithm in simulation.
     role: "Contributor · HTL Leonding robotics club"
-    stack: ["Python", "C", "Webots"]
+    stack: ["Python", "C"]
     repo_url: "https://github.com/lGruenzweilHTL/lego-spike-serial"
     status: "shipped"
 
@@ -147,18 +168,47 @@ projects:
     status: "shipped"
 
 skills:
-  languages:
-    strong: ["C#", "Python", "TypeScript", "C"]
-    familiar: ["C++", "Java", "Kotlin", "HTML/CSS"]
+  # Flat lists, ordered most-relevant-first for a backend role. The old
+  # strong/familiar split is gone: it invited "define familiar", which is a bad
+  # interview position, and a plain list is easier to defend.
+  languages: ["C#", "Python", "TypeScript", "C", "C++", "Kotlin", "Java", "HTML/CSS"]
   tools_and_infra:
-    strong: ["Unity", "Docker"]
-    familiar:
-      - "Docker Compose"
-      - "Kubernetes"
-      - "Azure"
-      - "Proxmox"
-      - "Webots"
-      - "Cloudflare Tunnel"
+    - "Docker"
+    - "Kubernetes"
+    - "Azure"
+    - "Unity"
+    - "Docker Compose"
+    - "Proxmox"
+
+  # Spoken languages, for Austrian applications where a "Sprachen" block is
+  # expected and genuinely gets filtered on. Check the levels before sending.
+  spoken:
+    - language: "German"
+      level: "Native"
+    - language: "English"
+      level: "Professional working proficiency"
+
+  # devicon class name(s) per skill, used only by the styled resume template
+  # (backend/templates/resume.html). A value may list several classes to render
+  # more than one glyph for one label, e.g. "HTML/CSS" -> "html5 css3".
+  # Names without a devicon class render a neutral dot instead of an icon.
+  # The font is subset to exactly these glyphs — after editing this map, re-run
+  #   python scripts/build_devicon_subset.py
+  icons:
+    "C#": csharp
+    "Python": python
+    "TypeScript": typescript
+    "C": c
+    "C++": cplusplus
+    "Java": java
+    "Kotlin": kotlin
+    "HTML/CSS": html5 css3
+    "Unity": unity
+    "Docker": docker
+    "Docker Compose": docker
+    "Kubernetes": kubernetes
+    "Azure": azure
+    "Proxmox": proxmox
 
 # Beyond-code is personal context for the chatbot. The site displays this
 # in the About section; the chatbot uses it to answer "what do you do outside code?"
@@ -167,7 +217,7 @@ beyond_code:
     body: >
       Three Proxmox nodes (repurposed desktops, with a fourth on the way) hosting
       Nextcloud, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server,
-      Pi-hole, and this site, all exposed through Cloudflare tunnels.
+      Pi-hole, and this site, all reachable from outside my network.
   - topic: "3D printing"
     body: >
       I 3D print functional parts for hardware projects and keep upgrading an
@@ -177,8 +227,9 @@ beyond_code:
     body: >
       Currently on an Aprilia Tuono 125, with plans to move up to something bigger.
 
-# Recruiter-facing summary used in the resume PDF header and the chatbot's
-# "tell me about yourself" answer. Keep it first-person and specific.
+# Recruiter-facing summary. Used by the chatbot's "tell me about yourself"
+# answer and the site — NOT the résumé PDFs, which open straight into education
+# and experience. Keep it first-person and specific.
 elevator_pitch: >
   I'm a student in Austria. Most of my work is backend systems and AI tooling,
   with games and occasional robotics on the side. I built vektorgrid, a

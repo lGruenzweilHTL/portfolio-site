@@ -56,11 +56,11 @@ system_prompt_template: |
   {% endfor %}
 
   Skills:
-  {% for lang in resume.skills.languages.strong %}
-  - {{ lang }} (strong)
+  {% for lang in resume.skills.languages %}
+  - {{ lang }}
   {% endfor %}
-  {% for lang in resume.skills.languages.familiar %}
-  - {{ lang }} (familiar)
+  {% for tool in resume.skills.tools_and_infra %}
+  - {{ tool }}
   {% endfor %}
 
   Beyond code (for casual questions):
