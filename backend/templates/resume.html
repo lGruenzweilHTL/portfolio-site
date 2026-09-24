@@ -18,7 +18,15 @@
    Projects reach the PDF only if flagged `cv: true`.
 
    The icon font is vendored (scripts/build_devicon_subset.py), not loaded from a
-   CDN — a CDN outage would fail silently as blank gaps in the PDF. #}
+   CDN — a CDN outage would fail silently as blank gaps in the PDF.
+
+   Two things Chrome prints happily are silently dropped by WeasyPrint 63.1, the
+   renderer that actually builds this PDF: `calc()`, which it does not implement at
+   all, and flex `gap`, which is not a property it knows. Neither raises anything —
+   the declaration just disappears and the box falls back to the initial value, so
+   a `calc()`ed ring offset lands `auto` and the ring drifts off its connector
+   line. Stick to plain lengths and margins here; both engines lay those out
+   identically. #}
 {% set p = r.personal %}
 {% set icons = r.skills.get('icons', {}) %}
 {% set name_parts = p.name.split() %}
@@ -149,26 +157,32 @@
   }
 
   .contact { list-style: none; margin: 0; padding: 0; }
+  /* The icon gap is a margin on the icon, not `gap` on the row: WeasyPrint 63.1
+     has no flex `gap`. `gap` isn't a property it knows at all (only column-gap and
+     row_gap, for multicol and grid), so the declaration was dropped and every
+     icon rendered flush against its label. A margin on the flex item lays out
+     identically in both engines. */
   .contact li {
     display: flex;
     align-items: center;
-    gap: 2.2mm;
     margin-bottom: 2mm;
     font-size: 8.5pt;
     line-height: 1.35;
   }
-  .contact svg { flex: none; width: 3.2mm; height: 3.2mm; }
+  .contact svg { flex: none; width: 3.2mm; height: 3.2mm; margin-right: 2.2mm; }
   .contact a { color: var(--dim); text-decoration: none; word-break: break-all; }
 
   /* Skill chips: devicon glyph + label. A skill with no devicon class falls back
      to a neutral dot rather than leaving a hole in the row. */
   .chips { list-style: none; margin: 0 0 3mm 0; padding: 0; }
-  .chip { display: flex; align-items: center; gap: 2.2mm; margin-bottom: 1.5mm; }
+  .chip { display: flex; align-items: center; margin-bottom: 1.5mm; }
   /* min-width, not width: a label like "HTML/CSS" maps to two glyphs and a fixed
-     3.6mm box pushed the second one under the label text. */
+     3.6mm box pushed the second one under the label text. The label gap lives on
+     this box rather than as `gap` on .chip — see the .contact note above. */
   .chip-ic {
     flex: none;
     min-width: 3.6mm;
+    margin-right: 2.2mm;
     text-align: center;
     font-size: 10.5pt;
     line-height: 1;
@@ -260,25 +274,39 @@
     padding: 0 0 4.6mm 7mm;
     /* Ring top, centred on the 11pt/1.3 title line box. With a date above it:
        4.37 (.when height) + 0.6 (title margin) + 2.52 (half title line)
-       - 1.55 (ring radius). Retune if .when or .entry-title change size. */
+       - 1.55 (ring radius). Retune if .when or .entry-title change size.
+
+       --line-top is where the connector starts: the ring's centre, so it is
+       always --ring-top + 1.55mm. It is a second number instead of
+       `calc(var(--ring-top) + 1.55mm)` because WeasyPrint 63.1 doesn't evaluate
+       calc() at all — there is no calc handling anywhere in the package — so it
+       silently dropped the declaration and the connector started at the entry's
+       top edge instead. Keep the pair 1.55mm apart. */
     --ring-top: 5.9mm;
+    --line-top: 7.45mm;
   }
   /* Projects have no date, so no 4.37mm date line to clear. Not 0 either:
      .entry-title has a 0.6mm top margin, so a zero offset left the ring that far
      proud of the title — obvious on a lowercase name like "vektorgrid", which
      has no cap height to visually anchor it. Half the title margin lands the ring
      on the x-height of both lowercase and uppercase names. */
-  .section-plain .entry { --ring-top: 0.8mm; }
+  .section-plain .entry { --ring-top: 0.8mm; --line-top: 2.35mm; }
   .entry:last-child { padding-bottom: 0; }
 
   /* Connector: this ring's centre down to the next ring's centre. height:100% is
      the entry's padding box (its full height), so the far end lands on the next
-     ring; both ends tuck under a ring's opaque fill. */
+     ring; both ends tuck under a ring's opaque fill.
+
+     The line and the ring are both centred on the entry's left edge — half the
+     line's 0.7pt width to the left of it, and the ring's 1.55mm radius to the
+     left of it — so they are concentric without any arithmetic between the two.
+     The earlier `left: 0` for the line and `calc(0.35pt - 1.55mm)` for the ring
+     described the same geometry, but the calc() is what WeasyPrint dropped. */
   .entry::before {
     content: "";
     position: absolute;
-    left: 0;
-    top: calc(var(--ring-top) + 1.55mm);   /* ring centre */
+    left: -0.35pt;
+    top: var(--line-top);
     width: 0.7pt;
     height: 100%;
     background: var(--accent);
@@ -290,7 +318,7 @@
   .entry::after {
     content: "";
     position: absolute;
-    left: calc(0.35pt - 1.55mm);
+    left: -1.55mm;
     top: var(--ring-top);
     width: 3.1mm; height: 3.1mm;
     border: 0.9pt solid var(--accent);
