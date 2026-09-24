@@ -20,11 +20,11 @@ the only ingress; the tunnel's `config.yml` just repointed from
 ## Layout
 
 ```
-/site                      Static site, notes, and downloads (served as /, /notes/, /files/, /files/secure/)
+/site                      Static site + notes (served as /, /notes/)
   index.html               Main portfolio page (with chatbot + feedback wired in)
   chat.js                  Floating-button chatbot UI
   notes/                   Study cheatsheets (moved from /study)
-  files/                   Public downloads (auto-listed)
+  files/                   Public downloads — listed by routes/files.py, not the static mount
   files/secure/            Protected downloads (token-gated, no listing)
   img/, favicon.svg
 /backend                   FastAPI app
@@ -33,18 +33,20 @@ the only ingress; the tunnel's `config.yml` just repointed from
   content.py               /content loader + system-prompt renderer
   chat.py                  OpenRouter streaming + fallback policy
   turnstile.py             siteverify helper with dev bypass
-  resume.py                WeasyPrint PDF render (cache + invalidate)
+  resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
   routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers
-  templates/               Resume PDF templates (light + dark), admin.html, error.html, services.html
+  templates/               resume.html (designed) + resume_ats.html (ATS), assets/,
+                           admin.html, error.html, services.html
 /content                   Single source of truth (YAML)
   resume.yaml              Personal, projects, skills, beyond_code
   chatbot_personality.yaml Persona + system prompt template
   services.yaml            Public/home-network service catalog
+/deploy                    systemd units + tmpfiles.d drop-in for the deploy webhook
+/scripts                   One-off dev tooling (devicon subsetting, résumé preview render)
 /static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
 .env.example               Copy to .env; all required env vars documented
 requirements.txt           Pinned Python dependencies
-archive/                   Old nginx-era scripts and templates (kept for reference)
 ```
 
 ## System dependencies
@@ -89,12 +91,16 @@ endpoint without real keys. **Never set those in production.**
 | `/services` | GET | Server-rendered public/home-network service directory |
 | `/services/` | GET | Same service directory with a trailing slash |
 | `/notes/` | GET | Static study cheatsheets, served as files |
+| `/notes/<slug>` | GET | Clean URL for a cheatsheet — serves the matching `.html` file |
+| `/notes/_listing`, `/notes/<sub>/_listing` | GET | JSON index of a notes directory, consumed by `cheatsheet.js` |
+| `/notes/notes.css`, `/notes/cheatsheet.js` | GET | Notes styling and index behaviour, served from `site/notes/` |
 | `/files/` | GET | Auto-generated HTML listing of public files |
 | `/files/<name>` | GET | Stream a public file |
 | `/files/secure/` | GET | 404 by design (no listing) |
 | `/files/secure/<name>` | GET | Stream a protected file (requires `?t=<token>`) |
 | `/resume.pdf` | GET | Cached PDF, two-column styled version. Regenerated on startup + deploy |
 | `/resume-ats.pdf` | GET | Single-column ATS-friendly version |
+| `/resume-themed.pdf` | GET | 301 → `/resume.pdf`. Retired dark variant, kept for old bookmarks |
 | `/api/chat` | POST | SSE stream from OpenRouter. Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
@@ -105,6 +111,37 @@ endpoint without real keys. **Never set those in production.**
 | `/admin/regenerate-resume` | POST | Manual PDF re-render. |
 | `/healthz` | GET | Liveness check. |
 | `/_api/docs` | GET | Swagger UI (non-standard path; hide in prod). |
+
+## Caching
+
+Every asset on this site is replaced in place by a deploy — nothing is
+fingerprinted or content-addressed, so there is no safe `immutable` to
+send. Anything cached without revalidation is a bug waiting to happen.
+
+`StaticAssetCacheMiddleware` (in `main.py`) therefore sets
+`Cache-Control: no-cache` on HTML, CSS, JS, JSON, and SVG. Starlette
+sends `ETag` + `Last-Modified` but no `Cache-Control` at all, so without
+this the browser falls back to *heuristic* freshness — roughly 10% of the
+file's age — and a stylesheet can sit in the disk cache long after a
+deploy replaced it.
+
+`no-cache` doesn't forbid storing the response, it requires a conditional
+request before reusing it, and the ETag comparison answers that with a
+bodiless 304. Two places set something stricter and are left alone
+(`setdefault`, not assignment):
+
+- `/` — `no-store`, because the Turnstile sitekey is injected per response
+- `/services` — `no-store`, because it's rendered from the content bundle
+
+Images and fonts get no header at all; browsers cache those for a
+session anyway. `/resume.pdf` and `/resume-ats.pdf` are `no-cache` for
+the same reason as the CSS: the deploy webhook re-renders them in place,
+so an hour-long `max-age` would show a résumé that contradicts the rest
+of the site.
+
+If you ever add fingerprinted assets (`styles.abc123.css`), give those
+`max-age=31536000, immutable` instead and take them out of the
+middleware's extension list.
 
 ## Secure download links
 
@@ -127,8 +164,15 @@ doesn't reveal whether the file exists or just the link is bad.
 ## Content updates
 
 Edit `content/resume.yaml`, `content/chatbot_personality.yaml`, or
-`content/services.yaml` and push to `main`. The deploy webhook reloads the
-content bundle automatically; resume PDFs are regenerated as before.
+`content/services.yaml` and push to `main`. The deploy webhook pulls,
+reloads the content bundle, and re-renders the résumé — in that order, so
+what you get reflects the commit you just pushed.
+
+The PDFs are also self-healing on startup: `ensure_resume_pdfs()` renders
+when the files are missing **or** when any template, template asset, or
+`content/resume.yaml` is newer than the PDFs. A `git pull` gives the files
+it checks out the current mtime, so an edit to the résumé invalidates the
+cache without anyone having to remember to clear it.
 
 The services catalog uses ordered categories. A category can own multiple URLs
 and/or nested services, and each nested service can own multiple URLs:
@@ -181,8 +225,23 @@ If you change the schema, also update:
 `site/notes/` is plain HTML/CSS/JS. To add a new cheatsheet:
 
 1. Create `site/notes/<topic>.html` (use the same template style as the existing ones)
-2. Either copy `site/notes/index.html` into a subdir as a directory listing, or hand-write a subdir index
+2. For a new subdirectory, copy `site/notes/index.html` into it as
+   `index.html` — that's the generic directory index, and it works at any
+   depth with no per-directory edits. It's committed as three identical
+   regular files (root, `Java/`, `SYP/`), **not** a symlink, so keep the
+   copies byte-identical or listings will drift apart.
 3. Cross-link from `site/notes/index.html` if it should appear on the top page
+
+The index's header comment still describes the nginx `autoindex` setup it
+was written for. That config is gone — `backend/routes/notes.py` now
+serves `/notes/_listing` and `/notes/<sub>/_listing` as JSON, and
+`cheatsheet.js` fetches those. Treat the comment as historical; the
+routes are the source of truth.
+
+`site/notes/study.css` is served from the fixed path `/notes/notes.css`
+(and `cheatsheet.js` from `/notes/cheatsheet.js`) rather than relatively,
+because the same file is reachable at several depths. Don't switch those
+to relative `./` links.
 
 The breadcrumb pattern is `~/<b>topic</b>` linking to `/notes/`. Internal
 CSS class names (`study-nav`, `study-footer`) are historical; renaming
@@ -249,17 +308,24 @@ sqlite> SELECT * FROM secure_links ORDER BY id DESC LIMIT 10;
 GitHub webhook → `POST /webhook/deploy` with header
 `X-Hub-Signature-256: sha256=<hmac-of-body>`. On valid signature:
 
-1. Reload `/content` in-process
-2. Regenerate resume PDFs
-3. `git pull --ff-only` in the project root
-4. Touch a flag file at `/run/backend.restart` (skipped if no systemd)
+1. `git pull --ff-only` in the project root
+2. Reload `/content` in-process
+3. Regenerate resume PDFs
+4. Create the restart trigger at `/run/backend-restart/trigger` (skipped
+   if there's no systemd, or if the pull failed)
 
-A separate systemd `.path` unit watches the flag and triggers
-`backend.service` to restart *as root*. The whole process takes ~5–10
-seconds end-to-end. Return value is a single-line summary suitable for
-logging.
+A separate systemd `.path` unit watches for the trigger and restarts
+`backend.service` *as root*. The whole process takes ~5–10 seconds
+end-to-end. Return value is a single-line summary suitable for logging.
 
-### Why a flag file instead of `systemctl restart` from the webhook
+**The pull comes first on purpose.** Steps 2 and 3 read from the working
+tree, so running them earlier reloads and re-renders the *pre-pull*
+content and templates — which leaves the résumé one deploy behind,
+since nothing re-renders it later (`ensure_resume_pdfs()` only filled
+in *missing* files, and it now compares mtimes against the templates
+and `content/resume.yaml` instead).
+
+### Why a trigger file instead of `systemctl restart` from the webhook
 
 The app process runs as `www-data` (or whatever user the systemd unit
 declares), which has no privilege to call `systemctl restart` — polkit
@@ -267,9 +333,25 @@ rejects non-root callers, and the unit's `ProtectSystem=strict` sandbox
 makes sending a signal to `$MAINPID` from outside unreliable across
 systemd versions. The supported path is a `.path` unit that watches a
 file `www-data` is allowed to write to, and a watcher service that
-runs the restart as root. The `ExecStartPre=` on the watcher service
-removes the flag, so a second deploy within the same restart window
-still triggers a fresh `PathExists=` event after the flag is recreated.
+runs the restart as root.
+
+Two details make or break it:
+
+- **The trigger lives in a group-writable *directory*, and is not
+  pre-created.** `/run` is root-owned `0755`, so the app cannot create
+  a file there — tmpfiles.d creates `/run/backend-restart` as
+  `root:www-data 0770` instead, and the app creates `trigger` inside
+  it. Each deploy therefore produces a real "file appeared" edge, and
+  the watcher deletes the trigger in `ExecStartPre=` so the next deploy
+  re-arms the condition. A pre-created trigger file cannot work: it
+  fires once at boot before any deploy, and once consumed it can never
+  be recreated.
+- **`backend-restart.service` must not set `RemainAfterExit=yes`.** It
+  reads like a cosmetic choice for `systemctl status`, but it makes the
+  oneshot latch in `active (exited)` permanently — and a `.path` unit's
+  start request against an already-active unit is a no-op. With it
+  set, the mechanism fires exactly once and then silently does nothing
+  forever.
 
 ### systemd units
 
@@ -278,9 +360,9 @@ Three units + one tmpfiles snippet work together. Reference files live in `deplo
 | File | Role |
 |------|------|
 | `backend.service` | The uvicorn process. Configurable name (`DEPLOY_SYSTEMD_UNIT`). |
-| `backend-restart.path` | Watches `/run/backend.restart`, triggers the service below. |
-| `backend-restart.service` | Removes the flag, then `systemctl restart backend`. |
-| `backend-restart.conf` | tmpfiles.d drop-in: recreates the flag file on every boot, root-owned, mode 0664, group=www-data. Required — without it, a boot with a missing flag file makes the next deploy fail with `EACCES` until something else touches the file. |
+| `backend-restart.path` | Watches `/run/backend-restart/trigger`, triggers the service below. |
+| `backend-restart.service` | Removes the trigger, then `systemctl restart backend`. No `RemainAfterExit` — see above. |
+| `backend-restart.conf` | tmpfiles.d drop-in: creates `/run/backend-restart/` on every boot, `root:www-data`, mode 0770. Required — without it the app can't create the trigger at all. |
 
 Install and enable all four (order matters — the `.path` unit only
 watches once both it and the service it points at are present):
@@ -290,20 +372,79 @@ watches once both it and the service it points at are present):
 sudo cp deploy/backend.service            /etc/systemd/system/backend.service
 sudo cp deploy/backend-restart.path       /etc/systemd/system/backend-restart.path
 sudo cp deploy/backend-restart.service    /etc/systemd/system/backend-restart.service
-# 2. Install the tmpfiles drop-in so the flag file is recreated on every
-#    boot with the right ownership (root:www-data, 0664). Adjust
+# 2. Install the tmpfiles drop-in so the trigger directory is recreated on
+#    every boot with the right ownership (root:www-data, 0770). Adjust
 #    `www-data` to match the User= in backend.service if it differs.
 sudo cp deploy/backend-restart.conf       /etc/tmpfiles.d/backend-restart.conf
 sudo systemd-tmpfiles --create
 # 3. Reload + enable
 sudo systemctl daemon-reload
 sudo systemctl enable --now backend.service backend-restart.path
+# 4. Clean up the old pre-created flag file, if one is lying around
+sudo rm -f /run/backend.restart
 ```
 
-If you skip the tmpfiles drop-in, the *first* deploy after a reboot will
-fail with `PermissionError: '/run/backend.restart'` until something
-else (a stray touch, a re-install) recreates the file. The drop-in is
-the durable fix.
+If you skip the tmpfiles drop-in, every deploy fails with
+`PermissionError` on the trigger. The drop-in is the durable fix.
+
+Verify it without waiting for a push:
+
+```bash
+sudo touch /run/backend-restart/trigger
+systemctl status backend-restart.service   # expect: ran, then inactive (dead)
+systemctl status backend.service           # expect: active (running), new PID
+```
+
+`inactive (dead)` is the correct end state, and it's the whole point. A
+oneshot with `RemainAfterExit=yes` would show `active (exited)` instead —
+and that latched state is exactly what stops the next deploy from
+retriggering.
+
+### Upgrading an existing install
+
+If the units are already installed and enabled, `systemctl enable --now`
+is **not** enough. Both units are already active, so the start is a
+no-op, and `daemon-reload` doesn't re-activate anything:
+
+- `backend-restart.path` set up its inotify watch against the *old*
+  `PathExists=` at activation. Re-reading the file doesn't move the watch.
+- `backend-restart.service` is latched `active (exited)` from the old
+  `RemainAfterExit=yes`, and `daemon-reload` doesn't clear that state.
+
+Pushing the new code before running any of this is safe — the old
+process keeps running the old code, and the worst outcome is a
+`systemd: FAILED` line in the webhook response (the handler can't create
+the trigger directory that isn't installed yet). Static files, content,
+and the résumé still update, so there's no downtime; only Python code
+changes fail to activate.
+
+To migrate, use explicit restarts instead of `--now`:
+
+```bash
+sudo cp deploy/backend.service            /etc/systemd/system/backend.service
+sudo cp deploy/backend-restart.path       /etc/systemd/system/backend-restart.path
+sudo cp deploy/backend-restart.service    /etc/systemd/system/backend-restart.service
+sudo cp deploy/backend-restart.conf       /etc/tmpfiles.d/backend-restart.conf
+
+sudo systemd-tmpfiles --create            # creates /run/backend-restart/ 0770
+sudo rm -f /run/backend.restart           # old pre-created flag, now unused
+sudo systemctl daemon-reload
+
+# Both units are already active, so they need an explicit restart.
+# Restarting the oneshot also restarts backend, which loads the new code.
+sudo systemctl restart backend-restart.service
+sudo systemctl restart backend-restart.path
+sudo systemctl enable backend.service backend-restart.path
+```
+
+`daemon-reload` must come first, or the restart re-runs the *old*
+definitions. The `restart backend-restart.service` line is the
+load-bearing one: it clears the latched state and restarts `backend`, so
+the new code is live immediately instead of at the next deploy.
+
+Note that `systemd-tmpfiles --create` only creates what the current
+config describes; it won't remove the old `/run/backend.restart` file,
+which is why the `rm` is there.
 
 `backend.service` is deliberately written to restart cleanly when the
 watcher cycles it — the two design choices that matter are:
@@ -324,21 +465,27 @@ watcher cycles it — the two design choices that matter are:
 
 #### Why the webhook returns 200 before the new instance is up
 
-The handler in `backend/routes/deploy.py` returns as soon as the flag
-file is written — before the `.path` unit has fired, before
+The handler in `backend/routes/deploy.py` returns as soon as the
+trigger file is created — before the `.path` unit has fired, before
 `systemctl restart` has scheduled the stop, and before the new uvicorn
 process has bound :8000. So GitHub sees `200 · systemd: restart flag
-set (/run/backend.restart)` while the new instance may still be
+set (/run/backend-restart/trigger)` while the new instance may still be
 starting. In practice the 2s `RestartSec` plus uvicorn's own startup
 time means the new process is up within a second or two of the
 response going out.
 
+The response body is also the *only* place a failing step shows up: the
+handler returns 200 even when `git pull` fails or the trigger can't be
+written, so GitHub shows a green delivery either way. Check **Settings
+→ Webhooks → Recent Deliveries** for the body, or watch for the `FAILED`
+marker — it also flips the ntfy notification to a failure.
+
 If you need a stronger guarantee — e.g. you want the deploy to fail
 loudly if the new instance never comes up — change the deploy handler
 to poll `systemctl is-active backend` (or to wait on a
-`/run/backend.restart.done` sibling flag set by the watcher service's
-`ExecStartPost=`) for a few seconds before returning. That's a code
-change, not a unit change, so it's not done by default.
+`/run/backend-restart/done` sibling file written by the watcher
+service's `ExecStartPost=`) for a few seconds before returning. That's a
+code change, not a unit change, so it's not done by default.
 
 ## What's not in this repo
 
