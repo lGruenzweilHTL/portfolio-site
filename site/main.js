@@ -20,12 +20,31 @@
     const href = a.getAttribute('href') || '';
     if (a.classList.contains('btn-solid') && href.startsWith('mailto:')) {
       track('contact_clicked', { kind: href.slice(7).split('?')[0] });
-    } else if (href === '/resume.pdf') {
-      track('resume_downloaded');
+    } else if (/^\/resume(-ats)?\.pdf$/.test(href)) {
+      track('resume_downloaded', { variant: href === '/resume-ats.pdf' ? 'ats' : 'classic' });
     } else if (a.target === '_blank' && /github\.com/.test(href)) {
       track('github_clicked', { url: href });
     }
   }, { passive: true });
+})();
+
+// Résumé format dropdown — <details> handles the open/close toggle itself, so
+// this only adds the two things the native element doesn't do: dismiss on an
+// outside click (or after picking a format) and dismiss on Escape.
+(function () {
+  const menu = document.querySelector('.resume-menu');
+  if (!menu) return;
+  document.addEventListener('click', function (e) {
+    if (!menu.open) return;
+    // A click on the summary is the native toggle — leave that alone.
+    if (menu.contains(e.target) && !e.target.closest('.resume-menu-item')) return;
+    menu.removeAttribute('open');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || !menu.open) return;
+    menu.removeAttribute('open');
+    menu.querySelector('summary').focus();
+  });
 })();
 
 const io = new IntersectionObserver(entries => {
