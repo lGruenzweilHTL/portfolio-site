@@ -48,8 +48,12 @@ def _serve(path: Path, download_name: str) -> FileResponse:
         path,
         media_type="application/pdf",
         headers={
-            # 1 hour cache; deploy webhook re-renders so content is fresh on push.
-            "Cache-Control": "public, max-age=3600",
+            # no-cache, not max-age: the deploy webhook re-renders these in
+            # place, so a shared cache holding the old bytes for an hour
+            # would show a résumé that contradicts the rest of the site.
+            # The ETag/Last-Modified FileResponse sets make revalidation a
+            # bodiless 304 for the overwhelmingly common unchanged case.
+            "Cache-Control": "public, no-cache",
             "Content-Disposition": f'inline; filename="{download_name}"',
         },
     )

@@ -124,10 +124,65 @@ def regenerate_resume_pdfs() -> tuple[Path, Path]:
     return _DESIGNED_OUT, _ATS_OUT
 
 
-def ensure_resume_pdfs() -> tuple[Path, Path]:
-    """Return existing PDFs, generating them if missing. Used at startup."""
+def _newest_input_mtime() -> float:
+    """Newest mtime across everything the PDFs are rendered from.
+
+    That's the résumé template pair, everything under templates/ (the vendored
+    devicon subset and the portrait are assets the templates pull in), and
+    content/resume.yaml. Deliberately not the whole content/ dir — services.yaml
+    doesn't reach the PDFs, and reacting to it would mean a pointless WeasyPrint
+    render on every catalogue edit.
+
+    Returns 0.0 if nothing is readable, which reads as "never newer" and lets
+    the existing PDFs stand.
+    """
+    candidates: list[Path] = [
+        Path(settings.content_dir) / "resume.yaml",
+    ]
+    templates_dir = Path(settings.templates_dir)
+    if templates_dir.is_dir():
+        candidates.extend(p for p in templates_dir.rglob("*") if p.is_file())
+
+    newest = 0.0
+    for path in candidates:
+        try:
+            newest = max(newest, path.stat().st_mtime)
+        except OSError:
+            continue
+    return newest
+
+
+def ensure_resume_pdfs(force: bool = False) -> tuple[Path, Path]:
+    """Return existing PDFs, rendering them if missing or stale. Used at startup.
+
+    "Stale" means a template, template asset, or content/resume.yaml is newer
+    than the PDFs. A git pull gives the files it checks out the current time,
+    so a deploy that changes the résumé reliably invalidates the cache.
+
+    Checking only for *missing* files (the old behaviour) left the PDFs one
+    deploy behind: the webhook re-rendered before its own `git pull`, and
+    startup then saw the PDFs present and left them alone forever.
+    """
+    if force:
+        log.info("Resume PDFs forced")
+        return regenerate_resume_pdfs()
+
     if not _DESIGNED_OUT.exists() or not _ATS_OUT.exists():
         log.info("Resume PDFs missing, generating (designed=%s ats=%s)",
                  _DESIGNED_OUT.exists(), _ATS_OUT.exists())
         return regenerate_resume_pdfs()
+
+    try:
+        # min(), not max(): the pair is only as fresh as its staler half.
+        oldest_pdf = min(_DESIGNED_OUT.stat().st_mtime, _ATS_OUT.stat().st_mtime)
+    except OSError as e:
+        log.warning("Could not stat resume PDFs (%s); regenerating", e)
+        return regenerate_resume_pdfs()
+
+    newest_input = _newest_input_mtime()
+    if newest_input > oldest_pdf:
+        log.info("Resume inputs changed (newest input %.0f > oldest PDF %.0f), regenerating",
+                 newest_input, oldest_pdf)
+        return regenerate_resume_pdfs()
+
     return _DESIGNED_OUT, _ATS_OUT

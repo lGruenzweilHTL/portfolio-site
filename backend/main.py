@@ -22,7 +22,7 @@ import sqlite3
 import time
 from datetime import datetime, timezone
 from hashlib import sha256
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
@@ -94,6 +94,48 @@ class Static404ToHtmlMiddleware(BaseHTTPMiddleware):
             # Drop the previous Content-Length header so Starlette recomputes.
             headers = [(k, v) for k, v in response.headers.items() if k.lower() != "content-length"]
             return HTMLResponse(html, status_code=404, headers=dict(headers))
+        return response
+
+
+class StaticAssetCacheMiddleware(BaseHTTPMiddleware):
+    """Force conditional revalidation of HTML/CSS/JS instead of blind caching.
+
+    Starlette's ``FileResponse`` sends ``ETag`` and ``Last-Modified`` but no
+    ``Cache-Control``, so the browser falls back to *heuristic* freshness —
+    roughly 10% of the asset's age — with no guarantee it revalidates at all.
+    A stylesheet that was on disk for months can therefore sit in the disk
+    cache long after a deploy replaces it, and a hard reload is the only way
+    to see the new version.
+
+    ``no-cache`` does not forbid storing the response; it requires a
+    conditional request before reusing it. The ETag comparison that follows
+    is a 304 with no body, so this costs one round trip and nothing else.
+    Fingerprinted assets (none yet) would want ``immutable`` instead, which
+    is why this is extension-based rather than a blanket header.
+
+    Images and fonts are left alone — they are either large or already
+    content-stable, and browsers cache them for a session anyway.
+    """
+
+    _REVALIDATE_EXTS = frozenset({
+        ".html", ".css", ".js", ".json", ".map", ".svg", ".webmanifest",
+    })
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if (
+            # Set by NotesCleanUrlMiddleware, which serves .html for an
+            # extensionless path the check below would miss.
+            request.scope.get("serves_html")
+            # Directory requests are index.html — `/`, `/notes/`.
+            or path.endswith("/")
+            or PurePosixPath(path).suffix.lower() in self._REVALIDATE_EXTS
+        ):
+            # setdefault, not assignment: the Turnstile middleware sets
+            # `no-store` on the rewritten index.html, and that is stricter
+            # than what we would add here. Don't talk it down to no-cache.
+            response.headers.setdefault("cache-control", "no-cache")
         return response
 
 
@@ -250,6 +292,10 @@ def create_app() -> FastAPI:
     # still log these requests (it wraps everything from the outside).
     from .routes.notes import NotesCleanUrlMiddleware
     app.add_middleware(NotesCleanUrlMiddleware)
+    # Added last => outermost, so it sees the final Cache-Control on the way
+    # out and can only fill in a default (setdefault), never override the
+    # stricter no-store the Turnstile rewrite sets on index.html.
+    app.add_middleware(StaticAssetCacheMiddleware)
 
     # --- Startup: DB + content + resume PDFs ---
     @app.on_event("startup")

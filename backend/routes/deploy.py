@@ -9,12 +9,16 @@ Security:
     refuses all requests.
 
 Actions triggered (idempotent — safe to call repeatedly):
-  1. Reload /content (cheap; safe to do even without a git pull).
-  2. Regenerate resume PDFs (in-process; takes a few seconds).
-  3. (Production only) `git pull` in the project dir, then
-     `systemctl restart backend` so the new code is live. Both run via
-     subprocess; failures are logged but don't return 5xx to GitHub (we
-     already accepted the deploy, returning 5xx just causes GitHub to retry).
+  1. (Production only) `git pull --ff-only` in the project dir.
+  2. Reload /content (cheap; safe to do even without a git pull).
+  3. Regenerate resume PDFs (in-process; takes a few seconds).
+  4. (Production only) create the systemd restart trigger so the new code is
+     live. Failures are logged but don't return 5xx to GitHub (we already
+     accepted the deploy, returning 5xx just causes GitHub to retry).
+
+The pull comes first on purpose: steps 2 and 3 read from the working tree,
+so running them earlier would reload and re-render the *pre-pull* content
+and templates.
 
 Returns 200 with a one-line summary of what happened.
 """
@@ -108,7 +112,30 @@ async def deploy(request: Request) -> PlainTextResponse:
 
     steps: list[str] = []
 
-    # 1) Reload /content (cheap, always safe)
+    # 1) git pull FIRST. Everything below reads from the working tree, so it
+    #    has to happen before we reload content or re-render the PDFs —
+    #    otherwise both operate on the pre-pull tree and the résumé ends up
+    #    one deploy behind (the PDFs are only ever regenerated from what is
+    #    on disk, and startup's ensure_resume_pdfs() only fills in *missing*
+    #    files, so nothing ever corrects it later).
+    #
+    #    Detected by the presence of a project root that contains a .git dir.
+    project_root = Path(__file__).resolve().parents[2]  # /workspace
+    git_dir = project_root / ".git"
+    pull_ok = True
+    if git_dir.is_dir():
+        rc, out, err = _run(["git", "pull", "--ff-only"], cwd=str(project_root), timeout=60)
+        if rc == 0:
+            steps.append(f"git: pulled ({out.strip().splitlines()[-1] if out.strip() else 'ok'})")
+        else:
+            pull_ok = False
+            steps.append(f"git: FAILED ({err.strip()[:200]})")
+            log.error("git pull failed: %s", err)
+    else:
+        steps.append("git: skipped (no .git dir)")
+
+    # 2) Reload /content. Cheap and safe, and now it picks up any content/
+    #    change that came down with the pull above.
     try:
         reload_content()
         steps.append("content: reloaded")
@@ -116,7 +143,10 @@ async def deploy(request: Request) -> PlainTextResponse:
         log.error("Content reload failed: %s", e)
         steps.append(f"content: FAILED ({e})")
 
-    # 2) Regenerate resume PDFs
+    # 3) Regenerate resume PDFs. Jinja re-reads the templates from disk on
+    #    every render, so a template change from the pull above is picked up
+    #    here without waiting for the restart. (The Python code itself is
+    #    still the old in-memory version until step 4 lands.)
     try:
         designed, ats = regenerate_resume_pdfs()
         steps.append(f"resume: regenerated ({designed.stat().st_size} + {ats.stat().st_size} bytes)")
@@ -124,43 +154,29 @@ async def deploy(request: Request) -> PlainTextResponse:
         log.exception("Resume regeneration failed")
         steps.append(f"resume: FAILED ({e})")
 
-    # 3) Production: git pull + restart. The dev case skips these.
-    # Detected by the presence of a project root that contains a .git dir
-    # AND the existence of a systemd unit named 'backend' (configurable via
-    # DEPLOY_SYSTEMD_UNIT env, default 'backend').
-    project_root = Path(__file__).resolve().parents[2]  # /workspace
-    git_dir = project_root / ".git"
-    if git_dir.is_dir():
-        rc, out, err = _run(["git", "pull", "--ff-only"], cwd=str(project_root), timeout=60)
-        if rc == 0:
-            steps.append(f"git: pulled ({out.strip().splitlines()[-1] if out.strip() else 'ok'})")
-        else:
-            steps.append(f"git: FAILED ({err.strip()[:200]})")
-            log.error("git pull failed: %s", err)
-    else:
-        steps.append("git: skipped (no .git dir)")
-
-    # Restart strategy: the app process runs as www-data (no sudo), so it
-    # can't call `systemctl restart` directly — polkit rejects non-root
-    # callers. Instead we touch a flag file under /run; a separate systemd
-    # .path unit (deploy/backend-restart.path) watches the file and runs
-    # the restart as root when it appears. The .service unit also removes
-    # the flag in ExecStartPre so the next deploy triggers a fresh
-    # PathExists= event.
+    # 4) Production: restart. The app process runs as www-data, so it can't
+    #    call `systemctl restart` — polkit rejects non-root callers. Instead
+    #    we create a trigger file; a systemd .path unit (deploy/
+    #    backend-restart.path) watches for it and runs the restart as root.
     #
-    # The flag file must be pre-created root-owned with mode 0664 and
-    # group=www-data (see deploy/backend-restart.conf + the README
-    # install section). /run/ is mode 0755 owned by root, so touch()ing
-    # a root-owned file there as www-data returns EACCES otherwise.
+    #    Skipped when the pull failed: there is nothing new to activate, and
+    #    restarting into a tree we know is stale is worse than staying put.
     #
-    # Why not signal uvicorn directly: the unit runs in a hardened
-    # sandbox (ProtectSystem=strict, ReadWritePaths=/opt/portfolio), so
-    # sending a signal to $MAINPID from outside isn't reliable across
-    # versions — letting systemd do the restart through a .path unit is
-    # the supported path.
+    #    The trigger's parent directory is created group-writable by
+    #    deploy/backend-restart.conf (tmpfiles.d) because /run itself is
+    #    root-owned 0755 — without that, creating the trigger as www-data
+    #    fails with EACCES.
+    #
+    #    Why not signal uvicorn directly: the unit runs in a hardened
+    #    sandbox (ProtectSystem=strict, ReadWritePaths=/opt/portfolio), so
+    #    sending a signal to $MAINPID from outside isn't reliable across
+    #    versions — letting systemd do the restart through a .path unit is
+    #    the supported path.
     systemd_unit = getattr(settings, "deploy_systemd_unit", "backend")
-    restart_flag = Path(getattr(settings, "deploy_restart_flag", "/run/backend.restart"))
-    if systemd_unit and Path("/run/systemd/system").exists():
+    restart_flag = Path(getattr(settings, "deploy_restart_flag", "/run/backend-restart/trigger"))
+    if not pull_ok:
+        steps.append("systemd: skipped (git pull failed)")
+    elif systemd_unit and Path("/run/systemd/system").exists():
         try:
             restart_flag.parent.mkdir(parents=True, exist_ok=True)
             restart_flag.touch(exist_ok=True)

@@ -38,11 +38,13 @@ class Settings(BaseSettings):
     deploy_webhook_secret: str = ""
     # systemd unit name to restart on deploy. Empty string disables restart.
     deploy_systemd_unit: str = "backend"
-    # Where the deploy handler writes the "please restart" flag. The matching
-    # systemd .path unit (deploy/backend-restart.path) watches this file.
-    # The file must be writable by the user the app runs as (typically
-    # www-data) — see the README install section for the pre-create step.
-    deploy_restart_flag: str = "/run/backend.restart"
+    # Where the deploy handler writes the "please restart" trigger. The
+    # matching systemd .path unit (deploy/backend-restart.path) watches for
+    # this file appearing, and deploy/backend-restart.conf (tmpfiles.d)
+    # creates the parent directory group-writable on every boot — the app
+    # process (typically www-data) must be able to create the trigger, and
+    # /run itself is root-owned 0755 so it cannot.
+    deploy_restart_flag: str = "/run/backend-restart/trigger"
 
     # --- ntfy notifications ---
     # Set NTFY_ENABLED=1 to send. Disabled by default so dev never spams you.

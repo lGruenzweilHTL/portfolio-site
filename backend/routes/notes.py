@@ -197,6 +197,11 @@ class NotesCleanUrlMiddleware(BaseHTTPMiddleware):
         if path.startswith("/notes/"):
             handled = self._try_clean_url(path)
             if handled is not None:
+                # Tell StaticAssetCacheMiddleware this is an HTML response.
+                # The request path is extensionless (/notes/plsql), so its
+                # extension check can't tell that we're serving .html — the
+                # scope is shared, and the header policy stays in one place.
+                request.scope["serves_html"] = True
                 return handled
         return await call_next(request)
 
