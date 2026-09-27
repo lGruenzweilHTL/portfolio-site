@@ -45,6 +45,21 @@
     menu.removeAttribute('open');
     menu.querySelector('summary').focus();
   });
+  // Mouse users also get hover-to-open. A closed <details> doesn't render its
+  // content at all, so this has to toggle [open] rather than use CSS :hover.
+  // Clicking the summary while hover-opened pins the menu open instead of
+  // closing it under the pointer.
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  let byHover = false;
+  menu.addEventListener('mouseenter', function () {
+    if (!menu.open) { menu.open = true; byHover = true; }
+  });
+  menu.addEventListener('mouseleave', function () {
+    if (byHover) { menu.open = false; byHover = false; }
+  });
+  menu.querySelector('summary').addEventListener('click', function (e) {
+    if (byHover) { e.preventDefault(); byHover = false; }
+  });
 })();
 
 // Scroll-triggered entrances (styles.css, "ANIMATIONS"). Elements that come

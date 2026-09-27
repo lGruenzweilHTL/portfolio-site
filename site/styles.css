@@ -207,10 +207,6 @@ nav {
   display: none;
 }
 .resume-menu[open] .resume-menu-items { display: block; }
-/* Pointer devices get hover-to-open; touch keeps click-to-toggle via [open]. */
-@media (hover: hover) {
-  .resume-menu:hover .resume-menu-items { display: block; }
-}
 .resume-menu-item { display: block; padding: 7px 10px; border-radius: 4px; text-decoration: none; }
 .resume-menu-item:hover, .resume-menu-item:focus-visible { background: var(--accent-soft); }
 .resume-menu-label { display: block; font-size: var(--fs-sm); font-weight: 500; color: var(--hi); }
