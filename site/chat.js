@@ -501,8 +501,9 @@
       // Drop the typing indicator if it's still in the DOM.
       const typing = this.messages.querySelector('.chat-typing');
       if (typing) typing.remove();
-      // Drop any half-streamed assistant message — it never finished.
-      const partial = this.messages.querySelector('.chat-msg.assistant');
+      // Drop the half-streamed reply, if any — it never finished. Only the
+      // one still streaming: earlier replies and the greeting stay.
+      const partial = this.messages.querySelector('.chat-msg.assistant.streaming');
       if (partial) partial.remove();
 
       const cfg = REASON_MESSAGES[reason] || REASON_MESSAGES.unknown;
@@ -616,7 +617,7 @@
           sawAnyEvent = true;
           if (!assistantDiv) {
             typing.remove();
-            assistantDiv = el('div', { class: 'chat-msg assistant' });
+            assistantDiv = el('div', { class: 'chat-msg assistant streaming' });
             this.messages.appendChild(assistantDiv);
           }
           assistantText += evt.text;
@@ -641,6 +642,7 @@
           if (assistantDiv) {
             const caret = assistantDiv.querySelector('.chat-caret');
             if (caret) caret.remove();
+            assistantDiv.classList.remove('streaming');
             assistantDiv.textContent = assistantText;
             this.announce(assistantText);
           }
