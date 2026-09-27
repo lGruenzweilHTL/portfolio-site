@@ -1,0 +1,45 @@
+# Lukas Grünzweil
+
+> Lukas Grünzweil is a student at HTL Leonding, a higher technical college in Leonding, Austria. He builds backend systems, AI tooling and games, mainly in C#, Unity and Python. He graduates in June 2027 and is open to a backend internship or thesis project. Contact: lukas.gruenzweil@liwest.at.
+
+This file summarises https://gruenzweil.cc/ for language models. The website and the résumé PDFs are the source of truth; the facts below are kept in sync with them.
+
+## Key facts
+
+- Name: Lukas Grünzweil
+- Status: student at HTL Leonding (Höhere Technische Lehranstalt), graduating June 2027
+- Based in: Linz area, Upper Austria
+- Looking for: a backend internship or thesis project
+- Languages spoken: German (native), English (professional working proficiency)
+- Email: lukas.gruenzweil@liwest.at
+- GitHub: https://github.com/lGruenzweilHTL
+- Programming languages: C#, Python, TypeScript, C (strongest); C++, Kotlin, Java, HTML/CSS
+- Tools and infrastructure: Unity, Docker (strongest); Docker Compose, Kubernetes, Azure, Proxmox
+
+## Experience
+
+- SlideLizard Software GmbH, Linz. Software Engineering Intern, August 2026. Built a PWA on top of Microsoft Dynamics 365 Sales with speech-to-text meeting notes (Azure Speech) and an Azure OpenAI assistant wired into Dataverse, plus a daily GEO-visibility tracker over OpenRouter. Stack: Angular, TypeScript. The head of development called it one of the best projects to come out of an internship there.
+- Caritas Upper Austria, Leonding. Office & IT Assistant Intern, July–August 2025. Administration, accounting assistance including quarterly billing, and first-level IT and infrastructure support.
+
+## Projects
+
+- [vektorgrid](https://github.com/vektorgrid-ai): a self-hosted voice assistant built as a distributed system. C++ edge relays catch the wake-word and stream audio to Origin, a C# orchestrator that drives a Python pipeline (speech-to-text, intent router, expert LLM, text-to-speech) in sequence. Nodes never talk to each other directly. Risky tool calls pause for biometric approval in Gate, a Kotlin phone app that also works as a standalone relay. Lukas is the architect and primary developer.
+- [SceneForge AI](https://github.com/lGruenzweilHTL/SceneForge-AI): an AI plugin for the Unity Editor. Describe a scene in plain text and get GameObjects and components back. C#, Unity.
+- [UniConsole](https://github.com/lGruenzweilHTL/UniConsole): a free, lightweight in-game debug console for Unity. Mark a static method with [Command] and call it from a terminal in the scene. An alternative to Quantum Console. C#, Unity.
+- Forkcast (private school project): a meal-planning app with recipe search via the Spoonacular API, a meal calendar, combined ingredient lists, ratings and friends. Lukas wrote most of the TypeScript backend; the frontend is Vue.
+- [Space Defenders](https://github.com/lGruenzweilHTL/Space-Defenders): a mobile arcade game in Unity with escalating waves of enemy spaceships, built for touchscreens.
+- P.I.G.E.O.N. — Covert Ops (in progress): a satirical Unity game in which you play a pigeon running covert ops for the government.
+- [RoboDucks — RescueMaze](https://github.com/lGruenzweilHTL/lego-spike-serial): robotics competition work for the HTL Leonding robotics club. A custom serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm in simulation. Python, C.
+
+## Beyond code
+
+- Runs a homelab of three Proxmox nodes hosting Nextcloud, Vaultwarden, Jellyfin, a Minecraft server, Pi-hole and this website.
+- 3D prints functional parts and keeps upgrading a heavily modded Ender 3 Pro running Klipper.
+- Rides motorbikes (an Aprilia Tuono 125).
+
+## Links
+
+- [Website](https://gruenzweil.cc/)
+- [Résumé, designed (PDF)](https://gruenzweil.cc/resume.pdf)
+- [Résumé, ATS-friendly plain text (PDF)](https://gruenzweil.cc/resume-ats.pdf)
+- [Study notes](https://gruenzweil.cc/notes/): cheatsheets on PL/SQL, Java design patterns, JavaFX, Docker and Kubernetes, Git, Scrum, UML and cryptography

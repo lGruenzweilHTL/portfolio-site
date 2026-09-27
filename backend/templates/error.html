@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ code }} {{ title }} — Lukas Grünzweil</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -45,7 +47,7 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <div class="code">{{ code }}</div>
   <h1>{{ title }}</h1>
   <p>{{ message }}</p>
@@ -55,6 +57,6 @@
     <a class="btn btn-outline" href="/files/">Files</a>
   </div>
   {% if path %}<div class="path">{{ path }}</div>{% endif %}
-</div>
+</main>
 </body>
 </html>

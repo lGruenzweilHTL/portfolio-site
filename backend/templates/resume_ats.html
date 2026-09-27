@@ -20,6 +20,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Résumé — {{ p.name }}</title>
+<!-- WeasyPrint copies these into the PDF metadata. -->
+<meta name="author" content="{{ p.name }}">
+<meta name="description" content="Résumé of {{ p.name }}: {{ p.availability }}">
+<meta name="keywords" content="{{ p.name }}, résumé, CV, {{ r.skills.languages | join(', ') }}">
 <style>
   @page {
     size: A4;

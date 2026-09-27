@@ -1,0 +1,10 @@
+# Everything public is crawlable, including by AI/LLM crawlers.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_api/
+Disallow: /admin
+Disallow: /webhook/
+Disallow: /files/secure/
+
+Sitemap: https://gruenzweil.cc/sitemap.xml

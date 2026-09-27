@@ -35,6 +35,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Résumé — {{ p.name }}</title>
+<!-- WeasyPrint copies these into the PDF metadata. -->
+<meta name="author" content="{{ p.name }}">
+<meta name="description" content="Résumé of {{ p.name }}: {{ p.availability }}">
+<meta name="keywords" content="{{ p.name }}, résumé, CV, {{ r.skills.languages | join(', ') }}">
 <link rel="stylesheet" href="assets/devicon/devicon.min.css">
 <style>
   /* Palette: the site's dark-theme tokens (site/styles.css) inverted for paper.

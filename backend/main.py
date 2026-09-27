@@ -51,6 +51,7 @@ _STATIC_ASSET_EXTS = frozenset({
     "png", "jpg", "jpeg", "gif", "webp", "svg", "ico",
     "woff", "woff2", "ttf", "eot",
     "pdf", "zip", "mp4", "webm", "mp3",
+    "txt", "xml",  # robots.txt / llms.txt / sitemap.xml: crawler traffic, not pageviews
 })
 
 
@@ -119,6 +120,7 @@ class StaticAssetCacheMiddleware(BaseHTTPMiddleware):
 
     _REVALIDATE_EXTS = frozenset({
         ".html", ".css", ".js", ".json", ".map", ".svg", ".webmanifest",
+        ".txt", ".xml",  # robots.txt, llms.txt, sitemap.xml
     })
 
     async def dispatch(self, request: Request, call_next):

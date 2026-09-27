@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-maintained: add a <url> when a page or study note is added. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://gruenzweil.cc/</loc><lastmod>2026-09-27</lastmod><priority>1.0</priority></url>
+  <url><loc>https://gruenzweil.cc/resume.pdf</loc><lastmod>2026-09-27</lastmod><priority>0.8</priority></url>
+  <url><loc>https://gruenzweil.cc/resume-ats.pdf</loc><lastmod>2026-09-27</lastmod><priority>0.5</priority></url>
+  <url><loc>https://gruenzweil.cc/llms.txt</loc><lastmod>2026-09-27</lastmod><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/</loc><priority>0.4</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/nscs</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/plsql</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/Java/design-patterns</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/Java/javafx</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/Java/serialization-db</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/SYP/docker-k8s</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/SYP/git</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/SYP/scrum-agile</loc><priority>0.3</priority></url>
+  <url><loc>https://gruenzweil.cc/notes/SYP/uml</loc><priority>0.3</priority></url>
+</urlset>
