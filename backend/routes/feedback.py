@@ -66,7 +66,7 @@ async def submit_feedback(req: FeedbackRequest, request: Request) -> JSONRespons
     if req.email and "@" not in req.email:
         raise HTTPException(status_code=400, detail="invalid email")
 
-    result = await verify_turnstile(req.turnstile_token)
+    result = await verify_turnstile(req.turnstile_token, expected_action="feedback")
     if not result.ok:
         log.info("Turnstile reject on feedback: %s", result.error)
         raise HTTPException(status_code=403, detail="captcha-failed")

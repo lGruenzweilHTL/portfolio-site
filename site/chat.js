@@ -266,6 +266,8 @@
     background: var(--text, #d0ccc0); margin-left: 1px;
     animation: chatCaret 0.9s steps(1) infinite;
   }
+  /* Horizontal padding only: the hidden widget must not add height. */
+  .chat-turnstile { flex-shrink: 0; padding: 0 12px; background: var(--bg2, #15140f); }
   .chat-form {
     border-top: 1px solid var(--line, #232019);
     padding: 10px 12px;
@@ -402,7 +404,12 @@
       const form = el('form', { class: 'chat-form' }, [input, sendBtn]);
       form.addEventListener('submit', (e) => { e.preventDefault(); this.send(); });
 
-      const panel = el('div', { class: 'chat-panel', role: 'dialog', 'aria-label': 'Chat with Lukas\'s assistant' }, [head, messages, form]);
+      // The chatbot's own Turnstile widget. Empty unless Cloudflare asks for
+      // an interactive challenge on send, which then appears right here.
+      const turnstileBox = el('div', { class: 'chat-turnstile' });
+      this.turnstileBox = turnstileBox;
+
+      const panel = el('div', { class: 'chat-panel', role: 'dialog', 'aria-label': 'Chat with Lukas\'s assistant' }, [head, messages, turnstileBox, form]);
       document.body.appendChild(panel);
       this.panel = panel;
 
@@ -514,13 +521,11 @@
 
       const sessionId = getOrCreateSessionId();
 
-      // Get a Turnstile token. If the widget isn't loaded (dev bypass or
-      // missing sitekey), send an empty string — server-side dev bypass
-      // accepts it.
-      let turnstileToken = '';
-      if (window.turnstile && typeof window.turnstile.getResponse === 'function') {
-        try { turnstileToken = window.turnstile.getResponse() || ''; } catch (_) {}
-      }
+      // Fresh single-use Turnstile token for this message. '' if Turnstile
+      // isn't available; the server's dev bypass accepts that.
+      const turnstileToken = window.getTurnstileToken
+        ? await window.getTurnstileToken(this.turnstileBox, 'chat')
+        : '';
 
       let resp;
       try {

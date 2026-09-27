@@ -1,10 +1,12 @@
 // site/index.html — feedback form submit handler.
-// Posts to /api/feedback with the current Turnstile token (dev bypass empty).
+// Posts to /api/feedback with a fresh Turnstile token fetched on submit
+// (see turnstile.js; '' when unavailable, which the dev bypass accepts).
 (function () {
   const form = document.getElementById('feedback-form');
   if (!form) return;
   const status = document.getElementById('feedback-status');
   const submit = document.getElementById('feedback-submit');
+  const turnstileBox = document.getElementById('feedback-turnstile');
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -16,7 +18,6 @@
       name: (data.get('name') || '').toString().trim() || null,
       email: (data.get('email') || '').toString().trim() || null,
       message: (data.get('message') || '').toString().trim(),
-      turnstile_token: window.__feedbackTurnstileToken || '',
     };
     if (!body.message) {
       status.textContent = 'Message is required.';
@@ -24,6 +25,13 @@
       submit.disabled = false;
       return;
     }
+    // Any interactive challenge appears beside the button while this waits,
+    // and the helper hides it again once the token is issued.
+    status.textContent = 'Verifying…';
+    body.turnstile_token = window.getTurnstileToken
+      ? await window.getTurnstileToken(turnstileBox, 'feedback')
+      : '';
+    status.textContent = '';
     let resp;
     try {
       resp = await fetch('/api/feedback', {
@@ -41,10 +49,6 @@
       status.textContent = 'Thanks — got it.';
       status.className = 'feedback-status ok';
       form.reset();
-      if (window.turnstile && document.querySelector('.cf-turnstile')) {
-        try { window.turnstile.reset(document.querySelector('.cf-turnstile')); } catch (_) {}
-      }
-      window.__feedbackTurnstileToken = '';
     } else if (resp.status === 429) {
       status.textContent = 'You\'re sending too fast. Try again in a minute.';
       status.className = 'feedback-status err';

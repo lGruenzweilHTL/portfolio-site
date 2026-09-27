@@ -23,6 +23,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
 /site                      Static site + notes (served as /, /notes/)
   index.html               Main portfolio page (with chatbot + feedback wired in)
   chat.js                  Floating-button chatbot UI
+  turnstile.js             On-demand Turnstile tokens (separate chat + feedback widgets)
   notes/                   Study cheatsheets (moved from /study)
   files/                   Public downloads — listed by routes/files.py, not the static mount
   files/secure/            Protected downloads (token-gated, no listing)
@@ -32,7 +33,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   config.py                Pydantic settings (env / .env)
   content.py               /content loader + system-prompt renderer
   chat.py                  OpenRouter streaming + fallback policy
-  turnstile.py             siteverify helper with dev bypass
+  turnstile.py             siteverify helper with dev bypass + per-widget action check
   resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
   routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers

@@ -81,7 +81,7 @@ async def chat(req: ChatRequest, request: Request):
         )
 
     # Turnstile (skipped in dev with TURNSTILE_DEV_BYPASS=1).
-    result = await verify_turnstile(req.turnstile_token)
+    result = await verify_turnstile(req.turnstile_token, expected_action="chat")
     if not result.ok:
         log.info("Turnstile reject: %s", result.error)
         return JSONResponse(

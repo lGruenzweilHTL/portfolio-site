@@ -630,7 +630,8 @@ nav {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   margin-top: 6px;
 }
-.feedback-actions .cf-turnstile { min-height: 65px; }
+/* Empty (zero height) unless Cloudflare asks for an interactive challenge. */
+.feedback-turnstile { flex: 1 1 300px; }
 .feedback-actions .btn { margin-left: auto; }
 .feedback-status {
   margin-top: 12px; font-family: var(--font-mono); font-size: 12px;

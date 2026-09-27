@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lukas Grünzweil</title>
+<!-- Rewritten per response by TurnstileSitekeyMiddleware; read by turnstile.js. -->
+<meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
 <meta name="description" content="Lukas Grünzweil — student building backend systems, AI tooling, and games. C# / Unity / Python." />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="alternate icon" href="favicon.svg" />
@@ -462,8 +464,8 @@
         <textarea name="message" required minlength="1" maxlength="4000" rows="4" placeholder="What did you think of the site? Spot a typo? Want to talk about a project?"></textarea>
       </label>
       <div class="feedback-actions">
-        <!-- Turnstile widget mount point -->
-        <div class="cf-turnstile" data-sitekey="__TURNSTILE_SITEKEY__" data-callback="__feedbackTurnstileCallback"></div>
+        <!-- Turnstile mount point: stays empty until a send needs an interactive challenge -->
+        <div class="feedback-turnstile" id="feedback-turnstile"></div>
         <button type="submit" class="btn btn-solid" id="feedback-submit">Send feedback</button>
       </div>
       <p class="feedback-status" id="feedback-status" role="status"></p>
@@ -478,16 +480,13 @@
 
 <script src="main.js" defer></script>
 
-<!-- Cloudflare Turnstile (chatbot captcha + feedback form). The sitekey
-     below is the documented "always passes" test key. Replace with your real
-     sitekey on the live server. If the script fails to load, the backend
-     still works in dev (TURNSTILE_DEV_BYPASS=1) and falls back to a
-     captcha-failed message in production if the sitekey is wrong. -->
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__chatTurnstileOnload" async defer></script>
-<script>
-window.__chatTurnstileOnload = function () { window.__chatTurnstileReady = true; };
-window.__feedbackTurnstileCallback = function (token) { window.__feedbackTurnstileToken = token; };
-</script>
+<!-- Cloudflare Turnstile: separate on-demand widgets for the chatbot and the
+     feedback form, see turnstile.js. It must load synchronously before the
+     async API script so the onload hook exists when that script fires. If the
+     API script fails to load, requests go out without a token: fine in dev
+     (TURNSTILE_DEV_BYPASS=1), a captcha-failed message in production. -->
+<script src="turnstile.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
 <script src="chat.js" defer></script>
 <script src="feedback.js" defer></script>
 </body>

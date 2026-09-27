@@ -12,6 +12,7 @@ endpoints are the two consumers — both must verify before doing real work.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 
 import httpx
@@ -19,6 +20,12 @@ import httpx
 from .config import settings
 
 log = logging.getLogger(__name__)
+
+# Cloudflare's dummy secrets (1x/2x/3x followed by zeros and AA). Siteverify
+# answers them with a fixed action ("test"), not the widget's, so the action
+# check can only apply to real secrets.
+# https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+_TEST_SECRET = re.compile(r"[123]x0+AA")
 
 
 @dataclass
@@ -72,7 +79,8 @@ async def verify_turnstile(token: str | None, *, expected_action: str | None = N
         )
 
     action = data.get("action")
-    if expected_action and action != expected_action:
+    check_action = expected_action and not _TEST_SECRET.fullmatch(settings.turnstile_secret)
+    if check_action and action != expected_action:
         return TurnstileResult(
             ok=False,
             error=f"action-mismatch (expected {expected_action!r}, got {action!r})",
