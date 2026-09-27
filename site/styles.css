@@ -526,6 +526,8 @@ nav {
 @media (max-width: 560px) {
   .feedback-row { grid-template-columns: 1fr; }
   .feedback-actions { flex-direction: column; align-items: stretch; }
+  /* Its 300px flex-basis would become height in a column. */
+  .feedback-turnstile { flex: none; }
   .feedback-actions .btn { margin-left: 0; justify-content: center; }
 }
 
@@ -597,6 +599,11 @@ footer {
 }
 
 /* RESPONSIVE */
+@media (max-width: 1000px) {
+  /* Below this the footer reaches under the floating chat button; leave
+     room so "Back to top" stays tappable at the end of the page. */
+  footer { padding-bottom: 100px; }
+}
 @media (max-width: 800px) {
   .about-wrap { grid-template-columns: 1fr; gap: 32px; }
   .info-card { max-width: 520px; }
@@ -619,7 +626,7 @@ footer {
 @media (max-width: 560px) {
   nav { padding-left: 20px; padding-right: 12px; }
   footer { padding-left: 20px; padding-right: 20px; }
-  .wrap { padding: 0 20px; }
+  .wrap { padding-left: 20px; padding-right: 20px; }
   .nav-links { gap: 0; }
   .nav-links a { padding: 8px 7px; }
   #hero { padding-top: 112px; padding-bottom: 56px; }
