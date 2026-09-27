@@ -124,7 +124,7 @@ projects:
     summary: >
       An in-game debug console for Unity. Mark a static method with [Command] and
       call it from a terminal in the scene. A free, lightweight alternative to
-      QuantumConsole.
+      Quantum Console.
     role: "Author"
     stack: ["C#", "Unity"]
     repo_url: "https://github.com/lGruenzweilHTL/UniConsole"
@@ -153,7 +153,7 @@ projects:
   - name: "RoboDucks — RescueMaze"
     summary: >
       RescueMaze competition work for the HTL Leonding robotics club. Built a
-      custom serial protocol for Raspberry Pi → Lego SPIKE communication, and a
+      custom serial protocol for Raspberry Pi → LEGO SPIKE communication, and a
       maze-exploration controller running Trémaux's algorithm in simulation.
     role: "Contributor · HTL Leonding robotics club"
     stack: ["Python", "C"]
