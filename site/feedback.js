@@ -7,6 +7,19 @@
   const status = document.getElementById('feedback-status');
   const submit = document.getElementById('feedback-submit');
   const turnstileBox = document.getElementById('feedback-turnstile');
+  const emailInput = form.elements.email;
+  const messageInput = form.elements.message;
+
+  // The form is novalidate so errors show up in the status line (announced
+  // by screen readers) instead of the browser's own bubbles.
+  function invalid(input, text) {
+    input.setAttribute('aria-invalid', 'true');
+    input.focus();
+    status.textContent = text;
+    status.className = 'feedback-status err';
+  }
+  [emailInput, messageInput].forEach((input) =>
+    input.addEventListener('input', () => input.removeAttribute('aria-invalid')));
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -20,8 +33,12 @@
       message: (data.get('message') || '').toString().trim(),
     };
     if (!body.message) {
-      status.textContent = 'Message is required.';
-      status.className = 'feedback-status err';
+      invalid(messageInput, 'Please write a message first.');
+      submit.disabled = false;
+      return;
+    }
+    if (body.email && !emailInput.checkValidity()) {
+      invalid(emailInput, "That email address doesn't look right. Fix it, or leave it empty.");
       submit.disabled = false;
       return;
     }
@@ -51,6 +68,9 @@
       form.reset();
     } else if (resp.status === 429) {
       status.textContent = "You're sending messages too fast. Wait a moment, or email me.";
+      status.className = 'feedback-status err';
+    } else if (resp.status === 400 || resp.status === 422) {
+      status.textContent = "The server rejected the form. Check the email address, or email me directly.";
       status.className = 'feedback-status err';
     } else if (resp.status === 403) {
       status.textContent = 'Captcha check failed. Refresh and try again.';

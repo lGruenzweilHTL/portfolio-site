@@ -1,4 +1,4 @@
-// site/index.html — analytics, reveal observer, arch diagram stepper.
+// site/index.html — analytics, résumé menu, entrance animations, nav state, arch diagram stepper.
 
 // Analytics beacon — auto-tracks outbound link clicks + resume download.
 // /api/track is fire-and-forget; never blocks the click.
@@ -47,20 +47,57 @@
   });
 })();
 
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-  });
-}, { threshold: 0.07 });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-// Interactive architecture pipeline stepper
+// Scroll-triggered entrances (styles.css, "ANIMATIONS"). Elements that come
+// into view in the same frame are staggered in document order, so a row of
+// cards cascades instead of popping in at once.
 (function () {
-  const svg = document.getElementById('archSvg');
+  const items = document.querySelectorAll('.rv');
+  document.querySelectorAll('.rv-stagger').forEach(row =>
+    [...row.children].forEach((c, i) => c.style.setProperty('--i', i)));
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(el => el.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    const arriving = entries.filter(e => e.isIntersecting).map(e => e.target);
+    arriving.forEach((el, i) => {
+      el.style.setProperty('--rv-delay', Math.min(i, 5) * 90 + 'ms');
+      el.classList.add('in');
+      io.unobserve(el);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  items.forEach(el => io.observe(el));
+})();
+
+// Nav: mark the link of the section currently on screen (aria-current).
+(function () {
+  const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+  // The hero has no link; observing it clears the highlight at the top.
+  const sections = ['#hero', ...links.map(a => a.getAttribute('href'))]
+    .map(sel => document.querySelector(sel)).filter(Boolean);
+  if (!sections.length || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(a => {
+        if (a.getAttribute('href') === '#' + e.target.id) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  sections.forEach(s => io.observe(s));
+})();
+
+// Interactive architecture pipeline stepper. The diagram exists twice
+// (landscape + portrait SVG); parts are addressed by data-part so both
+// stay in sync whichever one is visible.
+(function () {
+  const arch = document.getElementById('arch');
   const noteEl = document.getElementById('archNote');
   const playBtn = document.getElementById('archPlay');
-  if (!svg || !noteEl || !playBtn) return;
-  const btns = [...document.querySelectorAll('.arch-step[data-step]')];
+  if (!arch || !noteEl || !playBtn) return;
+  const btns = [...arch.querySelectorAll('.arch-step[data-step]')];
+  const parts = id => arch.querySelectorAll('[data-part="' + id + '"]');
 
   // step -> { nodes lit, edges lit ([id, reverse-flow]), badge lit, note }
   const steps = {
@@ -74,39 +111,48 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   };
 
   function clear() {
-    svg.querySelectorAll('.on').forEach(el => el.classList.remove('on', 'rev'));
-    btns.forEach(b => b.classList.remove('active'));
+    arch.querySelectorAll('svg .on').forEach(el => el.classList.remove('on', 'rev'));
+    btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
   }
   function show(n) {
     clear();
     const s = steps[n];
     if (!s) return;
-    s.on.forEach(id => document.getElementById(id)?.classList.add('on'));
-    s.edges.forEach(([id, rev]) => {
-      const el = document.getElementById(id);
-      if (el) { el.classList.add('on'); if (rev) el.classList.add('rev'); }
-    });
-    if (s.badge) document.getElementById(s.badge)?.classList.add('on');
-    btns.find(b => +b.dataset.step === n)?.classList.add('active');
+    s.on.forEach(id => parts(id).forEach(el => el.classList.add('on')));
+    s.edges.forEach(([id, rev]) => parts(id).forEach(el => {
+      el.classList.add('on');
+      if (rev) el.classList.add('rev');
+    }));
+    if (s.badge) parts(s.badge).forEach(el => el.classList.add('on'));
+    const b = btns.find(b => +b.dataset.step === n);
+    if (b) { b.classList.add('active'); b.setAttribute('aria-pressed', 'true'); }
     noteEl.innerHTML = s.note;
   }
 
-  let timer = null, cur = 1;
-  function stop() {
-    if (timer) { clearInterval(timer); timer = null; }
-    playBtn.classList.remove('active');
-    playBtn.textContent = '▶ Auto';
-  }
-  function play() {
-    stop();
-    playBtn.classList.add('active');
-    playBtn.textContent = '❚❚ Pause';
-    timer = setInterval(() => { cur = cur % 7 + 1; show(cur); }, 1700);
+  // Autoplay runs only while the diagram is on screen, and never after the
+  // user has taken over (a step click or Pause). The note is announced to
+  // screen readers only for manual steps, not every autoplay tick.
+  let timer = null, cur = 1, wantPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches, visible = false;
+  function tick() { cur = cur % 7 + 1; show(cur); }
+  function sync() {
+    const run = wantPlay && visible && !document.hidden;
+    if (run && !timer) timer = setInterval(tick, 1700);
+    if (!run && timer) { clearInterval(timer); timer = null; }
+    playBtn.classList.toggle('active', wantPlay);
+    playBtn.setAttribute('aria-pressed', String(wantPlay));
+    playBtn.textContent = wantPlay ? '❚❚ Pause' : '▶ Auto';
+    noteEl.setAttribute('aria-live', wantPlay ? 'off' : 'polite');
   }
 
-  btns.forEach(b => b.addEventListener('click', () => { stop(); cur = +b.dataset.step; show(cur); }));
-  playBtn.addEventListener('click', () => { timer ? stop() : play(); });
+  btns.forEach(b => b.addEventListener('click', () => { wantPlay = false; sync(); cur = +b.dataset.step; show(cur); }));
+  playBtn.addEventListener('click', () => { wantPlay = !wantPlay; sync(); });
+  document.addEventListener('visibilitychange', sync);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => {
+      visible = entries[entries.length - 1].isIntersecting; sync();
+    }).observe(arch);
+  } else { visible = true; }
 
   show(1);
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) play();
+  sync();
 })();

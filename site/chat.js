@@ -168,7 +168,8 @@
     border-right: 1px solid var(--line2, #302c22);
     border-top: 1px solid var(--line2, #302c22);
   }
-  .chat-fab:hover .chat-fab-tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
+  .chat-fab:hover .chat-fab-tooltip,
+  .chat-fab:focus-visible .chat-fab-tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
   .chat-panel {
     position: fixed; right: 22px; bottom: 22px; z-index: 60;
     width: min(420px, calc(100vw - 28px));
@@ -193,12 +194,19 @@
   .chat-panel.closing {
     animation: chatPanelOut 0.18s ease both;
   }
+  /* Fully closed: out of the tab order and the accessibility tree (the
+     element is also inert), not just transparent. */
+  .chat-panel:not(.open):not(.closing) { visibility: hidden; }
+  .chat-sr {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
   .chat-head {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 14px; border-bottom: 1px solid var(--line, #232019);
     background: var(--bg2, #15140f);
   }
-  .chat-head-title { font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+  .chat-head-title { margin: 0; line-height: 1.3; font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
     font-size: var(--fs-base, 15px); color: var(--hi, #eceae1); font-weight: 600; }
   .chat-head-sub { font-family: var(--font-mono, monospace); font-size: var(--fs-xs, 11px);
     color: var(--muted, #918c7f); margin-top: 1px;
@@ -212,6 +220,7 @@
   }
   .chat-close:hover { color: var(--hi, #eceae1); background: var(--line, #232019); }
   .chat-close:active { transform: scale(0.92); }
+  .chat-close, .chat-reset { min-width: 28px; min-height: 28px; }
   .chat-messages {
     flex: 1; overflow-y: auto; padding: 14px;
     display: flex; flex-direction: column; gap: 10px;
@@ -345,9 +354,9 @@
       const fabIcon = el('span', { class: 'chat-fab-icon', 'aria-hidden': 'true' }, [
         document.createTextNode('✦')
       ]);
-      const fab = el('button', { class: 'chat-fab chat-fab-enter', 'aria-label': 'Chat', 'aria-expanded': 'false', title: 'Chat' }, [
+      const fab = el('button', { type: 'button', class: 'chat-fab chat-fab-enter', 'aria-label': 'Chat about Lukas', 'aria-expanded': 'false', 'aria-controls': 'chat-panel', 'aria-haspopup': 'dialog' }, [
         fabIcon,
-        el('span', { class: 'chat-fab-tooltip' }, [document.createTextNode('Chat')])
+        el('span', { class: 'chat-fab-tooltip', 'aria-hidden': 'true' }, [document.createTextNode('Chat')])
       ]);
       fab.addEventListener('click', () => this.toggle());
       // Once the one-shot entrance has finished, drop the class so
@@ -368,21 +377,25 @@
 
       const head = el('div', { class: 'chat-head' }, [
         el('div', null, [
-          el('div', { class: 'chat-head-title' }, [document.createTextNode('Ask about Lukas')]),
+          el('h2', { class: 'chat-head-title', id: 'chat-title' }, [document.createTextNode('Ask about Lukas')]),
           el('div', { class: 'chat-head-sub' }, [document.createTextNode('Powered by a free model · may be slow')])
         ]),
-        el('div', null, [
-          el('button', { class: 'chat-reset', title: 'Start a new conversation' }, [document.createTextNode('Reset')]),
-          el('button', { class: 'chat-close', 'aria-label': 'Close' }, [document.createTextNode('×')])
+        el('div', { class: 'chat-head-actions' }, [
+          el('button', { type: 'button', class: 'chat-reset', title: 'Start a new conversation' }, [document.createTextNode('Reset')]),
+          el('button', { type: 'button', class: 'chat-close', 'aria-label': 'Close chat' }, [document.createTextNode('×')])
         ])
       ]);
       head.querySelector('.chat-close').addEventListener('click', () => this.close());
       head.querySelector('.chat-reset').addEventListener('click', () => this.reset());
 
-      const messages = el('div', { class: 'chat-messages' });
+      // Screen readers don't follow the log while tokens stream in; finished
+      // replies and errors are announced once through this.live instead.
+      const messages = el('div', { class: 'chat-messages', role: 'log', 'aria-live': 'off', 'aria-label': 'Conversation', tabindex: '0' });
       this.messages = messages;
+      const live = el('div', { class: 'chat-sr', 'aria-live': 'polite', 'aria-atomic': 'true' });
+      this.live = live;
 
-      const input = el('textarea', { class: 'chat-input', rows: '1', placeholder: 'Ask about projects, skills, availability…' });
+      const input = el('textarea', { class: 'chat-input', rows: '1', 'aria-label': 'Your question', placeholder: 'Ask about projects, skills, availability…' });
       this.input = input;
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -396,9 +409,8 @@
         input.style.height = Math.min(input.scrollHeight, 120) + 'px';
       });
 
-      const sendBtn = el('button', { class: 'chat-send' }, [document.createTextNode('Send')]);
+      const sendBtn = el('button', { type: 'submit', class: 'chat-send' }, [document.createTextNode('Send')]);
       this.sendBtn = sendBtn;
-      sendBtn.addEventListener('click', () => this.send());
 
       const form = el('form', { class: 'chat-form' }, [input, sendBtn]);
       form.addEventListener('submit', (e) => { e.preventDefault(); this.send(); });
@@ -408,7 +420,11 @@
       const turnstileBox = el('div', { class: 'chat-turnstile' });
       this.turnstileBox = turnstileBox;
 
-      const panel = el('div', { class: 'chat-panel', role: 'dialog', 'aria-label': 'Chat with Lukas\'s assistant' }, [head, messages, turnstileBox, form]);
+      const panel = el('div', { class: 'chat-panel', id: 'chat-panel', role: 'dialog', 'aria-labelledby': 'chat-title' }, [head, messages, live, turnstileBox, form]);
+      panel.inert = true;
+      panel.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { e.stopPropagation(); this.close(); }
+      });
       document.body.appendChild(panel);
       this.panel = panel;
 
@@ -424,6 +440,7 @@
     },
     openPanel() {
       this.panel.classList.remove('closing');
+      this.panel.inert = false;
       this.panel.classList.add('open');
       this.fab.setAttribute('aria-expanded', 'true');
       this.open = true;
@@ -434,6 +451,7 @@
       this.fab.setAttribute('aria-expanded', 'false');
       this.open = false;
       // Play exit animation, then hide so it can't trap focus / block clicks.
+      this.panel.inert = true;
       this.panel.classList.remove('open');
       this.panel.classList.add('closing');
       const onEnd = () => {
@@ -441,6 +459,15 @@
         this.panel.removeEventListener('animationend', onEnd);
       };
       this.panel.addEventListener('animationend', onEnd);
+      // Reduced motion kills the animation, so animationend never fires.
+      setTimeout(onEnd, 250);
+      this.fab.focus();
+    },
+
+    announce(text) {
+      this.live.textContent = '';
+      // Set on the next frame, so a repeated message is still announced.
+      requestAnimationFrame(() => { this.live.textContent = text; });
     },
 
     reset() {
@@ -485,6 +512,7 @@
         ? escape(text) + ' <a href="mailto:' + EMAIL + '">' + EMAIL + '</a>'
         : escape(text);
       this.appendHTML('fallback', html);
+      this.announce(text);
       this.track('chatbot_error', { reason: reason });
     },
 
@@ -614,6 +642,7 @@
             const caret = assistantDiv.querySelector('.chat-caret');
             if (caret) caret.remove();
             assistantDiv.textContent = assistantText;
+            this.announce(assistantText);
           }
         }
       };
