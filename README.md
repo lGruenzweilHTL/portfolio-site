@@ -27,7 +27,10 @@ the only ingress; the tunnel's `config.yml` just repointed from
   notes/                   Study cheatsheets (moved from /study)
   files/                   Public downloads — listed by routes/files.py, not the static mount
   files/secure/            Protected downloads (token-gated, no listing)
-  img/, favicon.svg
+  img/, favicon.svg         Project screenshots (WebP), favicon
+  robots.txt, sitemap.xml   Crawler rules + hand-maintained sitemap (add new notes pages)
+  llms.txt                  Plain-text fact sheet for LLMs (GEO); keep in sync with index.html
+  og.png, apple-touch-icon.png  Link-preview image (1200x630) and home-screen icon
 /backend                   FastAPI app
   main.py                  App factory, middlewares, static mount, error handlers
   config.py                Pydantic settings (env / .env)
