@@ -31,5 +31,5 @@ There is no test suite, linter, or build step. Frontend (`site/`) is hand-writte
 ## Conventions
 
 - Caching: nothing is fingerprinted, so HTML/CSS/JS/JSON/SVG must revalidate; don't add `max-age`/`immutable` to in-place assets.
-- Study notes: `site/notes/index.html` is committed as byte-identical copies in each subdirectory (not symlinks) — keep them identical. `study.css` and `cheatsheet.js` are referenced by absolute paths (`/notes/notes.css`, `/notes/cheatsheet.js`); don't make them relative. The index's nginx header comment is historical; `routes/notes.py` is the source of truth for `_listing` JSON.
+- Study notes: `site/notes/index.html` is the only directory index; `NotesCleanUrlMiddleware` serves it for every `/notes/<dir>/` (and redirects `/notes/<dir>` to add the slash), so don't put `index.html` files in subdirectories. `study.css` and `cheatsheet.js` are referenced by absolute paths (`/notes/notes.css`, `/notes/cheatsheet.js`); don't make them relative. `routes/notes.py` is the source of truth for `_listing` JSON.
 - Commits use Conventional Commits with scopes (`feat(resume):`, `fix(deploy):`, `chore(scripts):`).

@@ -226,18 +226,14 @@ If you change the schema, also update:
 `site/notes/` is plain HTML/CSS/JS. To add a new cheatsheet:
 
 1. Create `site/notes/<topic>.html` (use the same template style as the existing ones)
-2. For a new subdirectory, copy `site/notes/index.html` into it as
-   `index.html` — that's the generic directory index, and it works at any
-   depth with no per-directory edits. It's committed as three identical
-   regular files (root, `Java/`, `SYP/`), **not** a symlink, so keep the
-   copies byte-identical or listings will drift apart.
+2. For a new subdirectory, just create the directory and put cheatsheets in
+   it. There is one directory index, `site/notes/index.html`;
+   `NotesCleanUrlMiddleware` in `backend/routes/notes.py` serves it for every
+   `/notes/<dir>/` request, so don't add `index.html` files to subdirectories.
 3. Cross-link from `site/notes/index.html` if it should appear on the top page
 
-The index's header comment still describes the nginx `autoindex` setup it
-was written for. That config is gone — `backend/routes/notes.py` now
-serves `/notes/_listing` and `/notes/<sub>/_listing` as JSON, and
-`cheatsheet.js` fetches those. Treat the comment as historical; the
-routes are the source of truth.
+The index fetches `./_listing/`. `backend/routes/notes.py` serves that as
+JSON for `/notes/_listing` and `/notes/<sub>/_listing`.
 
 `site/notes/study.css` is served from the fixed path `/notes/notes.css`
 (and `cheatsheet.js` from `/notes/cheatsheet.js`) rather than relatively,

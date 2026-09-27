@@ -1,9 +1,10 @@
 <!--
   GENERIC STUDY DIRECTORY INDEX
   =============================
-  Symlink this exact file as `index.html` into every directory under /notes
-  that should show a browsable listing (root included). It is fully
-  self-locating — no per-directory edits needed.
+  The one index for every directory under /notes (root included):
+  NotesCleanUrlMiddleware in backend/routes/notes.py serves this file for
+  each /notes/<dir>/ request. It is fully self-locating, so don't copy it
+  into subdirectories.
 
   Backed by backend/routes/notes.py (no nginx):
     - GET /notes/<dir>/_listing   -> JSON array of children, shape:
@@ -59,8 +60,8 @@
 <script>
 // ---- Optional manual descriptions for individual cheatsheet files. ----
 // Keyed by filename-without-extension. Safe to leave entries out — falls
-// back to no subtitle. This map applies wherever this index.html is
-// symlinked, so only add entries relevant to that level if you want to
+// back to no subtitle. This map applies to every directory this index
+// serves, so only add entries relevant to that level if you want to
 // keep it tidy (irrelevant keys are simply unused).
 const descriptions = {
   'plsql': 'Oracle PL/SQL — syntax, cursors, exceptions, packages',

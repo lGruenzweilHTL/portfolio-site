@@ -1,21 +1,22 @@
 """Notes section: directory listings + asset aliases + clean URLs.
 
 Routes:
-  GET /notes/                       -> served by the static site mount
-                                      (index.html at site/notes/index.html)
+  GET /notes/, /notes/<subdir>/     -> site/notes/index.html (shared by
+                                      every directory, via the middleware)
   GET /notes/_listing               -> JSON listing of /notes/
   GET /notes/<subdir>/_listing      -> JSON listing of <subdir>
   GET /notes/notes.css              -> alias for site/notes/study.css
   GET /notes/cheatsheet.js          -> alias for site/notes/cheatsheet.js
 
-Plus a middleware (`NotesCleanUrlMiddleware`) that handles extensionless
-URLs like /notes/plsql -> site/notes/plsql.html. The middleware runs
-before the static mount and short-circuits only for clean-URL requests;
-real files and 404s flow through to the static mount as usual.
+Plus a middleware (`NotesCleanUrlMiddleware`) that serves the shared index
+for directory requests, redirects /notes/Java -> /notes/Java/, and handles
+extensionless URLs like /notes/plsql -> site/notes/plsql.html. It runs
+before the static mount and short-circuits only for those cases; real
+files and 404s flow through to the static mount as usual.
 
 Why this module exists:
-  The notes index pages (root + Java/ + SYP/) are a single template
-  symlinked into every listing directory. The template fetches
+  The notes index pages (root + Java/ + SYP/) are one template,
+  site/notes/index.html, served for every directory. The template fetches
   `./_listing/` and expects a JSON array of `{name, type, ...}` entries
   (the same shape nginx's `autoindex_format json` produces). Since the
   app runs behind FastAPI only — no nginx — we provide that endpoint
@@ -40,7 +41,7 @@ import logging
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
@@ -51,6 +52,7 @@ log = logging.getLogger(__name__)
 router = APIRouter()
 
 _NOTES_ROOT = Path(settings.site_dir) / "notes"
+_NOTES_INDEX = _NOTES_ROOT / "index.html"
 _STUDY_CSS = _NOTES_ROOT / "study.css"
 _CHEATSHEET_JS = _NOTES_ROOT / "cheatsheet.js"
 
@@ -167,6 +169,11 @@ def notes_js() -> FileResponse:
 
 # --- Clean URL middleware --------------------------------------------------
 #
+# Directory requests (`/notes/`, `/notes/Java/`) all get the one
+# site/notes/index.html; it locates itself from the URL, so subdirectories
+# need no copy of it. An extensionless path naming a directory is
+# redirected to its trailing-slash form.
+#
 # The notes index links to cheatsheets with extensionless URLs
 # (`./plsql`, `./Java/javafx`). The static mount only resolves
 # `index.html` on directory requests, so a path like `/notes/plsql`
@@ -184,7 +191,7 @@ def notes_js() -> FileResponse:
 # Why a middleware and not a route: a catch-all route would have to
 # either match paths with extensions (and shadow the static mount for
 # them) or use a regex constraint that's easy to get wrong. The
-# middleware runs first and only fires for the exact clean-URL case,
+# middleware runs first and only fires for directory and clean-URL cases,
 # so the static mount keeps its full responsibility for everything
 # else under /notes/.
 
@@ -205,20 +212,28 @@ class NotesCleanUrlMiddleware(BaseHTTPMiddleware):
                 return handled
         return await call_next(request)
 
-    def _try_clean_url(self, path: str) -> FileResponse | None:
+    def _try_clean_url(self, path: str) -> Response | None:
         rel = path[len("/notes/"):]
+        if any(seg.startswith(p) for seg in rel.split("/") for p in _HIDDEN_PREFIXES):
+            return None
         if not rel or rel.endswith("/"):
-            return None  # directory request -> static mount serves index.html
+            # Directory request: every notes directory shares the root index.
+            if _safe_subdir(path) is None:
+                return None  # let the static mount 404 normally
+            return FileResponse(_NOTES_INDEX, media_type="text/html; charset=utf-8")
         base = rel.rsplit("/", 1)[-1]
         if "." in base:
             return None  # has extension -> static mount handles
-        if any(seg.startswith(p) for seg in rel.split("/") for p in _HIDDEN_PREFIXES):
-            return None
         target = (_NOTES_ROOT / rel).resolve()
         try:
             target.relative_to(_NOTES_ROOT.resolve())
         except ValueError:
             return None
+        if target.is_dir():
+            # The index's relative links (`./_listing/`, `./plsql`) need the
+            # trailing slash. StaticFiles would add it, but only for
+            # directories that contain their own index.html.
+            return RedirectResponse(path + "/", status_code=307)
         html_path = target.with_suffix(".html")
         if not html_path.is_file():
             return None  # let the static mount 404 normally
