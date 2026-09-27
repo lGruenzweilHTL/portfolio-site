@@ -5,23 +5,22 @@
   that should show a browsable listing (root included). It is fully
   self-locating — no per-directory edits needed.
 
-  Requires:
-  1. A single nginx regex location (works at any depth, see nginx-listing.conf):
-       location ~ ^(/notes(?:/.+)?)/_listing/?$ {
-           alias <document-root>$1/;
-           autoindex on;
-           autoindex_format json;
-       }
-  2. study.css served from a fixed absolute path (/notes/notes.css) — do NOT
-     use a relative "./notes.css" link, since this file lives at different
-     depths depending on where it's symlinked.
-  3. Clean URLs already working site-wide (./plsql instead of ./plsql.html,
-     ./subfolder/ instead of ./subfolder/index.html) — confirmed in place.
+  Backed by backend/routes/notes.py (no nginx):
+    - GET /notes/<dir>/_listing   -> JSON array of children, shape:
+      [{"name": "...", "type": "file"|"directory", "mtime": <unix>,
+        "size": <bytes>?}, ...]
+    - GET /notes/notes.css        -> alias for site/notes/study.css
+    - GET /notes/cheatsheet.js    -> alias for site/notes/cheatsheet.js
+
+  The CSS link below is an absolute path; the route above makes the
+  real file (study.css) reachable at the URL the cheatsheets already use.
+  The listing fetch (`./_listing/`) is a relative URL so the same file
+  works at any depth.
 -->
 <html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Study / Cheatsheets</title>
+<title>Study notes — Lukas Grünzweil</title>
 <meta name="description" content="A collection of study cheatsheets and reference material.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">

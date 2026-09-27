@@ -111,8 +111,8 @@
   .chat-fab {
     position: fixed; right: 22px; bottom: 22px; z-index: 60;
     width: 60px; height: 60px; border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, var(--accent-hi, #f5be5f) 0%, var(--accent, #eba53a) 65%, #c9871f 100%);
-    color: #17110a;
+    background: radial-gradient(circle at 30% 30%, var(--accent-hi, #f5be5f) 0%, var(--accent, #eba53a) 65%, var(--accent-deep, #c9871f) 100%);
+    color: var(--on-accent, #17110a);
     border: 1px solid rgba(255,255,255,0.08);
     cursor: pointer; font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
     font-size: 22px; font-weight: 700; letter-spacing: 0.01em;
@@ -155,8 +155,7 @@
     transform: translateY(-50%) translateX(6px);
     background: var(--panel, #191712); color: var(--hi, #eceae1);
     border: 1px solid var(--line2, #302c22);
-    font-family: var(--font-mono, monospace); font-size: 11px;
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono, monospace); font-size: var(--fs-xs, 11px);
     padding: 6px 10px; border-radius: 4px;
     white-space: nowrap; pointer-events: none; opacity: 0;
     transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.36, 0.64, 1);
@@ -200,10 +199,10 @@
     background: var(--bg2, #15140f);
   }
   .chat-head-title { font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
-    font-size: 14px; color: var(--hi, #eceae1); font-weight: 600; }
-  .chat-head-sub { font-family: var(--font-mono, monospace); font-size: 10px;
+    font-size: var(--fs-base, 15px); color: var(--hi, #eceae1); font-weight: 600; }
+  .chat-head-sub { font-family: var(--font-mono, monospace); font-size: var(--fs-xs, 11px);
     color: var(--muted, #918c7f); margin-top: 1px;
-    letter-spacing: 0.04em; }
+  }
   .chat-head-actions { display: flex; align-items: center; gap: 4px; }
   .chat-close {
     background: none; border: none; color: var(--muted, #918c7f); cursor: pointer;
@@ -216,7 +215,7 @@
   .chat-messages {
     flex: 1; overflow-y: auto; padding: 14px;
     display: flex; flex-direction: column; gap: 10px;
-    font-size: 13.5px; line-height: 1.55;
+    font-size: var(--fs-sm, 13px); line-height: 1.55;
     scroll-behavior: smooth;
   }
   .chat-msg {
@@ -225,7 +224,7 @@
   }
   .chat-msg.user {
     align-self: flex-end;
-    background: var(--accent, #eba53a); color: #17110a;
+    background: var(--accent, #eba53a); color: var(--on-accent, #17110a);
   }
   .chat-msg.assistant {
     align-self: flex-start;
@@ -236,12 +235,12 @@
   .chat-msg.system {
     align-self: center; max-width: 100%;
     background: transparent; color: var(--muted, #918c7f);
-    font-family: var(--font-mono, monospace); font-size: 11px;
+    font-family: var(--font-mono, monospace); font-size: var(--fs-xs, 11px);
     padding: 4px 0;
   }
   .chat-msg.fallback {
     align-self: flex-start; max-width: 100%;
-    background: rgba(235,165,58,0.06);
+    background: var(--accent-soft, rgba(235,165,58,0.10));
     color: var(--dim, #aca699);
     border: 1px solid var(--accent-line, rgba(235,165,58,0.22));
   }
@@ -278,7 +277,7 @@
     flex: 1; resize: none; min-height: 38px; max-height: 120px;
     background: var(--bg, #0e0d0b); color: var(--text, #d0ccc0);
     border: 1px solid var(--line2, #302c22); border-radius: 4px;
-    padding: 8px 10px; font-family: inherit; font-size: 13.5px;
+    padding: 8px 10px; font-family: inherit; font-size: var(--fs-sm, 13px);
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
@@ -287,10 +286,10 @@
     box-shadow: 0 0 0 3px rgba(235,165,58,0.10);
   }
   .chat-send {
-    background: var(--accent, #eba53a); color: #17110a;
+    background: var(--accent, #eba53a); color: var(--on-accent, #17110a);
     border: none; border-radius: 4px; padding: 8px 16px;
     font-family: var(--font-body, 'IBM Plex Sans', sans-serif);
-    font-size: 13px; font-weight: 600;
+    font-size: var(--fs-sm, 13px); font-weight: 600;
     cursor: pointer; align-self: stretch;
     transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
     box-shadow: 0 1px 0 rgba(0,0,0,0.2);
@@ -301,7 +300,7 @@
   .chat-reset {
     background: none; border: none; color: var(--muted, #918c7f);
     font-family: var(--font-body, 'IBM Plex Sans', sans-serif);
-    font-size: 12px; font-weight: 500;
+    font-size: var(--fs-xs, 11px); font-weight: 500;
     cursor: pointer; padding: 4px 8px; border-radius: 4px;
     transition: background 0.15s ease, color 0.15s ease;
   }
@@ -369,7 +368,7 @@
 
       const head = el('div', { class: 'chat-head' }, [
         el('div', null, [
-          el('div', { class: 'chat-head-title' }, [document.createTextNode('Ask About Lukas')]),
+          el('div', { class: 'chat-head-title' }, [document.createTextNode('Ask about Lukas')]),
           el('div', { class: 'chat-head-sub' }, [document.createTextNode('Powered by a free model · may be slow')])
         ]),
         el('div', null, [
@@ -415,7 +414,6 @@
 
       // Opening greeting
       this.appendMessage('assistant', 'Hi! I\'m a small assistant that can answer questions about Lukas\'s projects, skills, and background. Ask away — or use the contact section if you\'d rather email.');
-      this.appendMessage('system', 'Powered by a free model; if rate-limited, try again or email ' + EMAIL);
 
       // Beacon: chatbot opened
       try { this.track('chatbot_opened'); } catch (_) {}
@@ -449,7 +447,6 @@
       try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
       this.messages.innerHTML = '';
       this.appendMessage('assistant', 'New conversation. Ask away.');
-      this.appendMessage('system', 'Powered by a free model; if rate-limited, try again or email ' + EMAIL);
     },
 
     appendMessage(role, text) {

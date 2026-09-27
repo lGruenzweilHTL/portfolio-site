@@ -15,23 +15,23 @@ html {
 
 :root {
   /* Color Palette - Premium Dark Theme */
-  --bg: #0b0c10;
-  --bg2: #1f2833;
-  --surface: #131921;
-  --surface2: #1b222c;
-  --line: #22303c;
-  --line2: #2d3d50;
-  --muted: #66788a;
-  --dim: #8899a6;
-  --text: #c5c6c7;
-  --hi: #e2e8f0;
+  --bg: #0e0d0b;
+  --bg2: #1f1c16;
+  --surface: #15140f;
+  --surface2: #191712;
+  --line: #232019;
+  --line2: #302c22;
+  --muted: #918c7f;
+  --dim: #aca699;
+  --text: #d0ccc0;
+  --hi: #eceae1;
   --white: #ffffff;
 
   /* Accent Colors */
-  --cyan: #66fcf1;
-  --accent: #66fcf1;
-  --accent-dim: rgba(102, 252, 241, 0.15);
-  --accent-border: rgba(102, 252, 241, 0.3);
+  --cyan: #eba53a;
+  --accent: #eba53a;
+  --accent-dim: rgba(235, 165, 58, 0.15);
+  --accent-border: rgba(235, 165, 58, 0.3);
 
   --accent2: #4f46e5;
   --accent3: #10b981;
@@ -291,7 +291,7 @@ nav.study-nav {
 
 /* Code Blocks */
 pre {
-  background: #090a0f;
+  background: #0a0908;
   border-radius: 6px;
   padding: 14px 16px;
   font-family: var(--mono);
@@ -330,7 +330,7 @@ code {
 
 /* Math blocks */
 .mathbox {
-  background: #090a0f;
+  background: #0a0908;
   border: 1px solid var(--line);
   border-left: 4px solid var(--accent3);
   border-radius: 4px;

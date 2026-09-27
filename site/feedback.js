@@ -40,23 +40,23 @@
         body: JSON.stringify(body),
       });
     } catch (_) {
-      status.textContent = 'Network error. Try again.';
+      status.textContent = 'Network error. Try again, or email me directly.';
       status.className = 'feedback-status err';
       submit.disabled = false;
       return;
     }
     if (resp.status === 204) {
-      status.textContent = 'Thanks — got it.';
+      status.textContent = 'Feedback sent. Thanks.';
       status.className = 'feedback-status ok';
       form.reset();
     } else if (resp.status === 429) {
-      status.textContent = 'You\'re sending too fast. Try again in a minute.';
+      status.textContent = "You're sending messages too fast. Wait a moment, or email me.";
       status.className = 'feedback-status err';
     } else if (resp.status === 403) {
-      status.textContent = 'Captcha failed. Refresh and try again.';
+      status.textContent = 'Captcha check failed. Refresh and try again.';
       status.className = 'feedback-status err';
     } else {
-      status.textContent = 'Server error. Try again later.';
+      status.textContent = 'Something went wrong. Try again, or email me.';
       status.className = 'feedback-status err';
     }
     submit.disabled = false;

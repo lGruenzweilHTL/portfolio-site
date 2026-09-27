@@ -17,11 +17,11 @@
 <body>
 
 <nav>
-  <div class="nav-id">Lukas Grünzweil</div>
+  <a class="nav-id" href="#hero">Lukas Grünzweil</a>
   <ul class="nav-links">
     <li><a href="#projects">Projects</a></li>
-    <li><a href="#about">About</a></li>
     <li><a href="#experience">Experience</a></li>
+    <li><a href="#about">About</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -30,22 +30,17 @@
   <section id="hero">
     <div class="hero-eyebrow">Student · <b>HTL Leonding</b> · Austria</div>
     <h1 class="hero-name">Lukas Grünzweil</h1>
-    <div class="hero-roles">
-      <span class="role-tag">Backend</span>
-      <span class="role-tag">AI tooling</span>
-      <span class="role-tag">Game dev</span>
-      <span class="role-tag">Robotics</span>
-    </div>
     <p class="hero-bio">
       I build backend systems and AI tooling, and I make games. C# and Unity are
-      what I reach for first. Most of my work is developer tooling, so if a tool needs
-      a wiki to use it, I don't call it finished.
+      what I reach for first, and most of what I make is developer tooling.
     </p>
+    <blockquote class="hero-quote">
+      “One of the best projects to come out of an internship here.”
+      <cite>Head of development, <a href="#experience">SlideLizard</a> · 2026 internship</cite>
+    </blockquote>
+    <p class="hero-availability"><span class="status-dot" aria-hidden="true"></span>Graduating June 2027 · open to a backend internship or thesis project</p>
     <div class="hero-actions">
-      <a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener" class="btn btn-solid">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
-        GitHub
-      </a>
+      <a href="mailto:lukas.gruenzweil@liwest.at" class="btn btn-solid">Email me</a>
       <details class="resume-menu">
         <summary class="btn btn-outline" aria-label="Choose a résumé format">Résumé ▾</summary>
         <div class="resume-menu-items">
@@ -59,28 +54,29 @@
           </a>
         </div>
       </details>
-      <a href="#projects" class="btn btn-outline">See projects</a>
+      <a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
+        GitHub
+      </a>
     </div>
   </section>
 
-  <div class="section-divider" aria-hidden="true"></div>
-
   <!-- PROJECTS -->
   <section id="projects" class="section reveal">
-    <div class="section-label">Projects</div>
+    <h2 class="section-label">Projects</h2>
 
-    <!-- vektorgrid -->
+    <!-- vektorgrid: the architecture diagram is its visual, so no screenshot slot -->
     <div class="featured">
       <div class="featured-header">
         <div>
-          <div class="featured-title">vektorgrid</div>
+          <h3 class="featured-title">vektorgrid</h3>
           <div class="featured-sub">
             A self-hosted voice assistant, built as a distributed system: edge relays capture
             speech, a central orchestrator runs the model pipeline, and a phone app approves
             anything risky.
           </div>
         </div>
-        <a class="card-link" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener" style="align-self:flex-start;">↗ repos</a>
+        <a class="card-link" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">GitHub ↗</a>
       </div>
 
       <!-- Signature: interactive system architecture (hand-authored SVG, vanilla JS) -->
@@ -161,136 +157,175 @@
           a Relay built in, so you can talk to the system from your phone.
         </p>
       </div>
-
-      <!-- Replace with: <div class="shot"><img src="img/vektorgrid.png" alt="vektorgrid dashboard"></div> -->
-      <div class="shot"><span class="shot-ph">Screenshot / demo</span></div>
     </div>
 
-    <!-- other projects -->
+    <!-- Other projects. Cards with a repo link are clickable as a whole
+         (stretched .card-link); cards without a screenshot render text-only. -->
     <div class="cards">
 
-      <div class="card">
+      <article class="card">
         <div class="shot"><img src="img/sceneforge.png" alt="SceneForge AI building a scene from a text prompt"></div>
         <div class="card-body">
           <div class="card-top">
-            <div class="card-name">SceneForge AI</div>
-            <a href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+            <h3 class="card-name">SceneForge AI</h3>
+            <a href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener" class="card-link">GitHub ↗</a>
           </div>
-          <div class="card-desc">
+          <p class="card-desc">
             An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and
             components back. Cuts the manual setup out of level design.
-          </div>
+          </p>
           <div class="card-tags">
-            <span class="tag">Unity</span><span class="tag">C#</span>
-            <span class="tag">AI</span><span class="tag">Editor tooling</span>
+            <span class="tag">Unity</span><span class="tag">C#</span><span class="tag">Editor tooling</span>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
+      <article class="card">
         <div class="shot"><img src="img/uniconsole.png" alt="UniConsole running in the Unity game view"></div>
         <div class="card-body">
           <div class="card-top">
-            <div class="card-name">UniConsole</div>
-            <a href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+            <h3 class="card-name">UniConsole</h3>
+            <a href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener" class="card-link">GitHub ↗</a>
           </div>
-          <div class="card-desc">
+          <p class="card-desc">
             An in-game debug console for Unity. Mark a static method with <code>[Command]</code> and
             call it from a terminal in the scene. A free, lightweight alternative to QuantumConsole.
-          </div>
+          </p>
           <div class="card-tags">
-            <span class="tag">Unity</span><span class="tag">C#</span>
-            <span class="tag">DX</span><span class="tag">Tooling</span>
+            <span class="tag">Unity</span><span class="tag">C#</span><span class="tag">Developer tooling</span>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
-        <!-- Replace with: <div class="shot"><img src="img/pigeon.png" alt="..."></div> -->
-        <div class="shot"><span class="shot-ph">Screenshot</span></div>
-        <div class="card-body">
-          <div class="card-top">
-            <div class="card-name">P.I.G.E.O.N. — Covert Ops</div>
-            <!-- TODO: swap for a GitHub link once the repo is public -->
-            <span class="card-status">In progress</span>
-          </div>
-          <div class="card-desc">
-            You play a pigeon on the government payroll, running covert ops. A satire built around
-            surveillance paranoia and the "birds aren't real" corner of the internet.
-          </div>
-          <div class="card-tags">
-            <span class="tag">Unity</span><span class="tag">C#</span>
-            <span class="tag">Game</span><span class="tag">Satire</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
+      <article class="card">
         <div class="shot"><img src="img/forkcast.png" alt="Forkcast app screenshot"></div>
         <div class="card-body">
           <div class="card-top">
-            <div class="card-name">Forkcast</div>
-            <span class="card-status">Private · school project</span>
+            <h3 class="card-name">Forkcast</h3>
+            <span class="card-status">Private repo</span>
           </div>
-          <div class="card-note">Contributed · TypeScript backend</div>
-          <div class="card-desc">
+          <div class="card-note">Contributor · TypeScript backend · school project</div>
+          <p class="card-desc">
             A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar,
-            get a combined ingredient list, rate recipes, add friends. Vue frontend,
-            TypeScript backend, most of which I wrote.
-          </div>
+            get a combined ingredient list, rate recipes, add friends. I wrote most of the backend.
+          </p>
           <div class="card-tags">
-            <span class="tag">TypeScript</span><span class="tag">Vue</span>
-            <span class="tag">REST API</span><span class="tag">School project</span>
+            <span class="tag">TypeScript</span><span class="tag">Vue</span><span class="tag">REST API</span>
           </div>
         </div>
-      </div>
+      </article>
 
-      <div class="card">
-        <!-- Replace with: <div class="shot"><img src="img/roboducks.png" alt="..."></div> -->
-        <div class="shot"><span class="shot-ph">Screenshot</span></div>
-        <div class="card-body">
-          <div class="card-top">
-            <div class="card-name">RoboDucks — RescueMaze</div>
-            <a href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
-          </div>
-          <div class="card-note">Contributed · HTL Leonding robotics club</div>
-          <div class="card-desc">
-            RescueMaze competition work for the school robotics club. I built a custom serial protocol
-            for Raspberry Pi → Lego SPIKE communication, and a maze-exploration controller
-            running Trémaux's algorithm in simulation.
-          </div>
-          <div class="card-tags">
-            <span class="tag">Python</span><span class="tag">C</span>
-            <span class="tag">Robotics</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
+      <article class="card">
         <div class="shot"><img src="img/space-defenders.png" alt="Space Defenders gameplay"></div>
         <div class="card-body">
           <div class="card-top">
-            <div class="card-name">Space Defenders</div>
-            <a href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener" class="card-link">↗ GitHub</a>
+            <h3 class="card-name">Space Defenders</h3>
+            <a href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener" class="card-link">GitHub ↗</a>
           </div>
-          <div class="card-desc">
+          <p class="card-desc">
             A mobile arcade game: destroy enemy spaceships, don't die. Escalating waves, built for touchscreens.
-          </div>
+          </p>
           <div class="card-tags">
-            <span class="tag">Unity</span><span class="tag">C#</span>
-            <span class="tag">Mobile</span><span class="tag">Game</span>
+            <span class="tag">Unity</span><span class="tag">C#</span><span class="tag">Mobile game</span>
           </div>
         </div>
-      </div>
+      </article>
+
+      <article class="card">
+        <!-- Add a screenshot with: <div class="shot"><img src="img/pigeon.png" alt="..."></div> -->
+        <div class="card-body">
+          <div class="card-top">
+            <h3 class="card-name">P.I.G.E.O.N. — Covert Ops</h3>
+            <!-- TODO: swap for a GitHub link once the repo is public -->
+            <span class="card-status">In progress</span>
+          </div>
+          <p class="card-desc">
+            You play a pigeon on the government payroll, running covert ops. A satire built around
+            surveillance paranoia and the "birds aren't real" corner of the internet.
+          </p>
+          <div class="card-tags">
+            <span class="tag">Unity</span><span class="tag">C#</span><span class="tag">Game</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <!-- Add a screenshot with: <div class="shot"><img src="img/roboducks.png" alt="..."></div> -->
+        <div class="card-body">
+          <div class="card-top">
+            <h3 class="card-name">RoboDucks — RescueMaze</h3>
+            <a href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener" class="card-link">GitHub ↗</a>
+          </div>
+          <div class="card-note">Contributor · HTL Leonding robotics club</div>
+          <p class="card-desc">
+            RescueMaze competition work for the school robotics club. I built a custom serial protocol
+            for Raspberry Pi → Lego SPIKE communication, and a maze-exploration controller
+            running Trémaux's algorithm in simulation.
+          </p>
+          <div class="card-tags">
+            <span class="tag">Python</span><span class="tag">C</span><span class="tag">Robotics</span>
+          </div>
+        </div>
+      </article>
 
     </div>
   </section>
 
-  <div class="section-divider" aria-hidden="true"></div>
+  <!-- EXPERIENCE -->
+  <section id="experience" class="section reveal">
+    <h2 class="section-label">Experience</h2>
+
+    <div class="xp-list">
+
+      <article class="xp">
+        <header class="xp-head">
+          <h3 class="xp-org">SlideLizard Software GmbH</h3>
+          <div class="xp-role">Software Engineering Intern</div>
+          <div class="xp-meta">Linz · Aug 2026</div>
+        </header>
+        <div class="xp-body">
+          <p class="xp-summary">
+            Built a PWA on top of Dynamics 365 Sales with speech-to-text meeting
+            notes and an Azure OpenAI assistant wired into Dataverse, plus a
+            small daily GEO-visibility tracker on the side. Built largely solo,
+            with help from a second intern.
+          </p>
+          <div class="xp-tags">
+            <span class="tag">Angular</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">Azure Speech</span>
+            <span class="tag">Azure OpenAI</span>
+            <span class="tag">Dataverse</span>
+            <span class="tag">OpenRouter</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="xp">
+        <header class="xp-head">
+          <h3 class="xp-org">Caritas Upper Austria</h3>
+          <div class="xp-role">Office &amp; IT Assistant Intern</div>
+          <div class="xp-meta">Leonding · Jul–Aug 2025</div>
+        </header>
+        <div class="xp-body">
+          <p class="xp-summary">
+            Office and IT support: admin, accounting assistance including
+            quarterly billing, first-level IT and infrastructure.
+          </p>
+          <div class="xp-tags">
+            <span class="tag">Admin</span>
+            <span class="tag">IT support</span>
+            <span class="tag">Billing</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
 
   <!-- ABOUT -->
   <section id="about" class="section reveal">
-    <div class="section-label">About</div>
+    <h2 class="section-label">About</h2>
     <div class="about-wrap">
       <div class="about-text">
         <p>
@@ -299,13 +334,13 @@
           for a competition.
         </p>
         <p>
-          Most of my projects started because something annoyed me. I built <strong>SceneForge</strong>
-          because setting up scenes by hand is tedious, and <strong>lego-spike-serial</strong> because there
-          was no clean way to drive a SPIKE over serial.
+          Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong>
+          because setting up scenes by hand is tedious, and the serial protocol behind
+          <strong>RoboDucks</strong> because there was no clean way to drive a Lego SPIKE from a Raspberry Pi.
         </p>
 
         <div class="tech-section">
-          <div class="tech-section-label">Languages</div>
+          <h3 class="label">Languages</h3>
           <div class="tech-row">
             <span class="tech-pill strong">C#</span>
             <span class="tech-pill strong">Python</span>
@@ -316,7 +351,7 @@
             <span class="tech-pill">Kotlin</span>
             <span class="tech-pill">HTML/CSS</span>
           </div>
-          <div class="tech-section-label" style="margin-top:18px;">Tools &amp; infra</div>
+          <h3 class="label">Tools &amp; infra</h3>
           <div class="tech-row">
             <span class="tech-pill strong">Unity</span>
             <span class="tech-pill strong">Docker</span>
@@ -328,7 +363,7 @@
         </div>
 
         <div class="tech-section">
-          <div class="tech-section-label">Beyond code</div>
+          <h3 class="label">Beyond code</h3>
           <p class="about-aside">
             Outside project work I run a small <strong>homelab</strong>: three Proxmox nodes
             (repurposed desktops, with a fourth on the way) hosting Nextcloud, Vaultwarden,
@@ -350,132 +385,62 @@
 
       <div class="info-card">
         <table class="info-table">
-          <tr><td class="k">Name</td><td class="v">Lukas Grünzweil</td></tr>
-          <tr><td class="k">Location</td><td class="v">Austria</td></tr>
-          <tr><td class="k">Status</td><td class="v">Student, HTL Leonding</td></tr>
-          <tr><td class="k">Education</td><td class="v">HTL Leonding · 2022 – 2027</td></tr>
+          <tr><td class="k">Available</td><td class="v">Backend internship or thesis project</td></tr>
+          <tr><td class="k">Graduating</td><td class="v">June 2027</td></tr>
+          <tr><td class="k">School</td><td class="v">HTL Leonding, higher technical college</td></tr>
+          <tr><td class="k">Based in</td><td class="v">Linz area, Austria</td></tr>
+          <tr><td class="k">Languages</td><td class="v">German (native), English (professional)</td></tr>
           <tr><td class="k">Email</td><td class="v"><a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a></td></tr>
-          <tr><td class="k">School</td><td class="v"><a href="mailto:l.gruenzweil@students.htl-leonding.ac.at">l.gruenzweil@students.htl-leonding.ac.at</a></td></tr>
           <tr><td class="k">GitHub</td><td class="v"><a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">lGruenzweilHTL</a></td></tr>
         </table>
       </div>
     </div>
   </section>
 
-  <div class="section-divider" aria-hidden="true"></div>
-
-  <!-- EXPERIENCE -->
-  <section id="experience" class="section reveal">
-    <div class="section-label">Experience</div>
-
-    <div class="xp-list">
-
-      <article class="xp">
-        <header class="xp-head">
-          <div class="xp-org">SlideLizard Software GmbH</div>
-          <div class="xp-role">Software Engineering Intern</div>
-          <div class="xp-meta">Linz · Aug 2026</div>
-        </header>
-        <div class="xp-body">
-          <p class="xp-summary">
-            Built a PWA on top of Dynamics 365 Sales with speech-to-text meeting
-            notes and an Azure OpenAI assistant wired into Dataverse, plus a
-            small daily GEO-visibility tracker on the side. Mostly solo — the
-            other intern had time to help, so they did.
-          </p>
-          <blockquote class="xp-quote">
-            <span class="xp-quote-mark" aria-hidden="true">“</span>
-            One of the best projects to come out of an internship here.
-            <cite>— head of development</cite>
-          </blockquote>
-          <div class="xp-tags">
-            <span class="tag">Angular</span>
-            <span class="tag">TypeScript</span>
-            <span class="tag">Azure Speech</span>
-            <span class="tag">Azure OpenAI</span>
-            <span class="tag">Dataverse</span>
-            <span class="tag">OpenRouter</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="xp">
-        <header class="xp-head">
-          <div class="xp-org">Caritas Upper Austria</div>
-          <div class="xp-role">Intern — Office &amp; IT Assistant</div>
-          <div class="xp-meta">Leonding · Jul–Aug 2025</div>
-        </header>
-        <div class="xp-body">
-          <p class="xp-summary">
-            Office and IT support: admin, accounting assistance including
-            quarterly billing, first-level IT and infrastructure.
-          </p>
-          <div class="xp-tags">
-            <span class="tag">Admin</span>
-            <span class="tag">IT support</span>
-            <span class="tag">Billing</span>
-          </div>
-        </div>
-      </article>
-
-    </div>
-  </section>
-
-  <div class="section-divider" aria-hidden="true"></div>
-
   <!-- CONTACT -->
   <section id="contact" class="section reveal">
-    <div class="section-label">Contact</div>
+    <h2 class="section-label">Contact</h2>
     <p class="contact-lead">
       Email is the fastest way to reach me. I'm open to internships and interesting projects, and I answer anything that isn't spam.
     </p>
-    <div class="hero-actions">
-      <a href="mailto:lukas.gruenzweil@liwest.at" class="btn btn-solid">email me</a>
-      <a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener" class="btn btn-outline">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.1.83-.26.83-.57v-2c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.81 1.3 3.49 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .31.21.69.82.57A12 12 0 0 0 12 .3z"/></svg>
-        GitHub
-      </a>
-    </div>
-    <div class="contact-emails">
-      <span class="lbl">Personal</span><a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a>
-      <span class="lbl">School</span><a href="mailto:l.gruenzweil@students.htl-leonding.ac.at">l.gruenzweil@students.htl-leonding.ac.at</a>
+    <div class="contact-actions">
+      <a href="mailto:lukas.gruenzweil@liwest.at" class="btn btn-solid">Email me</a>
     </div>
 
-    <!-- Feedback form (POSTs to /api/feedback, gated by Turnstile) -->
-    <div class="section-divider" aria-hidden="true"></div>
-    <div class="feedback-header">
-      <div class="feedback-eyebrow">Feedback</div>
-      <h3 class="feedback-title">Spotted a typo? Have a thought?</h3>
-      <p class="feedback-sub">Quick note, bug report, idea — drop it here and it lands straight in my inbox.</p>
+    <!-- Site feedback (POSTs to /api/feedback, gated by Turnstile). Kept quiet on
+         purpose: it's for typos and bugs, email is for everything else. -->
+    <div class="feedback">
+      <h3 class="label">Site feedback</h3>
+      <p class="feedback-sub">Spotted a typo or a bug? Tell me here. For anything else, email is faster.</p>
+      <form id="feedback-form" class="feedback-form" autocomplete="off">
+        <div class="feedback-row">
+          <label class="feedback-field">
+            <span class="label">Name (optional)</span>
+            <input type="text" name="name" maxlength="120" />
+          </label>
+          <label class="feedback-field">
+            <span class="label">Email (optional, for a reply)</span>
+            <input type="email" name="email" maxlength="254" />
+          </label>
+        </div>
+        <label class="feedback-field">
+          <span class="label">Message</span>
+          <textarea name="message" required minlength="1" maxlength="4000" rows="4" placeholder="What's broken or wrong, and where?"></textarea>
+        </label>
+        <div class="feedback-actions">
+          <!-- Turnstile mount point: stays empty until a send needs an interactive challenge -->
+          <div class="feedback-turnstile" id="feedback-turnstile"></div>
+          <button type="submit" class="btn btn-outline" id="feedback-submit">Send feedback</button>
+        </div>
+        <p class="feedback-status" id="feedback-status" role="status"></p>
+      </form>
     </div>
-    <form id="feedback-form" class="feedback-form" autocomplete="off">
-      <div class="feedback-row">
-        <label class="feedback-field">
-          <span>Name (optional)</span>
-          <input type="text" name="name" maxlength="120" />
-        </label>
-        <label class="feedback-field">
-          <span>Email (optional, if you want a reply)</span>
-          <input type="email" name="email" maxlength="254" />
-        </label>
-      </div>
-      <label class="feedback-field">
-        <span>Message</span>
-        <textarea name="message" required minlength="1" maxlength="4000" rows="4" placeholder="What did you think of the site? Spot a typo? Want to talk about a project?"></textarea>
-      </label>
-      <div class="feedback-actions">
-        <!-- Turnstile mount point: stays empty until a send needs an interactive challenge -->
-        <div class="feedback-turnstile" id="feedback-turnstile"></div>
-        <button type="submit" class="btn btn-solid" id="feedback-submit">Send feedback</button>
-      </div>
-      <p class="feedback-status" id="feedback-status" role="status"></p>
-    </form>
   </section>
 </div>
 
 <footer>
   <span class="footer-note">© 2026 Lukas Grünzweil</span>
-  <span class="footer-note"><a href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">github.com/lGruenzweilHTL ↗</a></span>
+  <span class="footer-note"><a href="#hero">Back to top ↑</a></span>
 </footer>
 
 <script src="main.js" defer></script>
