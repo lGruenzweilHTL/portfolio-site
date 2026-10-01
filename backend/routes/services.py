@@ -11,6 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from ..config import settings
 from ..content import get_content
+from ..i18n import DEFAULT_LANG, catalogs
 
 router = APIRouter()
 
@@ -20,8 +21,13 @@ def _render_services() -> str:
         loader=FileSystemLoader(settings.templates_dir),
         autoescape=select_autoescape(["html"]),
     )
+    en = catalogs()[DEFAULT_LANG]
     return env.get_template("services.html").render(
         categories=get_content().services,
+        # English only; the shared PDU partial and main.js need these.
+        t=en.t,
+        js_strings=en.js(),
+        home="/",
     )
 
 

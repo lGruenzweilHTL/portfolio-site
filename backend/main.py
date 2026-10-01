@@ -5,9 +5,12 @@ Run locally:
     uvicorn backend.main:app --reload --port 8000
 
 Architecture:
-    /site           -> StaticFiles mount, served as the portfolio site
+    /, /<lang>/     -> main page, one per content/i18n catalog (templates/index.html)
+    /site           -> StaticFiles mount: assets, notes, llms.txt, robots.txt
     /services       -> server-rendered self-hosted service directory
-    /api/...        -> JSON API routes (chat, feedback, track)
+    /projects/<slug>-> server-rendered project pages (resume.yaml + GitHub README)
+    /sitemap.xml    -> generated sitemap
+    /api/...        -> JSON API routes (chat, feedback, track, status)
     /resume.pdf     -> generated on demand (with on-disk cache)
     /webhook/...    -> deploy trigger
     /admin          -> combined feedback + analytics view (Cloudflare Access gated)
@@ -145,11 +148,10 @@ class TurnstileSitekeyMiddleware(BaseHTTPMiddleware):
     """Replaces the ``__TURNSTILE_SITEKEY__`` token in HTML responses with the
     real sitekey from settings.
 
-    Why a middleware instead of a Jinja template: ``/`` is served by the
-    ``StaticFiles`` mount, so the on-disk ``site/index.html`` is a plain
-    static file. The token is the only piece of that page that needs to
-    be environment-specific, and a single-pass string replacement keeps
-    the rest of the static pipeline (caching, range requests, etc.) intact.
+    Why a middleware instead of a template variable: the token appears in
+    several templates (main page, project pages), and the rewrite also
+    covers any static HTML that carries it. One pass here keeps the sitekey
+    out of every render call.
 
     Only fires on HTML responses that actually contain the token — every
     other response (assets, API JSON, 404s) flows through untouched.
@@ -167,7 +169,7 @@ class TurnstileSitekeyMiddleware(BaseHTTPMiddleware):
         ctype = response.headers.get("content-type", "")
         if "text/html" not in ctype.lower():
             return response
-        # Buffer the body. index.html is small; this is fine. If the file
+        # Buffer the body. The pages are small; this is fine. If the file
         # ever grows large enough for this to matter, switch to a streaming
         # transform.
         #
@@ -283,7 +285,7 @@ def create_app() -> FastAPI:
     app.add_middleware(Static404ToHtmlMiddleware)
     app.add_middleware(AnalyticsMiddleware)
     # Turnstile sitekey injection: rewrites the __TURNSTILE_SITEKEY__ token
-    # in HTML responses (only `site/index.html` carries it) with the value
+    # in HTML responses (the main page and project pages carry it) with the value
     # from settings, so the env var — not a hardcoded test key — is what
     # the browser actually loads. Must wrap the static mount, which it does
     # automatically because every middleware is added before routes/mounts.
@@ -296,7 +298,7 @@ def create_app() -> FastAPI:
     app.add_middleware(NotesCleanUrlMiddleware)
     # Added last => outermost, so it sees the final Cache-Control on the way
     # out and can only fill in a default (setdefault), never override the
-    # stricter no-store the Turnstile rewrite sets on index.html.
+    # stricter no-store the Turnstile rewrite sets on the main page.
     app.add_middleware(StaticAssetCacheMiddleware)
 
     # --- Startup: DB + content + resume PDFs ---
@@ -336,6 +338,9 @@ def create_app() -> FastAPI:
     from .routes import secure_links_admin
     from .routes import notes
     from .routes import services
+    from .routes import status
+    from .routes import projects
+    from .routes import home
     app.include_router(chat.router)
     app.include_router(feedback.router)
     app.include_router(track.router)
@@ -346,6 +351,9 @@ def create_app() -> FastAPI:
     app.include_router(secure_links_admin.router)
     app.include_router(notes.router)
     app.include_router(services.router)
+    app.include_router(status.router)
+    app.include_router(projects.router)
+    app.include_router(home.router)
 
     # --- Exception handlers: styled HTML for browsers, JSON for API clients ---
     _install_error_handlers(app)

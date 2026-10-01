@@ -20,16 +20,17 @@ the only ingress; the tunnel's `config.yml` just repointed from
 ## Layout
 
 ```
-/site                      Static site + notes (served as /, /notes/)
-  index.html               Main portfolio page (with chatbot + feedback wired in)
-  chat.js                  Floating-button chatbot UI
+/site                      Static assets + notes (served under /, /notes/)
+  styles.css               Rack design system (tokens mirror the Figma variables) + console styles
+  main.js                  Nav ports, U grid, chassis flip, feedback drawer, live status polling, racking units on scroll
+  chat.js                  Chatbot as a terminal ("ask-lukas") opened from a console tab
   turnstile.js             On-demand Turnstile tokens (separate chat + feedback widgets)
   notes/                   Study cheatsheets (moved from /study)
   files/                   Public downloads — listed by routes/files.py, not the static mount
   files/secure/            Protected downloads (token-gated, no listing)
   img/, favicon.svg         Project screenshots (WebP), favicon
-  robots.txt, sitemap.xml   Crawler rules + hand-maintained sitemap (add new notes pages)
-  llms.txt                  Plain-text fact sheet for LLMs (GEO); keep in sync with index.html
+  robots.txt                Crawler rules (the sitemap is generated, see routes/projects.py)
+  llms.txt                  Plain-text fact sheet for LLMs (GEO); keep in sync with the main page
   og.png, apple-touch-icon.png  Link-preview image (1200x630) and home-screen icon
 /backend                   FastAPI app
   main.py                  App factory, middlewares, static mount, error handlers
@@ -38,6 +39,8 @@ the only ingress; the tunnel's `config.yml` just repointed from
   chat.py                  OpenRouter streaming + fallback policy
   turnstile.py             siteverify helper with dev bypass + per-widget action check
   resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
+  i18n.py                  Translation catalogs for the main page (content/i18n/*.yaml)
+  templates/index.html     Main portfolio page: one server rack, each section a rack unit
   routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers
   templates/               resume.html (designed) + resume_ats.html (ATS), assets/,
@@ -93,6 +96,9 @@ endpoint without real keys. **Never set those in production.**
 | --- | --- | --- |
 | `/` | GET | Static site (main portfolio page) |
 | `/services` | GET | Server-rendered public/home-network service directory |
+| `/`, `/<lang>/` | GET | Main page, rendered from `templates/index.html` once per catalog in `content/i18n/` (`/de/`, `/es/`, `/fr/`, `/it/`). Each version links the others with `hreflang`; `/en/` and `/index.html` redirect to `/`. |
+| `/projects/<slug>` | GET | Project page for every GitHub-hosted project in `resume.yaml`: facts, JSON-LD (SoftwareSourceCode + BreadcrumbList) and the repo README, fetched from the GitHub API and sanitised through an allowlist (`backend/projects.py`). `/projects` redirects to `/#projects`. |
+| `/sitemap.xml` | GET | Generated: the main page in every language (with `xhtml:link` hreflang alternates), project pages, résumés, `llms.txt`, and every study note on disk. |
 | `/services/` | GET | Same service directory with a trailing slash |
 | `/notes/` | GET | Static study cheatsheets, served as files |
 | `/notes/<slug>` | GET | Clean URL for a cheatsheet — serves the matching `.html` file |
@@ -108,6 +114,7 @@ endpoint without real keys. **Never set those in production.**
 | `/api/chat` | POST | SSE stream from OpenRouter. Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
+| `/api/status` | GET | Coarse live values for the rack UI: host uptime, deployed short SHA, Cloudflare edge colo (from `CF-Ray`), `HOMELAB_NODES`, chatbot model, per-project GitHub `pushed_at` (fetched in the background, cached `GITHUB_CACHE_SECONDS`). `no-store`. |
 | `/webhook/deploy` | POST | GitHub HMAC. 10/min/IP. Pulls + restarts. |
 | `/admin` | GET | Cloudflare Access gated. Combined dashboard. |
 | `/admin/secure-links` | POST | Create a secure download link (returns full URL) |
@@ -222,7 +229,30 @@ If you change the schema, also update:
 - `backend/content.py` validation
 - `backend/templates/resume.html` and `resume_ats.html`
 - `backend/templates/services.html` when changing the service page markup
-- `site/index.html` (the rich project cards there are not driven by `/content`)
+- `backend/templates/index.html` and `content/i18n/*.yaml` (the rich project
+  cards there are not driven by `resume.yaml`)
+
+## Translations
+
+The main page exists in English (`/`), German (`/de/`), Spanish (`/es/`),
+French (`/fr/`) and Italian (`/it/`). `backend/templates/index.html` holds
+the markup once; every visible string is a key in `content/i18n/<lang>.yaml`,
+looked up with `{{ t('hero.bio') }}` (see `backend/i18n.py`):
+
+- `en.yaml` is the reference. A key missing from another catalog falls back
+  to English and is logged; a key the template uses that `en.yaml` lacks
+  raises.
+- Keys ending in `_html` are trusted markup; everything else is escaped.
+- The `js:` subtree becomes `window.I18N` for `main.js`, `chat.js` and
+  `feedback.js`.
+- Adding a language means adding a catalog. The page, the switcher, the
+  hreflang links and the sitemap pick it up; the route goes live after a
+  restart. Catalog edits show up without one.
+
+German is the only translation reviewed for tone (Austrian usage, "Sie").
+Spanish, French and Italian are machine-assisted; their pages say that
+Lukas works in German and English. The résumé PDFs and project pages stay
+English.
 
 ## Study notes
 

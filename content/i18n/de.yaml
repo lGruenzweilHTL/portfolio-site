@@ -1,0 +1,274 @@
+# UI strings for the main page, German (/de/). Keys mirror en.yaml.
+# Austrian usage (Oberösterreich, Jänner); readers are addressed with "Sie".
+
+meta:
+  name: Deutsch
+  hreflang: de
+  og_locale: de_AT
+  date_locale: de-AT
+
+head:
+  title: "Lukas Grünzweil · Backend- & KI-Entwickler, Schüler an der HTL Leonding"
+  description: "Lukas Grünzweil, Schüler an der HTL Leonding in Österreich, entwickelt Backend-Systeme, KI-Tools und Unity-Spiele in C#, Python und TypeScript. Abschluss im Juni 2027, offen für ein Backend-Praktikum oder eine Diplomarbeit."
+  og_title: "Lukas Grünzweil · Backend- & KI-Entwickler"
+  og_description: "Schüler an der HTL Leonding, Österreich. Backend-Systeme, KI-Tools und Spiele in C#, Python und TypeScript. Offen für ein Backend-Praktikum oder eine Diplomarbeit."
+  og_image_alt: "Lukas Grünzweil: Backend-Systeme, KI-Tools und Spiele"
+
+ld:
+  job_title: Schüler
+  person_description: "Schüler an der HTL Leonding in Österreich, der Backend-Systeme, KI-Tools und Spiele entwickelt, vor allem in C#, Unity und Python. Abschluss im Juni 2027, offen für ein Backend-Praktikum oder eine Diplomarbeit."
+  seeks_name: "Backend-Praktikum oder Diplomarbeit"
+  seeks_description: "Offen für ein Backend-Praktikum oder eine Diplomarbeit; Abschluss an der HTL Leonding im Juni 2027."
+  projects_name: "Projekte von Lukas Grünzweil"
+  vektorgrid: "Ein selbst gehosteter Sprachassistent als verteiltes System: C++-Edge-Relays nehmen Sprache auf, ein C#-Orchestrator steuert eine Python-Pipeline aus Spracherkennung, Intent-Routing, LLM und Sprachausgabe, und eine Kotlin-App gibt riskante Tool-Aufrufe per Biometrie frei."
+  sceneforge: "Ein KI-Plugin für den Unity Editor, das aus einer Szenenbeschreibung in Klartext GameObjects und Komponenten erzeugt."
+  uniconsole: "Eine kostenlose, schlanke In-Game-Debug-Konsole für Unity: statische Methode mit [Command] markieren und über ein Terminal in der Szene aufrufen."
+  forkcast: "Ein Schulprojekt zur Essensplanung mit Rezeptsuche über die Spoonacular-API, Essenskalender und zusammengeführten Einkaufslisten. Lukas hat den Großteil des TypeScript-Backends geschrieben."
+  space_defenders: "Ein Arcade-Spiel für Mobilgeräte, gebaut in Unity, mit immer stärkeren Wellen feindlicher Raumschiffe und Touch-Steuerung."
+  pigeon: "Ein satirisches Unity-Spiel in Arbeit über eine Taube, die verdeckte Einsätze für die Regierung erledigt."
+  roboducks: "Arbeit für den RescueMaze-Robotikwettbewerb im Robotikclub der HTL Leonding: ein serielles Protokoll zwischen Raspberry Pi und LEGO-SPIKE-Hub sowie ein Labyrinth-Explorer mit dem Trémaux-Algorithmus."
+
+common:
+  email_me: E-Mail schreiben
+  tech: Technik
+
+a11y:
+  skip: Zum Inhalt springen
+
+roof: "gruenzweil.cc · ausgeliefert von LG-RACK-01"
+
+nav:
+  label: Hauptnavigation
+  host_label: "Lukas Grünzweil, zurück nach oben"
+  ports: Ports
+  projects: Projekte
+  experience: Erfahrung
+  about: Über mich
+  contact: Kontakt
+  lang_label: Sprache
+
+hero:
+  unit: Controller
+  line1: "Backend-Entwickler, meistens in C# und Python"
+  line2: "Abschlussjahr an der HTL Leonding, bei Linz"
+  line3: "Abschluss im Juni 2027, auf der Suche nach einem Backend-Praktikum oder einer Diplomarbeit"
+  quote: "„Eines der besten Projekte, die hier je in einem Praktikum entstanden sind.“"
+  quote_by_html: '— Leiter der Entwicklung bei der <a href="#experience">SlideLizard Software GmbH</a>, Linz, über mein Praktikum dort im August 2026'
+  front_panel: Frontpanel
+  online: Online
+  bio: "Das meiste, was ich baue, läuft auf einem Server, und in letzter Zeit hängt oft ein Sprachmodell mit drin. Den Rest der Zeit verbringe ich in Unity, und daraus wird oft ein Werkzeug für andere Unity-Entwickler."
+  github_sr: "Profil (öffnet in einem neuen Tab)"
+  resume: Lebenslauf (Englisch)
+  classic: Klassisch
+  download: "Lebenslauf herunterladen"
+  classic_sr: "Lebenslauf, zweispaltig, öffnet in einem neuen Tab"
+  ats_sr: "Lebenslauf, reiner Text für Jobportale, öffnet in einem neuen Tab"
+  translation_note: ""
+  facts: Eckdaten
+  bay: Schacht
+  bay0: "Höhere Technische Lehranstalt · 2022–2027"
+  bay1: "Praktikant Softwareentwicklung · 08/2026"
+  bay2: "Sprachassistent · in aktiver Entwicklung"
+  bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
+
+vg:
+  model: "Chassis · Hot-Swap"
+  status: Aktiv
+  view_label: Chassis-Ansicht
+  front: Vorne
+  rear: Hinten
+  lead: "Ein selbst gehosteter Sprachassistent als verteiltes System: Edge-Relays nehmen Sprache auf, ein zentraler Orchestrator steuert die Modell-Pipeline, und eine App am Handy gibt alles Riskante frei."
+  role: "Architekt & Hauptentwickler"
+  project_page: Projektseite
+  org: Organisation auf GitHub
+  org_sr: "(vektorgrid-Organisation, öffnet in einem neuen Tab)"
+  repo_sr: 'Repository auf GitHub, öffnet in einem neuen Tab'
+  modules_label: vektorgrid-Komponenten
+  origin_role: Orchestrator
+  origin_desc: "Alles läuft über Origin; kein Knoten spricht direkt mit einem anderen. Origin steuert die Pipeline und sammelt jedes Ergebnis ein."
+  relay_role: Wake-Word am Edge
+  relay_desc: "Erkennt das Wake-Word direkt am Gerät und streamt das Audio an Origin. Die gesprochene Antwort kommt auf demselben Weg zurück."
+  gate_role: Biometrische Freigabe
+  gate_desc: "Riskante Tool-Aufrufe warten, bis sie per Biometrie am Handy freigegeben werden. Funktioniert auch als eigenständiges Relay."
+  scalars_role: Modell-Pipeline
+  scalars_desc: "Spracherkennung, Intent-Router, Experten-LLM und Sprachausgabe, von Origin der Reihe nach aufgerufen."
+  pull: Ziehen
+  rear_cap: "Rückansicht · Verkabelung"
+  steps_label: Die Anfrage-Pipeline Schritt für Schritt
+  step1: Aufnahme
+  step3: Routing
+  step4: Inferenz
+  step5: Freigabe
+  step7: Antwort
+  diagram_title: "vektorgrid-Architektur: Relay und Gate sind über den zentralen Orchestrator Origin verbunden, der eine sequenzielle Scalar-Pipeline aus STT, Intent-Router, Experten-LLM und TTS steuert."
+  d_audio: Audio
+  d_speech: Sprache
+  d_approval: Tool-Freigabe
+  d_orchestrator: Orchestrator
+  d_wake: Wake-Word
+  d_biometric: Biometrie
+  d_in_sequence: nacheinander
+  d_router: Intent-Router
+  d_llm: Experten-LLM
+  flow_html: >-
+    Alles läuft über <b>Origin</b>; kein Knoten spricht direkt mit einem anderen. Ein <b>Relay</b>
+    erkennt das Wake-Word und streamt das Audio an Origin, das die <b>Scalar</b>-Pipeline der Reihe
+    nach abarbeitet (STT &#8594; Intent-Router &#8594; Experten-LLM &#8594; TTS): Es ruft jeden Worker auf
+    und wartet auf sein Ergebnis, bevor der nächste drankommt. Die gesprochene Antwort geht über das
+    Relay zurück. Fordert das Modell einen riskanten Tool-Aufruf an, pausiert Origin und lässt ihn von
+    <b>Gate</b> per Biometrie freigeben. Gate läuft auch eigenständig: Es fragt Metriken von Origin ab
+    und hat ein Relay eingebaut, sodass man auch vom Handy aus mit dem System sprechen kann.
+
+blades:
+  title: Weitere Projekte
+  model: "Blade-Gehäuse · 6 Einschübe"
+  hint: 'Einschub anklicken für die ganze Projektseite'
+  last_push: Letzter Push
+  details: Details
+  details_sr: "zu {name}"
+  repo_sr: "von {name} (öffnet in einem neuen Tab)"
+  shipped: Fertig
+  private: Privat
+  in_progress: In Arbeit
+  no_signal: Kein Signal
+  private_repo: Privates Repo
+  not_public: Noch nicht öffentlich
+  tag_editor: Editor-Tools
+  tag_devtools: Entwickler-Tools
+  tag_mobile: Mobile-Spiel
+  tag_game: Spiel
+  tag_robotics: Robotik
+  sceneforge_alt: "SceneForge-AI-Chatfenster im Unity Editor, das aus einem Text-Prompt einen roten Kapsel-Spieler mit CharacterController erstellt"
+  sceneforge_desc: "Ein KI-Plugin für den Unity Editor. Szene in Klartext beschreiben, GameObjects und Komponenten zurückbekommen. Spart die manuelle Einrichtung beim Leveldesign."
+  uniconsole_alt: "UniConsole-Terminal, das die verfügbaren Befehle auflistet und einen echo-Befehl ausführt"
+  uniconsole_desc_html: "Eine In-Game-Debug-Konsole für Unity. Eine statische Methode mit <code>[Command]</code> markieren und sie über ein Terminal in der Szene aufrufen. Eine kostenlose, schlanke Alternative zu Quantum Console."
+  forkcast_alt: "Forkcast-Wochenkalender für die Essensplanung neben einer Rezeptsuche nach Nudeln"
+  forkcast_meta: "Mitwirkender · TypeScript-Backend · Schulprojekt"
+  forkcast_desc: "Eine App zur Essensplanung. Rezepte über die Spoonacular-API finden, in einen Kalender ziehen, eine gemeinsame Einkaufsliste bekommen, Rezepte bewerten, Freunde hinzufügen. Den Großteil des Backends habe ich geschrieben."
+  roboducks_meta: Robotikclub der HTL Leonding
+  roboducks_desc: "Wettbewerbsarbeit für RescueMaze im Robotikclub der Schule. Ich habe ein eigenes serielles Protokoll für die Kommunikation Raspberry Pi → LEGO SPIKE gebaut und einen Labyrinth-Explorer, der in der Simulation den Trémaux-Algorithmus ausführt."
+  space_alt: "Space Defenders im Spiel: ein kleines Schiff zwischen leuchtenden feindlichen Schiffen, mit Joystick und Boost-Tasten am Bildschirm"
+  space_desc: "Ein Arcade-Spiel fürs Handy: feindliche Raumschiffe zerstören, nicht sterben. Immer stärkere Wellen, gebaut für Touchscreens."
+  pigeon_desc: "Man spielt eine Taube im Staatsdienst, die verdeckte Einsätze erledigt. Eine Satire über Überwachungsparanoia und die „Birds Aren't Real“-Ecke des Internets."
+
+exp:
+  title: Erfahrung
+  model: Ereignisprotokoll
+  count: 2 Einträge
+  open: 'Details +'
+  close: 'Schließen −'
+  sl_role: Praktikant Softwareentwicklung
+  sl_place: "Linz · Aug. 2026"
+  sl_desc: "Eine PWA auf Basis von Microsoft Dynamics 365 Sales gebaut, mit Besprechungsnotizen per Spracherkennung und einem Azure-OpenAI-Assistenten mit Anbindung an Dataverse, dazu nebenbei ein kleiner täglicher GEO-Sichtbarkeits-Tracker. Den Großteil habe ich allein umgesetzt, mit Unterstützung eines zweiten Praktikanten."
+  caritas_org: Caritas Oberösterreich
+  caritas_role: "Praktikant Büro & IT"
+  caritas_place: "Leonding · Juli–Aug. 2025"
+  caritas_desc: "Büro- und IT-Unterstützung: Verwaltung, Mithilfe in der Buchhaltung inklusive Quartalsabrechnung sowie First-Level-Support für IT und Infrastruktur."
+  tag_admin: Verwaltung
+  tag_it: IT-Support
+  tag_billing: Abrechnung
+
+stack:
+  languages: Programmiersprachen
+  tools: "Tools & Infrastruktur"
+  spoken: Sprachen
+  german: "Deutsch · Muttersprache"
+  english: "Englisch · verhandlungssicher"
+
+about:
+  title: Über mich
+  model: "Regal · abseits vom Code"
+  p1: "Ich bin Lukas, Schüler an der HTL Leonding. Die meiste Zeit stecke ich in Servercode und Spiele, und ab und zu in einen Raspberry Pi, der für einen Wettbewerb auf einen LEGO-Roboter geschraubt ist."
+  p2_html: "Die meisten meiner Projekte sind entstanden, weil mich etwas genervt hat. <strong>SceneForge AI</strong> habe ich gebaut, weil es mühsam ist, Szenen von Hand aufzubauen, und das serielle Protokoll hinter <strong>RoboDucks</strong>, weil es keinen sauberen Weg gab, einen LEGO SPIKE von einem Raspberry Pi aus zu steuern."
+  homelab: "Drei Proxmox-Knoten (umfunktionierte Desktop-PCs, ein vierter ist unterwegs) mit Nextcloud, Vaultwarden, Jellyfin samt *arr-Stack, einem Minecraft-Server, Pi-hole und dieser Website, alles auch von außerhalb meines Netzwerks erreichbar."
+  homelab_link: Live-Werte in der PDU
+  ender_html: 'Ich drucke funktionale Teile für meine Hardwareprojekte in 3D und rüste laufend einen Ender 3 Pro auf. Er läuft mit Klipper auf einem Raspberry Pi und ist inzwischen so umgebaut, dass ich ihn den <a href="https://de.wikipedia.org/wiki/Schiff_des_Theseus" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Schiff des Theseus auf Wikipedia, öffnet in einem neuen Tab)</span></a> nenne.'
+  moto_title: Motorräder
+  moto: "Abseits vom Bildschirm fahre ich Motorrad. Derzeit eine Aprilia Tuono 125, der Umstieg auf etwas Größeres ist geplant."
+
+contact:
+  title: Kontakt
+  lead: Per E-Mail erreichen Sie mich am schnellsten.
+  body: "Ich bin offen für Praktika und spannende Projekte und beantworte alles, was kein Spam ist."
+  report: Fehler melden
+  feedback_sub: "Einen Tippfehler oder Bug entdeckt? Hier melden. Für alles andere ist E-Mail schneller."
+  name_label: Name (optional)
+  email_label: "E-Mail (optional, für eine Antwort)"
+  message_label: Nachricht
+  placeholder: "Was ist kaputt oder falsch, und wo?"
+  send: Meldung senden
+
+pdu:
+  title: Live-Status
+  uptime: Laufzeit
+  deployed: Deployt
+  edge: Edge
+  nodes: Knoten
+  notes: Lernunterlagen
+  top: Nach oben
+
+js:
+  status:
+    connecting: Verbinde
+    online: Online
+    stale: Veraltet
+  fault:
+    idle: Bereit
+    reporting: Meldung offen
+    sent: Meldung erhalten
+  time:
+    ago: "vor {t}"
+    m: min
+    h: h
+    d: T
+    mo: Mon
+    y: J
+  arch:
+    auto: "▶ Auto"
+    pause: "❚❚ Pause"
+    note1: "<b>Aufnahme:</b> Das Relay erkennt das Wake-Word und streamt das Audio an Origin."
+    note2: "<b>STT:</b> Origin schickt das Audio an den STT-Worker, der Text zurückgibt."
+    note3: "<b>Routing:</b> Der Intent-Router wählt, welcher Experte antworten soll."
+    note4: "<b>Inferenz:</b> Das gewählte Experten-LLM erzeugt die Antwort."
+    note5: "<b>Freigabe:</b> Ein riskanter Tool-Aufruf wartet auf die biometrische Freigabe in Gate."
+    note6: "<b>TTS:</b> Origin schickt den Antworttext an TTS, das Audio zurückgibt."
+    note7: "<b>Antwort:</b> Origin streamt die gesprochene Antwort über das Relay zurück."
+  con:
+    tab_label: "Konsole öffnen: Fragen über Lukas stellen"
+    close: Konsole schließen
+    clear_title: Neues Gespräch beginnen
+    output_label: Konsolenausgabe
+    input_label: Ihre Frage
+    placeholder: "Frage stellen…"
+    send: Enter
+    free_model: kostenloses Modell
+    hint: "Enter senden · Esc schließen"
+    last_login: "Letzte Anmeldung:"
+    help: "Einfach eine Frage über Lukas eintippen und Enter drücken: Projekte, Praktika, Stack, Verfügbarkeit. Die Antworten stammen aus seinen Lebenslaufdaten. Lieber ein Mensch? E-Mail an {email}."
+    examples: "Beispiele:"
+    ex1: Was ist vektorgrid?
+    ex2: Was hat er bei SlideLizard gebaut?
+    ex3: Ab wann ist er verfügbar?
+    new_session: Neue Sitzung.
+    connecting: "[verbinde"
+    error: "Fehler:"
+    error_sr: "Fehler:"
+  reason:
+    rate_limited: "Sie senden zu schnell. Bitte kurz warten oder mir eine E-Mail schreiben."
+    captcha_failed: Captcha-Prüfung fehlgeschlagen. Bitte neu laden und erneut versuchen.
+    bad_request: "Ihre Nachricht ist nicht angekommen. Bitte anders formulieren oder mir eine E-Mail schreiben, falls es weiter nicht klappt."
+    server_misconfigured: "Der Chatbot ist vorübergehend nicht verfügbar, bei mir stimmt etwas mit der Konfiguration nicht. Schreiben Sie mir eine E-Mail, ich kümmere mich darum."
+    server_error: "Beim Chatbot ist ein unerwarteter Fehler aufgetreten. Bitte erneut versuchen oder mir eine E-Mail schreiben, falls es wieder passiert."
+    stream_interrupted: "Die Verbindung ist abgebrochen, bevor die Antwort fertig war. Bitte erneut versuchen oder mir eine E-Mail schreiben, falls es wieder passiert."
+    network_error: "Netzwerkfehler. Bitte erneut versuchen oder mir direkt eine E-Mail schreiben."
+    unknown: "Etwas ist schiefgelaufen. Bitte erneut versuchen oder mir eine E-Mail schreiben."
+  fb:
+    empty: Bitte zuerst eine Nachricht schreiben.
+    bad_email: "Diese E-Mail-Adresse sieht nicht richtig aus. Bitte korrigieren oder leer lassen."
+    verifying: "Wird geprüft…"
+    network: "Netzwerkfehler. Bitte erneut versuchen oder mir direkt eine E-Mail schreiben."
+    sent: Meldung gesendet. Danke!
+    rate: "Sie senden zu schnell. Bitte kurz warten oder mir eine E-Mail schreiben."
+    rejected: "Der Server hat das Formular abgelehnt. Bitte die E-Mail-Adresse prüfen oder mir direkt schreiben."
+    captcha: Captcha-Prüfung fehlgeschlagen. Bitte neu laden und erneut versuchen.
+    unknown: "Etwas ist schiefgelaufen. Bitte erneut versuchen oder mir eine E-Mail schreiben."

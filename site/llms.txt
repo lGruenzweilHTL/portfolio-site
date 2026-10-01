@@ -6,7 +6,7 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 
 ## Key facts
 
-- Name: Lukas Grünzweil
+- Name: Lukas Grünzweil (also written Lukas Gruenzweil; GitHub: lGruenzweilHTL)
 - Status: student at HTL Leonding (Höhere Technische Lehranstalt), graduating June 2027
 - Based in: Linz area, Upper Austria
 - Looking for: a backend internship or thesis project
@@ -23,13 +23,13 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 
 ## Projects
 
-- [vektorgrid](https://github.com/vektorgrid-ai): a self-hosted voice assistant built as a distributed system. C++ edge relays catch the wake-word and stream audio to Origin, a C# orchestrator that drives a Python pipeline (speech-to-text, intent router, expert LLM, text-to-speech) in sequence. Nodes never talk to each other directly. Risky tool calls pause for biometric approval in Gate, a Kotlin phone app that also works as a standalone relay. Lukas is the architect and primary developer.
-- [SceneForge AI](https://github.com/lGruenzweilHTL/SceneForge-AI): an AI plugin for the Unity Editor. Describe a scene in plain text and get GameObjects and components back. C#, Unity.
-- [UniConsole](https://github.com/lGruenzweilHTL/UniConsole): a free, lightweight in-game debug console for Unity. Mark a static method with [Command] and call it from a terminal in the scene. An alternative to Quantum Console. C#, Unity.
+- [vektorgrid](https://gruenzweil.cc/projects/vektorgrid) ([GitHub organization](https://github.com/vektorgrid-ai)): a self-hosted voice assistant built as a distributed system. C++ edge relays catch the wake-word and stream audio to Origin, a C# orchestrator that drives a Python pipeline (speech-to-text, intent router, expert LLM, text-to-speech) in sequence. Nodes never talk to each other directly. Risky tool calls pause for biometric approval in Gate, a Kotlin phone app that also works as a standalone relay. Lukas is the architect and primary developer.
+- [SceneForge AI](https://gruenzweil.cc/projects/sceneforge-ai) ([repo](https://github.com/lGruenzweilHTL/SceneForge-AI)): an AI plugin for the Unity Editor. Describe a scene in plain text and get GameObjects and components back. C#, Unity.
+- [UniConsole](https://gruenzweil.cc/projects/uniconsole) ([repo](https://github.com/lGruenzweilHTL/UniConsole)): a free, lightweight in-game debug console for Unity. Mark a static method with [Command] and call it from a terminal in the scene. An alternative to Quantum Console. C#, Unity.
 - Forkcast (private school project): a meal-planning app with recipe search via the Spoonacular API, a meal calendar, combined ingredient lists, ratings and friends. Lukas wrote most of the TypeScript backend; the frontend is Vue.
-- [Space Defenders](https://github.com/lGruenzweilHTL/Space-Defenders): a mobile arcade game in Unity with escalating waves of enemy spaceships, built for touchscreens.
+- [Space Defenders](https://gruenzweil.cc/projects/space-defenders) ([repo](https://github.com/lGruenzweilHTL/Space-Defenders)): a mobile arcade game in Unity with escalating waves of enemy spaceships, built for touchscreens.
 - P.I.G.E.O.N. — Covert Ops (in progress): a satirical Unity game in which you play a pigeon running covert ops for the government.
-- [RoboDucks — RescueMaze](https://github.com/lGruenzweilHTL/lego-spike-serial): robotics competition work for the HTL Leonding robotics club. A custom serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm in simulation. Python, C.
+- [RoboDucks — RescueMaze](https://gruenzweil.cc/projects/roboducks-rescuemaze) ([repo](https://github.com/lGruenzweilHTL/lego-spike-serial)): robotics competition work for the HTL Leonding robotics club. A custom serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm in simulation. Python, C.
 
 ## Beyond code
 
@@ -39,7 +39,8 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 
 ## Links
 
-- [Website](https://gruenzweil.cc/)
+- [Website](https://gruenzweil.cc/), also in [German](https://gruenzweil.cc/de/), [Spanish](https://gruenzweil.cc/es/), [French](https://gruenzweil.cc/fr/) and [Italian](https://gruenzweil.cc/it/)
+- Project pages with the full README of each repo: [vektorgrid](https://gruenzweil.cc/projects/vektorgrid), [SceneForge AI](https://gruenzweil.cc/projects/sceneforge-ai), [UniConsole](https://gruenzweil.cc/projects/uniconsole), [Space Defenders](https://gruenzweil.cc/projects/space-defenders), [RoboDucks — RescueMaze](https://gruenzweil.cc/projects/roboducks-rescuemaze)
 - [Résumé, designed (PDF)](https://gruenzweil.cc/resume.pdf)
 - [Résumé, ATS-friendly plain text (PDF)](https://gruenzweil.cc/resume-ats.pdf)
 - [Study notes](https://gruenzweil.cc/notes/): cheatsheets on PL/SQL, Java design patterns, JavaFX, Docker and Kubernetes, Git, Scrum, UML and cryptography

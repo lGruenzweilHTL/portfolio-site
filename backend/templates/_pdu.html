@@ -1,0 +1,25 @@
+{#- PDU: the footer unit with live values from /api/status (main.js polls
+    it). Shared by the main page, project pages and /services; needs `t` and,
+    off the main page, `home` (the portfolio link). #}
+<footer class="unit unit--pdu" id="pdu" aria-labelledby="pdu-title">
+  <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+  <div class="face">
+    <div class="unit-head">
+      <h2 class="silk" id="pdu-title">{{ t('pdu.title') }}</h2>
+      <span class="model" aria-hidden="true">/api/status<span class="u-size"></span></span>
+      <p class="unit-head-r status" id="pdu-state"><span class="led" aria-hidden="true"></span><span class="pdu-state-label">{{ t('js.status.connecting') }}</span></p>
+    </div>
+    <div class="pdu">
+      <dl class="readouts">
+        <div><dt class="silk silk--dim">{{ t('pdu.uptime') }}</dt><dd class="lcd lcd--chip" data-status="uptime">--</dd></div>
+        <div><dt class="silk silk--dim">{{ t('pdu.deployed') }}</dt><dd class="lcd lcd--chip" data-status="rev">--</dd></div>
+        <div><dt class="silk silk--dim">{{ t('pdu.edge') }}</dt><dd class="lcd lcd--chip" data-status="edge">--</dd></div>
+        <div><dt class="silk silk--dim">{{ t('pdu.nodes') }}</dt><dd class="lcd lcd--chip" data-status="nodes">--</dd></div>
+      </dl>
+    </div>
+    <p class="pdu-foot silk silk--dim">
+      © 2026 Lukas Grünzweil ·{% if home %} <a href="{{ home }}">Portfolio</a> ·{% endif %} <a href="/notes/">{{ t('pdu.notes') }}</a> · <a href="#main">{{ t('pdu.top') }} <span aria-hidden="true">↑</span></a>
+    </p>
+  </div>
+  <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+</footer>

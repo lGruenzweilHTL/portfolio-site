@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="{{ lang.hreflang }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+{#- Main page. Rendered once per language by backend/routes/home.py; every
+    visible string is a key in content/i18n/<lang>.yaml (see backend/i18n.py). #}
+<title>{{ t('head.title') }}</title>
+<meta name="description" content="{{ t('head.description') }}" />
+<meta name="author" content="Lukas Grünzweil" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="{{ origin }}{{ lang.path }}" />
+{# One page per language; x-default is the English page. #}
+{% for l in langs %}<link rel="alternate" hreflang="{{ l.hreflang }}" href="{{ origin }}{{ l.path }}" />
+{% endfor %}<link rel="alternate" hreflang="x-default" href="{{ origin }}/" />
+<meta name="theme-color" content="#0d0e11" />
+<meta name="color-scheme" content="dark" />
+{# Rewritten per response by TurnstileSitekeyMiddleware; read by turnstile.js. #}
+<meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
+
+{# Link previews (Open Graph / X). og.png is 1200x630. #}
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content="Lukas Grünzweil" />
+<meta property="og:title" content="{{ t('head.og_title') }}" />
+<meta property="og:description" content="{{ t('head.og_description') }}" />
+<meta property="og:url" content="{{ origin }}{{ lang.path }}" />
+<meta property="og:image" content="{{ origin }}/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="{{ t('head.og_image_alt') }}" />
+<meta property="og:locale" content="{{ lang.og_locale }}" />
+{% for l in langs if l.code != lang.code %}<meta property="og:locale:alternate" content="{{ l.og_locale }}" />
+{% endfor %}<meta property="profile:first_name" content="Lukas" />
+<meta property="profile:last_name" content="Grünzweil" />
+<meta property="profile:username" content="lGruenzweilHTL" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ t('head.og_title') }}" />
+<meta name="twitter:description" content="{{ t('head.og_description') }}" />
+<meta name="twitter:image" content="{{ origin }}/og.png" />
+<meta name="twitter:image:alt" content="{{ t('head.og_image_alt') }}" />
+{# Identity: the profiles that are the same person as this page. #}
+<link rel="me" href="https://github.com/lGruenzweilHTL" />
+<link rel="me" href="mailto:lukas.gruenzweil@liwest.at" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+{# Entry animations hide content only once JS is known to run, so the page
+     stays fully readable without it. "post" plays the power-on self-test once
+     per browser session (main.js removes it); skipped for reduced motion.
+     window.I18N carries the page scripts' strings in this page's language. #}
+<script>
+window.I18N = {{ js_strings | tojson }};
+(function (h) {
+  h.classList.add('js');
+  try {
+    if (!sessionStorage.getItem('rack.post') && !matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('post');
+  } catch (_) {}
+})(document.documentElement);
+</script>
+
+{# Structured data: who this is, and what they built. Keep in sync with the
+     visible copy below and content/resume.yaml. The @ids are shared by every
+     language version: they all describe the same person and projects. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://gruenzweil.cc/#website",
+      "url": "https://gruenzweil.cc/",
+      "name": "Lukas Grünzweil",
+      "alternateName": ["gruenzweil.cc", "Lukas Gruenzweil"],
+      "inLanguage": {{ langs | map(attribute='hreflang') | list | tojson }},
+      "publisher": { "@id": "https://gruenzweil.cc/#person" }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "{{ origin }}{{ lang.path }}#profile",
+      "url": "{{ origin }}{{ lang.path }}",
+      "name": {{ t('head.title') | tojson }},
+      "description": {{ t('head.description') | tojson }},
+      "isPartOf": { "@id": "https://gruenzweil.cc/#website" },
+      "mainEntity": { "@id": "https://gruenzweil.cc/#person" },
+      "dateModified": "2026-09-30T00:00:00+02:00",
+      "inLanguage": "{{ lang.hreflang }}"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://gruenzweil.cc/#person",
+      "name": "Lukas Grünzweil",
+      "alternateName": ["Lukas Gruenzweil", "lGruenzweilHTL"],
+      "givenName": "Lukas",
+      "familyName": "Grünzweil",
+      "url": "https://gruenzweil.cc/",
+      "image": "https://gruenzweil.cc/og.png",
+      "email": "mailto:lukas.gruenzweil@liwest.at",
+      "jobTitle": {{ t('ld.job_title') | tojson }},
+      "description": {{ t('ld.person_description') | tojson }},
+      "affiliation": {
+        "@type": "EducationalOrganization",
+        "name": "HTL Leonding",
+        "url": "https://www.htl-leonding.at/",
+        "address": { "@type": "PostalAddress", "addressLocality": "Leonding", "addressCountry": "AT" }
+      },
+      "homeLocation": {
+        "@type": "Place",
+        "address": { "@type": "PostalAddress", "addressRegion": "Upper Austria", "addressCountry": "AT" }
+      },
+      "address": { "@type": "PostalAddress", "addressLocality": "Linz", "addressRegion": "Upper Austria", "addressCountry": "AT" },
+      "alumniOf": { "@type": "EducationalOrganization", "name": "HTL Leonding", "url": "https://www.htl-leonding.at/" },
+      "seeks": {
+        "@type": "Demand",
+        "name": {{ t('ld.seeks_name') | tojson }},
+        "description": {{ t('ld.seeks_description') | tojson }}
+      },
+      "knowsLanguage": ["de", "en"],
+      "knowsAbout": ["Backend development", "Distributed systems", "AI tooling", "Large language models", "Game development", "Unity", "C#", "Python", "TypeScript", "C", "C++", "Kotlin", "Java", "Docker", "Kubernetes", "Azure", "Proxmox"],
+      "sameAs": ["https://github.com/lGruenzweilHTL", "https://github.com/vektorgrid-ai"]
+    },
+    {
+      "@type": "ItemList",
+      "@id": "{{ origin }}{{ lang.path }}#projects",
+      "name": {{ t('ld.projects_name') | tojson }},
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "item": {
+          "@type": "SoftwareSourceCode", "name": "vektorgrid", "url": "https://gruenzweil.cc/projects/vektorgrid",
+          "description": {{ t('ld.vektorgrid') | tojson }},
+          "codeRepository": "https://github.com/vektorgrid-ai",
+          "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 2, "item": {
+          "@type": "SoftwareSourceCode", "name": "SceneForge AI", "url": "https://gruenzweil.cc/projects/sceneforge-ai",
+          "description": {{ t('ld.sceneforge') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/SceneForge-AI",
+          "programmingLanguage": "C#", "runtimePlatform": "Unity Editor",
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 3, "item": {
+          "@type": "SoftwareSourceCode", "name": "UniConsole", "url": "https://gruenzweil.cc/projects/uniconsole",
+          "description": {{ t('ld.uniconsole') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/UniConsole",
+          "programmingLanguage": "C#", "runtimePlatform": "Unity",
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 4, "item": {
+          "@type": "CreativeWork", "name": "Forkcast",
+          "description": {{ t('ld.forkcast') | tojson }},
+          "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 5, "item": {
+          "@type": "SoftwareSourceCode", "name": "Space Defenders", "url": "https://gruenzweil.cc/projects/space-defenders",
+          "description": {{ t('ld.space_defenders') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/Space-Defenders",
+          "programmingLanguage": "C#", "runtimePlatform": "Unity",
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 6, "item": {
+          "@type": "CreativeWork", "name": "P.I.G.E.O.N. — Covert Ops",
+          "description": {{ t('ld.pigeon') | tojson }},
+          "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 7, "item": {
+          "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
+          "description": {{ t('ld.roboducks') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
+          "programmingLanguage": ["Python", "C"],
+          "contributor": { "@id": "https://gruenzweil.cc/#person" } } }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">{{ t('a11y.skip') }}</a>
+
+{# The page is one rack cabinet; every section is a rack-mounted unit.
+     Decoration (ears, rails, LEDs, model numbers) is aria-hidden; the copy
+     inside each .face is plain, readable HTML. #}
+<div class="cabinet" id="cabinet">
+  <div class="cab-roof" aria-hidden="true"><span>{{ t('roof') }}</span></div>
+  <div class="cab-body">
+    <div class="rail rail--l" aria-hidden="true"></div>
+    <div class="units" id="units">
+
+      {# PATCH-01: primary nav. Ports light up for the section in view. #}
+      <header class="unit unit--nav unit--nohandle" id="nav">
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        <nav class="face nav" aria-label="{{ t('nav.label') }}">
+          <a class="nav-host" href="#hero" aria-label="{{ t('nav.host_label') }}">
+            <span class="lcd lcd--chip" aria-hidden="true">lukas@lg-rack-01</span>
+          </a>
+          <button type="button" class="key key--sm nav-toggle" aria-expanded="false" aria-controls="ports">{{ t('nav.ports') }}</button>
+          <ul class="ports" id="ports">
+            <li><a class="port" href="#projects"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.projects') }}</span></a></li>
+            <li><a class="port" href="#experience"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.experience') }}</span></a></li>
+            <li><a class="port" href="#about"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.about') }}</span></a></li>
+            <li><a class="port" href="#contact"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.contact') }}</span></a></li>
+          </ul>
+          {# Language switch: plain links, so crawlers find every version. #}
+          <details class="lang">
+            <summary class="key key--sm"><span class="sr-only">{{ t('nav.lang_label') }}: {{ lang.name }}</span><span aria-hidden="true">{{ lang.code | upper }}</span></summary>
+            <ul class="lang-list">
+              {% for l in langs %}<li><a href="{{ l.path }}" hreflang="{{ l.hreflang }}" lang="{{ l.hreflang }}"{% if l.code == lang.code %} aria-current="page"{% endif %}><span class="lcd" aria-hidden="true">{{ l.code | upper }}</span>{{ l.name }}</a></li>
+              {% endfor %}
+            </ul>
+          </details>
+        </nav>
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+      </header>
+
+      <main id="main" class="units-main" tabindex="-1">
+
+        {# CTRL: hero. VFD front display, control cluster, drive bays. #}
+        <section class="unit" id="hero" aria-labelledby="hero-name">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <p class="silk">{{ t('hero.unit') }}</p>
+              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+              <div class="unit-head-r" aria-hidden="true">
+                <span class="ind"><span class="led led--green"></span>PWR</span>
+                <span class="ind"><span class="led led--act"></span>ACT</span>
+                <span class="ind"><span class="led" data-led="status"></span>NET</span>
+                <span class="lcd lcd--chip" id="lat">LAT --</span>
+              </div>
+            </div>
+
+            <div class="ctrl">
+              <div class="ctrl-display">
+                <div class="vfd-bezel">
+                  <div class="vfd">
+                    <h1 class="vfd-name" id="hero-name">Lukas Grünzweil</h1>
+                    <p class="vfd-line">{{ t('hero.line1') }}</p>
+                    <p class="vfd-line">{{ t('hero.line2') }}</p>
+                    <p class="vfd-line">{{ t('hero.line3') }}</p>
+                  </div>
+                </div>
+                {# LCD strip: the SlideLizard quote on its own readout. #}
+                <figure class="quote">
+                  <blockquote class="lcd-strip">{{ t('hero.quote') }}</blockquote>
+                  <figcaption class="quote-by">{{ t('hero.quote_by_html') }}</figcaption>
+                </figure>
+              </div>
+
+              <div class="panel-ctl">
+                <p class="silk silk--dim" aria-hidden="true">{{ t('hero.front_panel') }}</p>
+                <div class="power">
+                  <span class="power-btn" aria-hidden="true"></span>
+                  <div>
+                    <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('hero.online') }}</p>
+                    <p class="power-text">{{ t('hero.bio') }}</p>
+                  </div>
+                </div>
+                <div class="keys">
+                  <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
+                  <a class="key" href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('hero.github_sr') }}</span></a>
+                </div>
+                {# Résumé: a two-position switch (radio group) plus one download
+                     key. CSS shows the key for the checked format, so it works
+                     without JS. #}
+                <fieldset class="resume">
+                  <legend class="silk silk--dim">{{ t('hero.resume') }}</legend>
+                  <div class="switch">
+                    <input type="radio" name="resume-format" id="rf-classic" value="classic" checked>
+                    <label for="rf-classic"><span class="led" aria-hidden="true"></span>{{ t('hero.classic') }}</label>
+                    <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+                    <input type="radio" name="resume-format" id="rf-ats" value="ats">
+                    <label for="rf-ats"><span class="led" aria-hidden="true"></span>ATS</label>
+                  </div>
+                  <div class="resume-dl">
+                  <a class="key dl dl--classic" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.classic_sr') }}</span></a>
+                  <a class="key dl dl--ats" href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.ats_sr') }}</span></a>
+                  </div>
+                </fieldset>
+                {% if t('hero.translation_note') %}<p class="translation-note silk silk--dim">{{ t('hero.translation_note') }}</p>{% endif %}
+              </div>
+            </div>
+
+            <ul class="bays" aria-label="{{ t('hero.facts') }}">
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 0</span><strong>HTL Leonding</strong><span>{{ t('hero.bay0') }}</span></div><span class="led" aria-hidden="true"></span></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 1</span><strong>SlideLizard</strong><span>{{ t('hero.bay1') }}</span></div><span class="led" aria-hidden="true"></span></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 2</span><strong>vektorgrid</strong><span>{{ t('hero.bay2') }}</span></div><span class="led" data-led="push:vektorgrid" aria-hidden="true"></span></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 3</span><strong>Homelab</strong><span>{{ t('hero.bay3') }}</span></div><span class="led" data-led="status" aria-hidden="true"></span></li>
+            </ul>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {# CHASSIS: vektorgrid. Front = hot-swap modules, rear = the
+             interactive wiring diagram. JS hides one side and flips between
+             them; without JS both are shown. #}
+        <section class="unit rv" id="projects" aria-labelledby="vektorgrid-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="vektorgrid-title">vektorgrid</h2>
+              <span class="model" aria-hidden="true">{{ t('vg.model') }}<span class="u-size"></span></span>
+              <div class="unit-head-r">
+                <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('vg.status') }}</p>
+                <div class="seg" role="group" aria-label="{{ t('vg.view_label') }}">
+                  <button type="button" class="key key--sm" data-view="front" aria-pressed="true" aria-controls="chassis">{{ t('vg.front') }}</button>
+                  <button type="button" class="key key--sm" data-view="rear" aria-pressed="false" aria-controls="chassis">{{ t('vg.rear') }}</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="chassis-intro">
+              <div>
+                <p class="lead">{{ t('vg.lead') }}</p>
+                <p class="silk silk--dim">{{ t('vg.role') }} · C# · C++ · Kotlin · Python</p>
+              </div>
+              <div class="keys">
+                <a class="key key--primary" href="/projects/vektorgrid">{{ t('vg.project_page') }}</a>
+                <a class="key" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">{{ t('vg.org') }} <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('vg.org_sr') }}</span></a>
+              </div>
+            </div>
+
+            <div class="chassis" id="chassis">
+              <ul class="chassis-front modules" aria-label="{{ t('vg.modules_label') }}">
+                <li class="module" style="--stripe: var(--lang-cs)">
+                  <p class="silk">Origin</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-origin" target="_blank" rel="noopener">{{ t('vg.origin_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
+                  <p>{{ t('vg.origin_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--cs">C#</li></ul>
+                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
+                </li>
+                <li class="module" style="--stripe: var(--lang-cpp)">
+                  <p class="silk">Relay</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-relay" target="_blank" rel="noopener">{{ t('vg.relay_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
+                  <p>{{ t('vg.relay_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--cpp">C++</li></ul>
+                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
+                </li>
+                <li class="module" style="--stripe: var(--lang-kt)">
+                  <p class="silk">Gate</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-gate" target="_blank" rel="noopener">{{ t('vg.gate_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
+                  <p>{{ t('vg.gate_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--kt">Kotlin</li></ul>
+                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
+                </li>
+                <li class="module" style="--stripe: var(--lang-py)">
+                  <p class="silk">Scalars</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-scalars" target="_blank" rel="noopener">{{ t('vg.scalars_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
+                  <p>{{ t('vg.scalars_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--py">Python</li></ul>
+                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
+                </li>
+              </ul>
+
+              <div class="chassis-rear" id="chassis-rear">
+            <div class="arch" id="arch">
+              <h3 class="silk arch-cap" id="arch-cap">{{ t('vg.rear_cap') }}</h3>
+              <div class="arch-steps" role="group" aria-label="{{ t('vg.steps_label') }}">
+                <button type="button" class="arch-step" data-step="1" aria-pressed="false">1 · {{ t('vg.step1') }}</button>
+                <button type="button" class="arch-step" data-step="2" aria-pressed="false">2 · STT</button>
+                <button type="button" class="arch-step" data-step="3" aria-pressed="false">3 · {{ t('vg.step3') }}</button>
+                <button type="button" class="arch-step" data-step="4" aria-pressed="false">4 · {{ t('vg.step4') }}</button>
+                <button type="button" class="arch-step" data-step="5" aria-pressed="false">5 · {{ t('vg.step5') }}</button>
+                <button type="button" class="arch-step" data-step="6" aria-pressed="false">6 · TTS</button>
+                <button type="button" class="arch-step" data-step="7" aria-pressed="false">7 · {{ t('vg.step7') }}</button>
+                <button type="button" class="arch-step arch-play" id="archPlay" aria-pressed="false">{{ t('js.arch.auto') }}</button>
+              </div>
+
+              <svg class="arch-svg arch-wide" viewBox="0 0 740 340" role="img" aria-labelledby="arch-desc-title">
+                <title id="arch-desc-title">{{ t('vg.diagram_title') }}</title>
+                <defs>
+                  <marker id="arw" markerWidth="9" markerHeight="9" refX="6.5" refY="3.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+                    <path d="M0,0 L7,3.5 L0,7 Z" style="fill:context-stroke"/>
+                  </marker>
+                </defs>
+
+                {# edges: everything routes through Origin. x1/y1 is always the
+                     end that starts a forward flow. #}
+                <line data-part="e-relay" class="d-line" x1="200" y1="104" x2="286" y2="176" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <text class="d-lbl" x="242" y="160" text-anchor="end">{{ t('vg.d_audio') }} &#8644; {{ t('vg.d_speech') }}</text>
+                <line data-part="e-gate" class="d-line" x1="200" y1="290" x2="286" y2="222" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <text class="d-lbl" x="242" y="240" text-anchor="end">{{ t('vg.d_approval') }} &#8644; &#10003;/&#10007;</text>
+                <line data-part="e-stt"    class="d-line" x1="440" y1="188" x2="548" y2="66"  marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-router" class="d-line" x1="440" y1="196" x2="548" y2="128" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-llm"    class="d-line" x1="440" y1="204" x2="548" y2="190" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-tts"    class="d-line" x1="440" y1="212" x2="548" y2="252" marker-start="url(#arw)" marker-end="url(#arw)"/>
+
+                <rect data-part="n-origin" class="d-box-origin" x="288" y="164" width="150" height="72" rx="8"/>
+                <text class="d-title d-title-o" x="363" y="196" text-anchor="middle">Origin</text>
+                <text class="d-sub" x="363" y="216" text-anchor="middle">{{ t('vg.d_orchestrator') }} · <tspan class="d-lang-cs">C#</tspan></text>
+
+                <rect data-part="n-relay" class="d-box" x="50" y="74" width="152" height="58" rx="7"/>
+                <text class="d-title" x="126" y="98" text-anchor="middle">Relay</text>
+                <text class="d-sub" x="126" y="116" text-anchor="middle">{{ t('vg.d_wake') }} · <tspan class="d-lang-cpp">C++</tspan></text>
+
+                <rect data-part="n-gate" class="d-box" x="50" y="262" width="152" height="58" rx="7"/>
+                <text class="d-title" x="126" y="286" text-anchor="middle">Gate</text>
+                <text class="d-sub" x="126" y="304" text-anchor="middle">{{ t('vg.d_biometric') }} · <tspan class="d-lang-kt">Kotlin</tspan></text>
+
+                <text class="d-sub" x="628" y="30" text-anchor="middle">SCALARS · <tspan class="d-lang-py">Python</tspan> · {{ t('vg.d_in_sequence') }}</text>
+
+                <rect data-part="n-stt" class="d-box-scalar" x="548" y="44"  width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="71"  text-anchor="middle">STT</text>
+                <rect data-part="n-router" class="d-box-scalar" x="548" y="106" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="133" text-anchor="middle">{{ t('vg.d_router') }}</text>
+                <rect data-part="n-llm" class="d-box-scalar" x="548" y="168" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="195" text-anchor="middle">{{ t('vg.d_llm') }}</text>
+                <rect data-part="n-tts" class="d-box-scalar" x="548" y="230" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="257" text-anchor="middle">TTS</text>
+
+                <g><circle data-part="b-stt"    class="d-numbg" cx="548" cy="66"  r="9"/><text class="d-num" x="548" y="69"  text-anchor="middle">1</text></g>
+                <g><circle data-part="b-router" class="d-numbg" cx="548" cy="128" r="9"/><text class="d-num" x="548" y="131" text-anchor="middle">2</text></g>
+                <g><circle data-part="b-llm"    class="d-numbg" cx="548" cy="190" r="9"/><text class="d-num" x="548" y="193" text-anchor="middle">3</text></g>
+                <g><circle data-part="b-tts"    class="d-numbg" cx="548" cy="252" r="9"/><text class="d-num" x="548" y="255" text-anchor="middle">4</text></g>
+              </svg>
+
+              {# Portrait layout: Relay / Origin / Gate stacked on the left, the
+                   Scalar pipeline stacked on the right. #}
+              <svg class="arch-svg arch-tall" viewBox="0 0 340 446" role="img" aria-labelledby="arch-desc-title-m">
+                <title id="arch-desc-title-m">{{ t('vg.diagram_title') }}</title>
+                <defs>
+                  <marker id="arw-m" markerWidth="9" markerHeight="9" refX="6.5" refY="3.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+                    <path d="M0,0 L7,3.5 L0,7 Z" style="fill:context-stroke"/>
+                  </marker>
+                </defs>
+
+                <line data-part="e-relay" class="d-line" x1="80" y1="96" x2="80" y2="197" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <text class="d-lbl" x="89" y="146">{{ t('vg.d_audio') }}</text>
+                <text class="d-lbl" x="89" y="160">&#8644; {{ t('vg.d_speech') }}</text>
+                <line data-part="e-gate" class="d-line" x1="80" y1="370" x2="80" y2="269" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <text class="d-lbl" x="89" y="314">{{ t('vg.d_approval') }}</text>
+                <text class="d-lbl" x="89" y="328">&#8644; &#10003;/&#10007;</text>
+                <line data-part="e-stt"    class="d-line" x1="152" y1="219" x2="196" y2="140" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-router" class="d-line" x1="152" y1="228" x2="196" y2="202" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-llm"    class="d-line" x1="152" y1="238" x2="196" y2="264" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-tts"    class="d-line" x1="152" y1="247" x2="196" y2="326" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+
+                <rect data-part="n-relay" class="d-box" x="10" y="40" width="140" height="54" rx="7"/>
+                <text class="d-title" x="80" y="63" text-anchor="middle">Relay</text>
+                <text class="d-sub" x="80" y="82" text-anchor="middle">{{ t('vg.d_wake') }} · <tspan class="d-lang-cpp">C++</tspan></text>
+
+                <rect data-part="n-origin" class="d-box-origin" x="10" y="199" width="140" height="68" rx="8"/>
+                <text class="d-title d-title-o" x="80" y="229" text-anchor="middle">Origin</text>
+                <text class="d-sub" x="80" y="250" text-anchor="middle">{{ t('vg.d_orchestrator') }} · <tspan class="d-lang-cs">C#</tspan></text>
+
+                <rect data-part="n-gate" class="d-box" x="10" y="372" width="140" height="54" rx="7"/>
+                <text class="d-title" x="80" y="395" text-anchor="middle">Gate</text>
+                <text class="d-sub" x="80" y="414" text-anchor="middle">{{ t('vg.d_biometric') }} · <tspan class="d-lang-kt">Kotlin</tspan></text>
+
+                <text class="d-sub" x="263" y="86" text-anchor="middle">SCALARS · <tspan class="d-lang-py">Python</tspan></text>
+                <text class="d-sub" x="263" y="102" text-anchor="middle">{{ t('vg.d_in_sequence') }}</text>
+
+                <rect data-part="n-stt" class="d-box-scalar" x="196" y="118" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="145" text-anchor="middle">STT</text>
+                <rect data-part="n-router" class="d-box-scalar" x="196" y="180" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="207" text-anchor="middle">{{ t('vg.d_router') }}</text>
+                <rect data-part="n-llm" class="d-box-scalar" x="196" y="242" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="269" text-anchor="middle">{{ t('vg.d_llm') }}</text>
+                <rect data-part="n-tts" class="d-box-scalar" x="196" y="304" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="331" text-anchor="middle">TTS</text>
+
+                <g><circle data-part="b-stt"    class="d-numbg" cx="196" cy="140" r="9"/><text class="d-num" x="196" y="143" text-anchor="middle">1</text></g>
+                <g><circle data-part="b-router" class="d-numbg" cx="196" cy="202" r="9"/><text class="d-num" x="196" y="205" text-anchor="middle">2</text></g>
+                <g><circle data-part="b-llm"    class="d-numbg" cx="196" cy="264" r="9"/><text class="d-num" x="196" y="267" text-anchor="middle">3</text></g>
+                <g><circle data-part="b-tts"    class="d-numbg" cx="196" cy="326" r="9"/><text class="d-num" x="196" y="329" text-anchor="middle">4</text></g>
+              </svg>
+
+              <p class="arch-note" id="archNote"></p>
+              <p class="arch-flow">{{ t('vg.flow_html') }}</p>
+            </div>
+              </div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {# ENCLOSURE: other projects as blades. [data-push] chips are filled
+             from /api/status (GitHub pushed_at); "--" until then. #}
+        <section class="unit rv" id="more-projects" aria-labelledby="blades-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="blades-title">{{ t('blades.title') }}</h2>
+              <span class="model" aria-hidden="true">{{ t('blades.model') }}<span class="u-size"></span></span>
+              <p class="unit-head-r silk silk--dim" aria-hidden="true">{{ t('blades.hint') }}</p>
+            </div>
+
+            <ul class="blades">
+              <li class="blade">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/sceneforge.webp" width="1200" height="458" loading="lazy" decoding="async" alt="{{ t('blades.sceneforge_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/sceneforge-ai">SceneForge AI</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="sceneforge-ai">--</span></p>
+                  <p class="blade-desc">{{ t('blades.sceneforge_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_editor') }}</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/sceneforge-ai">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='SceneForge AI') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='SceneForge AI') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/uniconsole.webp" width="553" height="451" loading="lazy" decoding="async" alt="{{ t('blades.uniconsole_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/uniconsole">UniConsole</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="uniconsole">--</span></p>
+                  <p class="blade-desc">{{ t('blades.uniconsole_desc_html') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_devtools') }}</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/uniconsole">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='UniConsole') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='UniConsole') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade blade--static">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/forkcast.webp" width="1200" height="668" loading="lazy" decoding="async" alt="{{ t('blades.forkcast_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3>Forkcast</h3><p class="status"><span class="led led--blue" aria-hidden="true"></span>{{ t('blades.private') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.forkcast_meta') }}</span></p>
+                  <p class="blade-desc">{{ t('blades.forkcast_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--ts">TypeScript</li><li class="cable">Vue</li><li class="cable">REST API</li></ul>
+                    <span class="blank-plate">{{ t('blades.private_repo') }}</span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot blade-shot--empty" aria-hidden="true"><span>{{ t('blades.no_signal') }}</span></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/roboducks-rescuemaze">RoboDucks — RescueMaze</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="roboducks-rescuemaze">--</span> <span class="silk silk--dim">· {{ t('blades.roboducks_meta') }}</span></p>
+                  <p class="blade-desc">{{ t('blades.roboducks_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--py">Python</li><li class="cable cable--c">C</li><li class="cable">{{ t('blades.tag_robotics') }}</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/roboducks-rescuemaze">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='RoboDucks') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='RoboDucks') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/space-defenders.webp" width="1200" height="670" loading="lazy" decoding="async" alt="{{ t('blades.space_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/space-defenders">Space Defenders</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="space-defenders">--</span></p>
+                  <p class="blade-desc">{{ t('blades.space_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_mobile') }}</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/space-defenders">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='Space Defenders') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Space Defenders') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade blade--static">
+                <span class="blade-handle" aria-hidden="true"></span>
+                {#- Add a screenshot with: <div class="blade-shot"><img src="/img/pigeon.webp" width="…" height="…" loading="lazy" alt="…"></div> #}
+                <div class="blade-shot blade-shot--empty" aria-hidden="true"><span>{{ t('blades.no_signal') }}</span></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3>P.I.G.E.O.N. — Covert Ops</h3><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
+                  <p class="blade-desc">{{ t('blades.pigeon_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_game') }}</li></ul>
+                    {#- TODO: swap for a Repo key once the repo is public #}
+                    <span class="blank-plate">{{ t('blades.not_public') }}</span>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        <div class="unit unit--blank unit--nohandle" aria-hidden="true"><i class="ear"><b class="screw"></b><b class="screw"></b></i><div class="face vents"></div><i class="ear"><b class="screw"></b><b class="screw"></b></i></div>
+
+        {# LOG: experience. <details> rows, most recent open. #}
+        <section class="unit rv" id="experience" aria-labelledby="experience-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="experience-title">{{ t('exp.title') }}</h2>
+              <span class="model" aria-hidden="true">{{ t('exp.model') }}<span class="u-size"></span></span>
+              <p class="unit-head-r silk silk--dim" aria-hidden="true">{{ t('exp.count') }}</p>
+            </div>
+            <ol class="log">
+              <li>
+                <details class="log-row" open>
+                  <summary data-open="{{ t('exp.open') }}" data-close="{{ t('exp.close') }}">
+                    <time class="lcd" datetime="2026-08">2026-08</time>
+                    <h3 class="log-org">SlideLizard Software GmbH</h3>
+                    <span class="log-role">{{ t('exp.sl_role') }}</span>
+                    <span class="log-place silk silk--dim">{{ t('exp.sl_place') }}</span>
+                  </summary>
+                  <div class="log-body">
+                    <p>{{ t('exp.sl_desc') }}</p>
+                    <ul class="cables" aria-label="{{ t('common.tech') }}">
+                      <li class="cable">Angular</li><li class="cable cable--ts">TypeScript</li><li class="cable">Azure Speech</li><li class="cable">Azure OpenAI</li><li class="cable">Dataverse</li><li class="cable">OpenRouter</li>
+                    </ul>
+                  </div>
+                </details>
+              </li>
+              <li>
+                <details class="log-row" open>
+                  <summary data-open="{{ t('exp.open') }}" data-close="{{ t('exp.close') }}">
+                    <time class="lcd" datetime="2025-07">2025-07</time>
+                    <h3 class="log-org">{{ t('exp.caritas_org') }}</h3>
+                    <span class="log-role">{{ t('exp.caritas_role') }}</span>
+                    <span class="log-place silk silk--dim">{{ t('exp.caritas_place') }}</span>
+                  </summary>
+                  <div class="log-body">
+                    <p>{{ t('exp.caritas_desc') }}</p>
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable">{{ t('exp.tag_admin') }}</li><li class="cable">{{ t('exp.tag_it') }}</li><li class="cable">{{ t('exp.tag_billing') }}</li></ul>
+                  </div>
+                </details>
+              </li>
+            </ol>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {# PATCH-02: stack. Same cable colours as the blades and modules. #}
+        <section class="unit rv" id="stack" aria-labelledby="stack-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="stack-title">Stack</h2>
+              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+            </div>
+            <div class="patch">
+              <h3 class="silk silk--dim" id="stack-lang">{{ t('stack.languages') }}</h3>
+              <ul class="cables" aria-labelledby="stack-lang">
+                <li class="cable cable--cs">C#</li><li class="cable cable--py">Python</li><li class="cable cable--ts">TypeScript</li><li class="cable cable--c">C</li><li class="cable cable--cpp">C++</li><li class="cable cable--kt">Kotlin</li><li class="cable cable--java">Java</li><li class="cable cable--html">HTML/CSS</li>
+              </ul>
+              <h3 class="silk silk--dim" id="stack-tools">{{ t('stack.tools') }}</h3>
+              <ul class="cables" aria-labelledby="stack-tools">
+                <li class="cable">Unity</li><li class="cable">Docker</li><li class="cable">Docker Compose</li><li class="cable">Kubernetes</li><li class="cable">Azure</li><li class="cable">Proxmox</li>
+              </ul>
+              <h3 class="silk silk--dim" id="stack-spoken">{{ t('stack.spoken') }}</h3>
+              <ul class="chips" aria-labelledby="stack-spoken"><li>{{ t('stack.german') }}</li><li>{{ t('stack.english') }}</li></ul>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {# SHELF: about + beyond code. #}
+        <section class="unit rv" id="about" aria-labelledby="about-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="about-title">{{ t('about.title') }}</h2>
+              <span class="model" aria-hidden="true">{{ t('about.model') }}<span class="u-size"></span></span>
+            </div>
+            <div class="about">
+              <p>{{ t('about.p1') }}</p>
+              <p>{{ t('about.p2_html') }}</p>
+            </div>
+            <div class="shelf">
+              <ul class="shelf-items">
+                <li class="shelf-item">
+                  <h3 class="silk">Homelab</h3>
+                  <p>{{ t('about.homelab') }}</p>
+                  <a class="shelf-link" href="#pdu">{{ t('about.homelab_link') }} <span aria-hidden="true">↓</span></a>
+                </li>
+                <li class="shelf-item">
+                  <h3 class="silk">Ender of Theseus</h3>
+                  <p>{{ t('about.ender_html') }}</p>
+                </li>
+                <li class="shelf-item">
+                  <h3 class="silk">{{ t('about.moto_title') }}</h3>
+                  <p>{{ t('about.moto') }}</p>
+                </li>
+              </ul>
+              <div class="shelf-lip" aria-hidden="true"></div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {# KVM: contact. The feedback form lives in a drawer that pulls out on
+             rails; without JS it is simply open. #}
+        <section class="unit rv" id="contact" aria-labelledby="contact-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="contact-title">{{ t('contact.title') }}</h2>
+              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+              <p class="unit-head-r status" id="fault-status"><span class="led" aria-hidden="true"></span><span class="fault-label">{{ t('js.fault.idle') }}</span></p>
+            </div>
+            <div class="contact">
+              <div>
+                <p class="contact-lead">{{ t('contact.lead') }}</p>
+                <p>{{ t('contact.body') }}</p>
+              </div>
+              <div class="keys">
+                <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
+                <button type="button" class="key drawer-toggle" aria-expanded="false" aria-controls="drawer">{{ t('contact.report') }}</button>
+              </div>
+            </div>
+
+            {# Site feedback (POSTs to /api/feedback, gated by Turnstile). Kept quiet on
+                 purpose: it's for typos and bugs, email is for everything else. #}
+            <div class="drawer" id="drawer">
+              {#- Mouse shortcut for the Report key above, which stays the accessible control. #}
+              <button type="button" class="drawer-handle" tabindex="-1" aria-hidden="true"></button>
+              <div class="drawer-inner">
+                <div class="drawer-tray">
+                  <h3 class="silk" id="feedback-title">{{ t('contact.report') }}</h3>
+                  <p class="feedback-sub" id="feedback-sub">{{ t('contact.feedback_sub') }}</p>
+                  <form id="feedback-form" class="feedback-form" aria-labelledby="feedback-title" aria-describedby="feedback-sub" novalidate>
+                    <div class="feedback-row">
+                      <label class="field">
+                        <span class="silk silk--dim">{{ t('contact.name_label') }}</span>
+                        <input type="text" name="name" maxlength="120" autocomplete="name" />
+                      </label>
+                      <label class="field">
+                        <span class="silk silk--dim">{{ t('contact.email_label') }}</span>
+                        <input type="email" name="email" maxlength="254" autocomplete="email" />
+                      </label>
+                    </div>
+                    <label class="field">
+                      <span class="silk silk--dim">{{ t('contact.message_label') }} <span aria-hidden="true">*</span></span>
+                      <textarea name="message" required maxlength="4000" rows="4" placeholder="{{ t('contact.placeholder') }}" aria-describedby="feedback-status"></textarea>
+                    </label>
+                    <div class="feedback-actions">
+                      {# Turnstile mount point: stays empty until a send needs an interactive challenge #}
+                      <div class="feedback-turnstile" id="feedback-turnstile"></div>
+                      <p class="feedback-status" id="feedback-status" role="status" aria-live="polite"></p>
+                      <button type="submit" class="key key--primary" id="feedback-submit">{{ t('contact.send') }}</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+      </main>
+
+      {# PDU: footer with live values from /api/status. #}
+      {% include "_pdu.html" %}
+
+    </div>
+    <div class="rail rail--r" aria-hidden="true"></div>
+  </div>
+  <div class="cab-plinth" aria-hidden="true"></div>
+</div>
+
+<script src="/main.js" defer></script>
+
+{# Cloudflare Turnstile: separate on-demand widgets for the chatbot and the
+     feedback form, see turnstile.js. It must load synchronously before the
+     async API script so the onload hook exists when that script fires. If the
+     API script fails to load, requests go out without a token: fine in dev
+     (TURNSTILE_DEV_BYPASS=1), a captcha-failed message in production. #}
+<script src="/turnstile.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
+<script src="/chat.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
