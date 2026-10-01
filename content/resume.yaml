@@ -4,8 +4,9 @@
 #   - backend/chat.py    -> chatbot system prompt
 # Validate with: backend/content.py::load_content (raises on schema errors)
 #
-# Keep this in sync with site/index.html for the project list. The site has
-# the rich narrative; this file has the structured facts.
+# Keep this in sync with the main page for the project list
+# (backend/templates/index.html + content/i18n/*.yaml). The site has the rich
+# narrative; this file has the structured facts.
 
 personal:
   name: "Lukas Grünzweil"
@@ -44,7 +45,7 @@ education:
 
 # Professional experience, most-recent first.
 # Rendered by both résumé PDFs. The public HTML site has its own richer copy
-# in site/index.html; public_summary and public_tags below are the reference
+# on the main page (content/i18n/*.yaml); public_summary and public_tags below are the reference
 # for it, kept here so the facts have one home, but nothing reads them.
 #
 # Keep `summary` to one line of context the bullets can't carry (team, scope,

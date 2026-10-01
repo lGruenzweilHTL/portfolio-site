@@ -84,6 +84,14 @@ class Settings(BaseSettings):
     track_rate_limit: str = "120/minute"
     deploy_rate_limit: str = "10/minute"
 
+    # --- Live rack status (GET /api/status) ---
+    # Number of homelab nodes shown on the PDU readout. Static on purpose:
+    # the page never queries Proxmox, so no internal hosts leak.
+    homelab_nodes: int = 3
+    # How long the per-project "last push" dates from the GitHub API stay
+    # cached. Unauthenticated GitHub allows 60 requests/hour per IP.
+    github_cache_seconds: int = 3600
+
     # --- Chat safety ---
     chat_max_tokens: int = 600
     chat_max_history_messages: int = 20

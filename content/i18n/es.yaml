@@ -1,0 +1,276 @@
+# UI strings for the main page, Spanish (/es/). Keys mirror en.yaml.
+# Machine-assisted translation, not reviewed by a native speaker; the
+# translation note under the résumé switch says so. Readers get "tú", as is
+# common on developer sites.
+
+meta:
+  name: Español
+  hreflang: es
+  og_locale: es_ES
+  date_locale: es-ES
+
+head:
+  title: "Lukas Grünzweil · Desarrollador backend e IA, estudiante en la HTL Leonding"
+  description: "Lukas Grünzweil, estudiante de la HTL Leonding en Austria, desarrolla sistemas backend, herramientas de IA y juegos en Unity con C#, Python y TypeScript. Se gradúa en junio de 2027 y busca unas prácticas de backend o un proyecto de fin de estudios."
+  og_title: "Lukas Grünzweil · Desarrollador backend e IA"
+  og_description: "Estudiante de la HTL Leonding, Austria. Sistemas backend, herramientas de IA y juegos en C#, Python y TypeScript. Abierto a unas prácticas de backend o a un proyecto de fin de estudios."
+  og_image_alt: "Lukas Grünzweil: sistemas backend, herramientas de IA y juegos"
+
+ld:
+  job_title: Estudiante
+  person_description: "Estudiante de la HTL Leonding en Austria que desarrolla sistemas backend, herramientas de IA y juegos, sobre todo en C#, Unity y Python. Se gradúa en junio de 2027 y está abierto a unas prácticas de backend o a un proyecto de fin de estudios."
+  seeks_name: "Prácticas de backend o proyecto de fin de estudios"
+  seeks_description: "Abierto a unas prácticas de backend o a un proyecto de fin de estudios (Diplomarbeit); se gradúa en la HTL Leonding en junio de 2027."
+  projects_name: "Proyectos de Lukas Grünzweil"
+  vektorgrid: "Un asistente de voz autoalojado construido como sistema distribuido: relés edge en C++ capturan la voz, un orquestador en C# ejecuta una cadena en Python de reconocimiento de voz, enrutado de intenciones, LLM y síntesis de voz, y una app en Kotlin aprueba con biometría las llamadas a herramientas arriesgadas."
+  sceneforge: "Un plugin de IA para el editor de Unity que convierte la descripción de una escena en texto plano en GameObjects y componentes."
+  uniconsole: "Una consola de depuración dentro del juego para Unity, gratuita y ligera: marca un método estático con [Command] y llámalo desde un terminal en la escena."
+  forkcast: "Un proyecto escolar de planificación de comidas con búsqueda de recetas mediante la API de Spoonacular, un calendario de comidas y listas de la compra combinadas. Lukas escribió la mayor parte del backend en TypeScript."
+  space_defenders: "Un juego arcade para móvil hecho en Unity, con oleadas crecientes de naves enemigas y controles táctiles."
+  pigeon: "Un juego satírico de Unity en desarrollo sobre una paloma que realiza operaciones encubiertas para el gobierno."
+  roboducks: "Trabajo para la competición de robótica RescueMaze en el club de robótica de la HTL Leonding: un protocolo serie entre una Raspberry Pi y un hub LEGO SPIKE, y un controlador de exploración de laberintos con el algoritmo de Trémaux."
+
+common:
+  email_me: Escríbeme
+  tech: Tecnologías
+
+a11y:
+  skip: Saltar al contenido
+
+roof: "gruenzweil.cc · servido desde LG-RACK-01"
+
+nav:
+  label: Navegación principal
+  host_label: "Lukas Grünzweil, volver arriba"
+  ports: Puertos
+  projects: Proyectos
+  experience: Experiencia
+  about: Sobre mí
+  contact: Contacto
+  lang_label: Idioma
+
+hero:
+  unit: Controlador
+  line1: "Desarrollador backend, sobre todo en C# y Python"
+  line2: "Último curso en la HTL Leonding, cerca de Linz, Austria"
+  line3: "Me gradúo en junio de 2027 y busco prácticas de backend o un proyecto de fin de estudios"
+  quote: "«Uno de los mejores proyectos que han salido de unas prácticas aquí»."
+  quote_by_html: '— Jefe de desarrollo de <a href="#experience">SlideLizard Software GmbH</a>, Linz, sobre mis prácticas allí en agosto de 2026'
+  front_panel: Panel frontal
+  online: En línea
+  bio: "Casi todo lo que construyo se ejecuta en un servidor, y últimamente muchas veces hay un modelo de lenguaje de por medio. El resto del tiempo estoy en Unity, y eso a menudo acaba en una herramienta para otros desarrolladores de Unity."
+  github_sr: "perfil (se abre en una pestaña nueva)"
+  resume: CV (en inglés)
+  classic: Clásico
+  download: "Descargar CV"
+  classic_sr: "CV, a dos columnas, se abre en una pestaña nueva"
+  ats_sr: "CV, texto plano para portales de empleo, se abre en una pestaña nueva"
+  translation_note: "Página traducida del inglés. Lukas trabaja en alemán y en inglés."
+  facts: Datos clave
+  bay: Bahía
+  bay0: "Escuela técnica superior · 2022–2027"
+  bay1: "Prácticas de ingeniería de software · 08/2026"
+  bay2: "Asistente de voz · en desarrollo activo"
+  bay3: "3 nodos Proxmox · sirven esta página"
+
+vg:
+  model: "Chasis · hot-swap"
+  status: Activo
+  view_label: Vista del chasis
+  front: Frontal
+  rear: Trasera
+  lead: "Un asistente de voz autoalojado, construido como sistema distribuido: los relés edge capturan la voz, un orquestador central ejecuta la cadena de modelos y una app en el móvil aprueba todo lo que sea arriesgado."
+  role: "Arquitecto y desarrollador principal"
+  project_page: Página del proyecto
+  org: Organización en GitHub
+  org_sr: "(organización vektorgrid, se abre en una pestaña nueva)"
+  repo_sr: 'repositorio en GitHub, se abre en una pestaña nueva'
+  modules_label: Componentes de vektorgrid
+  origin_role: Orquestador
+  origin_desc: "Todo pasa por Origin; ningún nodo habla directamente con otro. Dirige la cadena y recoge cada resultado."
+  relay_role: Palabra de activación en el edge
+  relay_desc: "Detecta la palabra de activación en el dispositivo y envía el audio a Origin. La respuesta hablada vuelve por el mismo camino."
+  gate_role: Aprobación biométrica
+  gate_desc: "Las llamadas a herramientas arriesgadas esperan hasta aprobarse con biometría en el móvil. También funciona como relé independiente."
+  scalars_role: Cadena de modelos
+  scalars_desc: "Reconocimiento de voz, enrutador de intenciones, LLM experto y síntesis de voz, llamados en orden por Origin."
+  pull: Tirar
+  rear_cap: "Vista trasera · cableado"
+  steps_label: Recorrer la cadena de la petición paso a paso
+  step1: Captura
+  step3: Enrutado
+  step4: Inferencia
+  step5: Aprobación
+  step7: Respuesta
+  diagram_title: "Arquitectura de vektorgrid: Relay y Gate se conectan a través del orquestador central Origin, que dirige una cadena secuencial de Scalars: STT, enrutador de intenciones, LLM experto y TTS."
+  d_audio: audio
+  d_speech: voz
+  d_approval: aprobación
+  d_orchestrator: orquestador
+  d_wake: activación
+  d_biometric: biometría
+  d_in_sequence: en orden
+  d_router: Enrutador
+  d_llm: LLM experto
+  flow_html: >-
+    Todo pasa por <b>Origin</b>; ningún nodo habla directamente con otro. Un <b>Relay</b>
+    detecta la palabra de activación y envía el audio a Origin, que ejecuta la cadena <b>Scalar</b>
+    en orden (STT &#8594; enrutador de intenciones &#8594; LLM experto &#8594; TTS), llamando a cada worker
+    y recogiendo su resultado antes del siguiente. La respuesta hablada vuelve por el Relay. Si el
+    modelo pide una llamada a una herramienta arriesgada, Origin se detiene y pide a <b>Gate</b> que
+    la apruebe con biometría. Gate también funciona por su cuenta: consulta métricas a Origin y lleva
+    un Relay integrado, así que se puede hablar con el sistema desde el móvil.
+
+blades:
+  title: Más proyectos
+  model: "Chasis de blades · 6 bandejas"
+  hint: 'Haz clic en una bandeja para ver la página del proyecto'
+  last_push: Último push
+  details: Detalles
+  details_sr: "sobre {name}"
+  repo_sr: "de {name} (se abre en una pestaña nueva)"
+  shipped: Publicado
+  private: Privado
+  in_progress: En desarrollo
+  no_signal: Sin señal
+  private_repo: Repo privado
+  not_public: Aún no es público
+  tag_editor: Herramientas de editor
+  tag_devtools: Herramientas para desarrolladores
+  tag_mobile: Juego para móvil
+  tag_game: Juego
+  tag_robotics: Robótica
+  sceneforge_alt: "Ventana de chat de SceneForge AI en el editor de Unity creando un jugador cápsula rojo con CharacterController a partir de un prompt"
+  sceneforge_desc: "Un plugin de IA para el editor de Unity. Describe una escena en texto plano y recibe GameObjects y componentes. Elimina el montaje manual en el diseño de niveles."
+  uniconsole_alt: "Terminal de UniConsole mostrando los comandos disponibles y ejecutando un comando echo"
+  uniconsole_desc_html: "Una consola de depuración dentro del juego para Unity. Marca un método estático con <code>[Command]</code> y llámalo desde un terminal en la escena. Una alternativa gratuita y ligera a Quantum Console."
+  forkcast_alt: "Calendario semanal de comidas de Forkcast junto a una búsqueda de recetas de fideos"
+  forkcast_meta: "Colaborador · backend en TypeScript · proyecto escolar"
+  forkcast_desc: "Una app para planificar comidas. Busca recetas con la API de Spoonacular, colócalas en un calendario, obtén una lista de ingredientes combinada, valora recetas y añade amigos. Escribí la mayor parte del backend."
+  roboducks_meta: Club de robótica de la HTL Leonding
+  roboducks_desc: "Trabajo para la competición RescueMaze en el club de robótica del instituto. Creé un protocolo serie propio para la comunicación Raspberry Pi → LEGO SPIKE y un controlador de exploración de laberintos con el algoritmo de Trémaux en simulación."
+  space_alt: "Partida de Space Defenders: una nave pequeña entre naves enemigas brillantes, con joystick y botón de impulso en pantalla"
+  space_desc: "Un juego arcade para móvil: destruye naves enemigas y no mueras. Oleadas cada vez más duras, pensado para pantallas táctiles."
+  pigeon_desc: "Juegas como una paloma a sueldo del gobierno que realiza operaciones encubiertas. Una sátira sobre la paranoia de la vigilancia y el rincón de internet de «Birds Aren't Real»."
+
+exp:
+  title: Experiencia
+  model: Registro de eventos
+  count: 2 entradas
+  open: 'Detalles +'
+  close: 'Cerrar −'
+  sl_role: Prácticas de ingeniería de software
+  sl_place: "Linz · ago. 2026"
+  sl_desc: "Desarrollé una PWA sobre Microsoft Dynamics 365 Sales con notas de reuniones por reconocimiento de voz y un asistente de Azure OpenAI conectado a Dataverse, además de un pequeño rastreador diario de visibilidad GEO. Hice la mayor parte solo, con ayuda de otro becario."
+  caritas_org: Caritas Alta Austria
+  caritas_role: "Prácticas de asistente de oficina e informática"
+  caritas_place: "Leonding · jul.–ago. 2025"
+  caritas_desc: "Apoyo administrativo e informático: administración, ayuda en contabilidad incluida la facturación trimestral, y soporte de primer nivel de informática e infraestructura."
+  tag_admin: Administración
+  tag_it: Soporte informático
+  tag_billing: Facturación
+
+stack:
+  languages: Lenguajes
+  tools: "Herramientas e infraestructura"
+  spoken: Idiomas
+  german: "Alemán · nativo"
+  english: "Inglés · profesional"
+
+about:
+  title: Sobre mí
+  model: "Estante · más allá del código"
+  p1: "Soy Lukas, estudiante de la HTL Leonding. Paso la mayor parte del tiempo con código de servidor y juegos y, de vez en cuando, con una Raspberry Pi atornillada a un robot de LEGO para una competición."
+  p2_html: "La mayoría de mis proyectos nacieron porque algo me molestaba. Creé <strong>SceneForge AI</strong> porque montar escenas a mano es tedioso, y el protocolo serie detrás de <strong>RoboDucks</strong> porque no había una forma limpia de controlar un LEGO SPIKE desde una Raspberry Pi."
+  homelab: "Tres nodos Proxmox (ordenadores de sobremesa reutilizados, con un cuarto en camino) que alojan Nextcloud, Vaultwarden, Jellyfin con la suite *arr, un servidor de Minecraft, Pi-hole y esta web, todo accesible desde fuera de mi red."
+  homelab_link: Datos en directo en la PDU
+  ender_html: 'Imprimo en 3D piezas funcionales para mis proyectos de hardware y no dejo de mejorar una Ender 3 Pro. Funciona con Klipper sobre una Raspberry Pi y la he modificado tanto que la llamo la <a href="https://es.wikipedia.org/wiki/Barco_de_Teseo" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Barco de Teseo en Wikipedia, se abre en una pestaña nueva)</span></a>.'
+  moto_title: Motos
+  moto: "Lejos de las pantallas, voy en moto. Ahora mismo en una Aprilia Tuono 125, con planes de pasar a algo más grande."
+
+contact:
+  title: Contacto
+  lead: El correo es la forma más rápida de contactarme.
+  body: "Estoy abierto a prácticas y proyectos interesantes, y respondo a todo lo que no sea spam."
+  report: Informar de un fallo
+  feedback_sub: "¿Has visto una errata o un bug? Cuéntamelo aquí. Para todo lo demás, el correo es más rápido."
+  name_label: Nombre (opcional)
+  email_label: "Correo (opcional, para responderte)"
+  message_label: Mensaje
+  placeholder: "¿Qué está roto o mal, y dónde?"
+  send: Enviar informe
+
+pdu:
+  title: Estado en directo
+  uptime: Tiempo activo
+  deployed: Desplegado
+  edge: Edge
+  nodes: Nodos
+  notes: Apuntes
+  top: Volver arriba
+
+js:
+  status:
+    connecting: Conectando
+    online: En línea
+    stale: Desactualizado
+  fault:
+    idle: En espera
+    reporting: Informando
+    sent: Informe recibido
+  time:
+    ago: "hace {t}"
+    m: min
+    h: h
+    d: d
+    mo: mes
+    y: a
+  arch:
+    auto: "▶ Auto"
+    pause: "❚❚ Pausa"
+    note1: "<b>Captura:</b> el Relay detecta la palabra de activación y envía el audio a Origin."
+    note2: "<b>STT:</b> Origin envía el audio al worker de STT, que devuelve texto."
+    note3: "<b>Enrutado:</b> el enrutador de intenciones elige qué experto debe responder."
+    note4: "<b>Inferencia:</b> el LLM experto elegido genera la respuesta."
+    note5: "<b>Aprobación:</b> una llamada a herramienta arriesgada espera la aprobación biométrica en Gate."
+    note6: "<b>TTS:</b> Origin envía el texto de la respuesta a TTS, que devuelve audio."
+    note7: "<b>Respuesta:</b> Origin devuelve la respuesta hablada a través del Relay."
+  con:
+    tab_label: "Abrir la consola: preguntar sobre Lukas"
+    close: Cerrar consola
+    clear_title: Empezar una conversación nueva
+    output_label: Salida de la consola
+    input_label: Tu pregunta
+    placeholder: "haz una pregunta…"
+    send: Intro
+    free_model: modelo gratuito
+    hint: "intro enviar · esc cerrar"
+    last_login: "Último acceso:"
+    help: "Escribe una pregunta sobre Lukas y pulsa Intro: proyectos, prácticas, stack, disponibilidad. Las respuestas salen de los datos de su CV. ¿Prefieres a una persona? Escribe a {email}."
+    examples: "ejemplos:"
+    ex1: ¿Qué es vektorgrid?
+    ex2: ¿Qué construyó en SlideLizard?
+    ex3: ¿Cuándo está disponible?
+    new_session: Sesión nueva.
+    connecting: "[conectando"
+    error: "error:"
+    error_sr: "Error:"
+  reason:
+    rate_limited: "Estás enviando mensajes demasiado rápido. Espera un momento o escríbeme."
+    captcha_failed: Falló la comprobación del captcha. Recarga la página e inténtalo de nuevo.
+    bad_request: "Tu mensaje no se ha enviado. Prueba a reformularlo o escríbeme si sigue fallando."
+    server_misconfigured: "El chatbot no está disponible temporalmente por un problema de configuración por mi parte. Escríbeme y lo soluciono."
+    server_error: "El chatbot ha tenido un error inesperado. Inténtalo de nuevo o escríbeme si vuelve a pasar."
+    stream_interrupted: "La conexión se cortó antes de terminar la respuesta. Inténtalo de nuevo o escríbeme si vuelve a pasar."
+    network_error: "Error de red. Inténtalo de nuevo o escríbeme directamente."
+    unknown: "Algo ha ido mal. Inténtalo de nuevo o escríbeme."
+  fb:
+    empty: Escribe primero un mensaje.
+    bad_email: "Esa dirección de correo no parece correcta. Corrígela o déjala vacía."
+    verifying: "Verificando…"
+    network: "Error de red. Inténtalo de nuevo o escríbeme directamente."
+    sent: Informe enviado. Gracias.
+    rate: "Estás enviando mensajes demasiado rápido. Espera un momento o escríbeme."
+    rejected: "El servidor rechazó el formulario. Revisa la dirección de correo o escríbeme directamente."
+    captcha: Falló la comprobación del captcha. Recarga la página e inténtalo de nuevo.
+    unknown: "Algo ha ido mal. Inténtalo de nuevo o escríbeme."

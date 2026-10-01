@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+{#- Rendered by backend/routes/projects.py from content/resume.yaml plus the
+    repo README (backend/projects.py). Same rack anatomy as the main page
+    (templates/index.html). English only. #}
+<title>{{ proj.name }} · Lukas Grünzweil</title>
+<meta name="description" content="{{ description }}" />
+<meta name="author" content="Lukas Grünzweil" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="canonical" href="{{ origin }}/projects/{{ slug }}" />
+<meta name="theme-color" content="#0d0e11" />
+<meta name="color-scheme" content="dark" />
+<meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Lukas Grünzweil" />
+<meta property="og:title" content="{{ proj.name }} · Lukas Grünzweil" />
+<meta property="og:description" content="{{ description }}" />
+<meta property="og:url" content="{{ origin }}/projects/{{ slug }}" />
+<meta property="og:image" content="{{ origin }}/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ proj.name }} · Lukas Grünzweil" />
+<meta name="twitter:description" content="{{ description }}" />
+<meta name="twitter:image" content="{{ origin }}/og.png" />
+<link rel="me" href="https://github.com/lGruenzweilHTL" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script>
+window.I18N = {{ js_strings | tojson }};
+document.documentElement.classList.add('js');
+</script>
+<script type="application/ld+json">
+{{ json_ld | safe }}
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="cabinet">
+  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
+  <div class="cab-body">
+    <div class="rail rail--l" aria-hidden="true"></div>
+    <div class="units">
+
+      <header class="unit unit--nav unit--nohandle">
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        <nav class="face nav" aria-label="Breadcrumb">
+          <ol class="crumbs lcd lcd--chip">
+            <li><a href="/">lukas@lg-rack-01</a></li>
+            <li><a href="/#projects">projects</a></li>
+            <li aria-current="page">{{ slug }}</li>
+          </ol>
+          <a class="key key--sm crumbs-back" href="/#projects"><span aria-hidden="true">←</span> Back to the rack</a>
+        </nav>
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+      </header>
+
+      <main id="main" class="units-main" tabindex="-1">
+        <article class="unit" aria-labelledby="project-name">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <p class="silk">Project</p>
+              <span class="model" aria-hidden="true">{{ src.owner }}/{{ src.repo or '' }}<span class="u-size"></span></span>
+              <p class="unit-head-r status"><span class="led led--{{ led }}" aria-hidden="true"></span>{{ status_label }}</p>
+            </div>
+
+            <div class="project">
+              <div class="ctrl-display">
+                <div class="vfd-bezel">
+                  <div class="vfd">
+                    <h1 class="vfd-name" id="project-name">{{ proj.name }}</h1>
+                    {% if proj.role %}<p class="vfd-line">{{ proj.role }}</p>{% endif %}
+                    <p class="vfd-line">{{ proj.stack | join(' · ') }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-ctl">
+                <p class="lead">{{ description }}</p>
+                <p class="blade-meta"><span class="silk silk--dim">Last push</span> <span class="lcd lcd--chip" data-push="{{ slug }}">--</span></p>
+                <ul class="cables" aria-label="Tech">
+                  {% for name, cls in stack %}<li class="cable{% if cls %} cable--{{ cls }}{% endif %}">{{ name }}</li>{% endfor %}
+                </ul>
+                <div class="keys">
+                  <a class="key key--primary" href="{{ src.html_url }}" target="_blank" rel="noopener">{% if src.repo %}Repo{% else %}Organization{% endif %} on GitHub <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
+                </div>
+              </div>
+            </div>
+
+            {% if proj.highlights %}
+            <ul class="highlights">
+              {% for h in proj.highlights %}<li>{{ h }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </article>
+
+        <section class="unit" aria-labelledby="readme-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="readme-title">README</h2>
+              <span class="model" aria-hidden="true">github.com/{{ src.owner }}{% if src.repo %}/{{ src.repo }}{% endif %}<span class="u-size"></span></span>
+            </div>
+            {% if readme %}
+            <div class="readme">{{ readme | safe }}</div>
+            {% else %}
+            <p class="readme-missing">The README can't be loaded right now. <a href="{{ src.html_url }}" target="_blank" rel="noopener">Read it on GitHub<span class="sr-only"> (opens in a new tab)</span></a>.</p>
+            {% endif %}
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        {% if others %}
+        <nav class="unit" aria-labelledby="more-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 class="silk" id="more-title">More projects</h2>
+              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+            </div>
+            <ul class="keys">
+              {% for s, name in others %}<li><a class="key" href="/projects/{{ s }}">{{ name }}</a></li>{% endfor %}
+              <li><a class="key" href="/#more-projects">All projects</a></li>
+            </ul>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </nav>
+        {% endif %}
+      </main>
+
+      {% include "_pdu.html" %}
+
+    </div>
+    <div class="rail rail--r" aria-hidden="true"></div>
+  </div>
+  <div class="cab-plinth" aria-hidden="true"></div>
+</div>
+
+<script src="/main.js" defer></script>
+<script src="/turnstile.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
+<script src="/chat.js" defer></script>
+</body>
+</html>

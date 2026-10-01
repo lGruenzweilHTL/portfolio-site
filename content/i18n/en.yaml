@@ -1,0 +1,281 @@
+# UI strings for the main page, English (reference catalog).
+#
+# Every key here must exist in the other catalogs in this folder; a missing
+# key falls back to this file. Keys ending in _html are trusted markup, the
+# rest is escaped. {name}-style placeholders are filled by the template.
+# See backend/i18n.py. Facts must match content/resume.yaml, the JSON-LD in
+# backend/templates/index.html and site/llms.txt.
+
+meta:
+  name: English
+  hreflang: en
+  og_locale: en_US
+  date_locale: en-US
+
+head:
+  title: "Lukas Grünzweil · Backend & AI developer, student at HTL Leonding"
+  description: "Lukas Grünzweil, a student at HTL Leonding in Austria, builds backend systems, AI tooling and Unity games in C#, Python and TypeScript. Graduating June 2027 and open to a backend internship or thesis project."
+  og_title: "Lukas Grünzweil · Backend & AI developer"
+  og_description: "Student at HTL Leonding, Austria. Backend systems, AI tooling and games in C#, Python and TypeScript. Open to a backend internship or thesis project."
+  og_image_alt: "Lukas Grünzweil: backend systems, AI tooling and games"
+
+ld:
+  job_title: Student
+  person_description: "Student at HTL Leonding in Austria who builds backend systems, AI tooling and games, mainly in C#, Unity and Python. Graduating June 2027 and open to a backend internship or thesis project."
+  seeks_name: "Backend internship or thesis project"
+  seeks_description: "Open to a backend internship or a thesis (Diplomarbeit) project; graduating from HTL Leonding in June 2027."
+  projects_name: "Projects by Lukas Grünzweil"
+  vektorgrid: "A self-hosted voice assistant built as a distributed system: C++ edge relays capture speech, a C# orchestrator runs a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin phone app approves risky tool calls with biometrics."
+  sceneforge: "An AI plugin for the Unity Editor that turns a plain-text scene description into GameObjects and components."
+  uniconsole: "A free, lightweight in-game debug console for Unity: mark a static method with [Command] and call it from a terminal in the scene."
+  forkcast: "A meal-planning school project with recipe search via the Spoonacular API, a meal calendar and combined shopping lists. Lukas wrote most of the TypeScript backend."
+  space_defenders: "A mobile arcade game made in Unity with escalating waves of enemy spaceships and touch controls."
+  pigeon: "A satirical Unity game in progress about a pigeon running covert ops for the government."
+  roboducks: "RescueMaze robotics competition work for the HTL Leonding robotics club: a serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm."
+
+common:
+  email_me: Email me
+  tech: Tech
+
+a11y:
+  skip: Skip to content
+
+roof: "gruenzweil.cc · served from LG-RACK-01"
+
+nav:
+  label: Primary
+  host_label: "Lukas Grünzweil, back to top"
+  ports: Ports
+  projects: Projects
+  experience: Experience
+  about: About
+  contact: Contact
+  lang_label: Language
+
+hero:
+  unit: Controller
+  line1: "Backend developer, mostly in C# and Python"
+  line2: "Final year at HTL Leonding, near Linz, Austria"
+  line3: "Graduating June 2027 and looking for a backend internship or thesis project"
+  quote: "“One of the best projects to come out of an internship here.”"
+  quote_by_html: '— Head of Development at <a href="#experience">SlideLizard Software GmbH</a>, Linz, about my internship there in August 2026'
+  front_panel: Front panel
+  online: Online
+  bio: "Most of what I build runs on a server, and lately a lot of it has a language model somewhere in the loop. The rest of the time I'm in Unity, which often ends in a tool for other Unity developers."
+  github_sr: "profile (opens in a new tab)"
+  resume: Résumé
+  classic: Classic
+  download: "Download résumé"
+  classic_sr: "résumé, two-column, opens in a new tab"
+  ats_sr: "résumé, plain text for job portals, opens in a new tab"
+  # Shown under the résumé switch on machine-assisted translations; empty here.
+  translation_note: ""
+  facts: Key facts
+  bay: Bay
+  bay0: "Higher technical college · 2022–2027"
+  bay1: "Software engineering intern · 08/2026"
+  bay2: "Voice assistant · in active development"
+  bay3: "3 Proxmox nodes · serves this page"
+
+vg:
+  model: "Chassis · hot-swap"
+  status: Active
+  view_label: Chassis view
+  front: Front
+  rear: Rear
+  lead: "A self-hosted voice assistant, built as a distributed system: edge relays capture speech, a central orchestrator runs the model pipeline, and a phone app approves anything risky."
+  role: "Architect & primary developer"
+  project_page: Project page
+  org: Org on GitHub
+  org_sr: "(vektorgrid organization, opens in a new tab)"
+  repo_sr: 'repository on GitHub, opens in a new tab'
+  modules_label: vektorgrid components
+  origin_role: Orchestrator
+  origin_desc: "Everything routes through Origin; no two nodes talk directly. It drives the pipeline and collects each result."
+  relay_role: Edge wake-word
+  relay_desc: "Catches the wake-word at the edge and streams audio to Origin. The spoken reply comes back the same way."
+  gate_role: Biometric approval
+  gate_desc: "Risky tool calls pause until they're approved with biometrics on the phone. Also works as a standalone relay."
+  scalars_role: Model pipeline
+  scalars_desc: "Speech-to-text, intent router, expert LLM and text-to-speech, called in sequence by Origin."
+  pull: Pull
+  rear_cap: "Rear view · wiring"
+  steps_label: Step through the request pipeline
+  step1: Capture
+  step3: Route
+  step4: Inference
+  step5: Approve
+  step7: Reply
+  diagram_title: "vektorgrid architecture: Relay and Gate connect through a central Origin orchestrator, which drives a sequential Scalar pipeline of STT, intent router, expert LLM, and TTS."
+  d_audio: audio
+  d_speech: speech
+  d_approval: tool approval
+  d_orchestrator: orchestrator
+  d_wake: wake-word
+  d_biometric: biometric
+  d_in_sequence: in sequence
+  d_router: Intent router
+  d_llm: Expert LLM
+  flow_html: >-
+    Everything routes through <b>Origin</b>; no two nodes talk directly. A <b>Relay</b>
+    catches the wake-word and streams audio to Origin, which drives the <b>Scalar</b>
+    pipeline in order (STT &#8594; intent router &#8594; expert LLM &#8594; TTS), calling each
+    worker and collecting its result before the next. The spoken reply returns through the
+    Relay. If the model requests a risky tool call, Origin pauses and asks <b>Gate</b> to
+    approve it with biometrics. Gate also runs standalone: it polls Origin for metrics and has
+    a Relay built in, so you can talk to the system from your phone.
+
+blades:
+  title: More projects
+  model: "Blade enclosure · 6 sleds"
+  hint: 'Click a sled for the full project page'
+  last_push: Last push
+  details: Details
+  details_sr: "about {name}"
+  repo_sr: "for {name} (opens in a new tab)"
+  shipped: Shipped
+  private: Private
+  in_progress: In progress
+  no_signal: No signal
+  private_repo: Private repo
+  not_public: Not public yet
+  tag_editor: Editor tooling
+  tag_devtools: Developer tooling
+  tag_mobile: Mobile game
+  tag_game: Game
+  tag_robotics: Robotics
+  sceneforge_alt: "SceneForge AI chat window in the Unity Editor, creating a red capsule player with a CharacterController from a text prompt"
+  sceneforge_desc: "An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and components back. Cuts the manual setup out of level design."
+  uniconsole_alt: "UniConsole terminal listing the available commands and running an echo command"
+  uniconsole_desc_html: "An in-game debug console for Unity. Mark a static method with <code>[Command]</code> and call it from a terminal in the scene. A free, lightweight alternative to Quantum Console."
+  forkcast_alt: "Forkcast weekly meal-planning calendar next to a recipe search for noodles"
+  forkcast_meta: "Contributor · TypeScript backend · school project"
+  forkcast_desc: "A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar, get a combined ingredient list, rate recipes, add friends. I wrote most of the backend."
+  roboducks_meta: HTL Leonding robotics club
+  roboducks_desc: "RescueMaze competition work for the school robotics club. I built a custom serial protocol for Raspberry Pi → LEGO SPIKE communication, and a maze-exploration controller running Trémaux's algorithm in simulation."
+  space_alt: "Space Defenders gameplay: a small ship among glowing enemy ships, with on-screen joystick and boost controls"
+  space_desc: "A mobile arcade game: destroy enemy spaceships, don't die. Escalating waves, built for touchscreens."
+  pigeon_desc: "You play a pigeon on the government payroll, running covert ops. A satire built around surveillance paranoia and the \"Birds Aren't Real\" corner of the internet."
+
+exp:
+  title: Experience
+  model: Event log
+  count: 2 entries
+  open: 'Details +'
+  close: 'Close −'
+  sl_role: Software Engineering Intern
+  sl_place: "Linz · Aug 2026"
+  sl_desc: "Built a PWA on top of Microsoft Dynamics 365 Sales with speech-to-text meeting notes and an Azure OpenAI assistant wired into Dataverse, plus a small daily GEO-visibility tracker on the side. I built most of it solo, with help from a second intern."
+  caritas_org: Caritas Upper Austria
+  caritas_role: "Office & IT Assistant Intern"
+  caritas_place: "Leonding · Jul–Aug 2025"
+  caritas_desc: "Office and IT support: administration, accounting assistance including quarterly billing, and first-level IT and infrastructure support."
+  tag_admin: Admin
+  tag_it: IT support
+  tag_billing: Billing
+
+stack:
+  languages: Languages
+  tools: "Tools & infra"
+  spoken: Spoken
+  german: "German · native"
+  english: "English · professional"
+
+about:
+  title: About
+  model: "Shelf · beyond code"
+  p1: "I'm Lukas, a student at HTL Leonding. Most of my time goes into server code and games, and every so often into a Raspberry Pi bolted to a LEGO robot for a competition."
+  p2_html: "Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong> because setting up scenes by hand is tedious, and the serial protocol behind <strong>RoboDucks</strong> because there was no clean way to drive a LEGO SPIKE from a Raspberry Pi."
+  homelab: "Three Proxmox nodes (repurposed desktops, with a fourth on the way) hosting Nextcloud, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site, all reachable from outside my network."
+  homelab_link: Live numbers in the PDU
+  ender_html: 'I 3D print functional parts for my hardware projects and keep upgrading an Ender 3 Pro. It runs Klipper off a Raspberry Pi and has been modded enough that I call it the <a href="https://en.wikipedia.org/wiki/Ship_of_Theseus" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Ship of Theseus on Wikipedia, opens in a new tab)</span></a>.'
+  moto_title: Motorbikes
+  moto: "Away from screens, I ride motorbikes. Currently on an Aprilia Tuono 125, with plans to move up to something bigger."
+
+contact:
+  title: Contact
+  lead: Email is the fastest way to reach me.
+  body: "I'm open to internships and interesting projects, and I answer anything that isn't spam."
+  report: Report a fault
+  feedback_sub: "Spotted a typo or a bug? Tell me here. For anything else, email is faster."
+  name_label: Name (optional)
+  email_label: "Email (optional, for a reply)"
+  message_label: Message
+  placeholder: "What's broken or wrong, and where?"
+  send: Send report
+
+pdu:
+  title: Live status
+  uptime: Uptime
+  deployed: Deployed
+  edge: Edge
+  nodes: Nodes
+  notes: Study notes
+  top: Back to top
+
+# Strings for main.js, chat.js and feedback.js (window.I18N, without "js.").
+js:
+  status:
+    connecting: Connecting
+    online: Online
+    stale: Stale
+  fault:
+    idle: Idle
+    reporting: Reporting
+    sent: Report received
+  time:
+    ago: "{t} ago"
+    m: m
+    h: h
+    d: d
+    mo: mo
+    y: y
+  arch:
+    auto: "▶ Auto"
+    pause: "❚❚ Pause"
+    note1: "<b>Capture:</b> Relay catches the wake-word and streams audio to Origin."
+    note2: "<b>STT:</b> Origin sends the audio to the STT worker, which returns text."
+    note3: "<b>Route:</b> the intent router picks which expert should answer."
+    note4: "<b>Inference:</b> the chosen expert LLM generates the response."
+    note5: "<b>Approve:</b> a risky tool call pauses for biometric approval in Gate."
+    note6: "<b>TTS:</b> Origin sends the reply text to TTS, which returns audio."
+    note7: "<b>Reply:</b> Origin streams the spoken reply back through the Relay."
+  con:
+    tab_label: "Open the console: ask questions about Lukas"
+    close: Close console
+    clear_title: Start a new conversation
+    output_label: Console output
+    input_label: Your question
+    placeholder: "ask a question…"
+    send: Enter
+    free_model: free model
+    hint: "enter send · esc close"
+    last_login: "Last login:"
+    help: "Type a question about Lukas and press Enter: projects, internships, stack, availability. Answers come from his résumé data. Prefer a human? Email {email}."
+    examples: "examples:"
+    ex1: What is vektorgrid?
+    ex2: What did he build at SlideLizard?
+    ex3: When is he available?
+    new_session: New session.
+    connecting: "[connecting"
+    error: "error:"
+    error_sr: "Error:"
+  reason:
+    rate_limited: "You're sending messages too fast. Wait a moment, or email me."
+    captcha_failed: Captcha check failed. Refresh and try again.
+    bad_request: "Your message didn't go through. Try rephrasing, or email me if it keeps failing."
+    server_misconfigured: "The chatbot is down because of a config problem on my end. Email me and I'll fix it."
+    server_error: "The chatbot hit an unexpected error. Try again, or email me if it keeps happening."
+    stream_interrupted: "The connection dropped before the answer finished. Try again, or email me if it keeps happening."
+    network_error: "Network error. Try again, or email me directly."
+    unknown: "Something went wrong. Try again, or email me."
+  fb:
+    empty: Please write a message first.
+    bad_email: "That email address doesn't look right. Fix it, or leave it empty."
+    verifying: "Verifying…"
+    network: "Network error. Try again, or email me directly."
+    sent: Feedback sent. Thanks.
+    rate: "You're sending messages too fast. Wait a moment, or email me."
+    rejected: "The server rejected the form. Check the email address, or email me directly."
+    captcha: Captcha check failed. Refresh and try again.
+    unknown: "Something went wrong. Try again, or email me."
