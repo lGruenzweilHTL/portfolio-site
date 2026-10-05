@@ -11,16 +11,16 @@ meta:
 
 head:
   title: "Lukas Grünzweil · Desarrollador backend e IA, estudiante en la HTL Leonding"
-  description: "Lukas Grünzweil, estudiante de la HTL Leonding en Austria, desarrolla sistemas backend, herramientas de IA y juegos en Unity con C#, Python y TypeScript. Se gradúa en junio de 2027 y busca unas prácticas de backend o un proyecto de fin de estudios."
+  description: "Lukas Grünzweil, estudiante de la HTL Leonding en Austria, desarrolla sistemas backend, herramientas de IA y juegos en Unity con C#, Python y TypeScript. Actualmente está en 4.º de 5, se gradúa en junio de 2028 y busca prácticas de backend."
   og_title: "Lukas Grünzweil · Desarrollador backend e IA"
-  og_description: "Estudiante de la HTL Leonding, Austria. Sistemas backend, herramientas de IA y juegos en C#, Python y TypeScript. Abierto a unas prácticas de backend o a un proyecto de fin de estudios."
+  og_description: "Estudiante de la HTL Leonding, Austria (4.º de 5). Sistemas backend, herramientas de IA y juegos en C#, Python y TypeScript. Abierto a prácticas de backend."
   og_image_alt: "Lukas Grünzweil: sistemas backend, herramientas de IA y juegos"
 
 ld:
   job_title: Estudiante
-  person_description: "Estudiante de la HTL Leonding en Austria que desarrolla sistemas backend, herramientas de IA y juegos, sobre todo en C#, Unity y Python. Se gradúa en junio de 2027 y está abierto a unas prácticas de backend o a un proyecto de fin de estudios."
-  seeks_name: "Prácticas de backend o proyecto de fin de estudios"
-  seeks_description: "Abierto a unas prácticas de backend o a un proyecto de fin de estudios (Diplomarbeit); se gradúa en la HTL Leonding en junio de 2027."
+  person_description: "Estudiante de la HTL Leonding en Austria que desarrolla sistemas backend, herramientas de IA y juegos, sobre todo en C#, Unity y Python. Actualmente está en 4.º de 5, se gradúa en junio de 2028 y está abierto a prácticas de backend."
+  seeks_name: "Prácticas de backend"
+  seeks_description: "Abierto a prácticas de backend; actualmente en 4.º de 5 en la HTL Leonding y se gradúa en junio de 2028."
   projects_name: "Proyectos de Lukas Grünzweil"
   vektorgrid: "Un asistente de voz autoalojado construido como sistema distribuido: relés edge en C++ capturan la voz, un orquestador en C# ejecuta una cadena en Python de reconocimiento de voz, enrutado de intenciones, LLM y síntesis de voz, y una app en Kotlin aprueba con biometría las llamadas a herramientas arriesgadas."
   sceneforge: "Un plugin de IA para el editor de Unity que convierte la descripción de una escena en texto plano en GameObjects y componentes."
@@ -52,8 +52,8 @@ nav:
 hero:
   unit: Controlador
   line1: "Desarrollador backend, sobre todo en C# y Python"
-  line2: "Último curso en la HTL Leonding, cerca de Linz, Austria"
-  line3: "Me gradúo en junio de 2027 y busco prácticas de backend o un proyecto de fin de estudios"
+  line2: "4.º de 5 en la HTL Leonding, cerca de Linz, Austria"
+  line3: "Me gradúo en junio de 2028 y busco prácticas de backend"
   quote: "«Uno de los mejores proyectos que han salido de unas prácticas aquí»."
   quote_by_html: '— Jefe de desarrollo de <a href="#experience">SlideLizard Software GmbH</a>, Linz, sobre mis prácticas allí en agosto de 2026'
   front_panel: Panel frontal
@@ -68,7 +68,7 @@ hero:
   translation_note: "Página traducida del inglés. Lukas trabaja en alemán y en inglés."
   facts: Datos clave
   bay: Bahía
-  bay0: "Escuela técnica superior · 2022–2027"
+  bay0: "Escuela técnica superior · 2022–2028"
   bay1: "Prácticas de ingeniería de software · 08/2026"
   bay2: "Asistente de voz · en desarrollo activo"
   bay3: "3 nodos Proxmox · sirven esta página"

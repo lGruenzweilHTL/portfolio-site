@@ -1,15 +1,15 @@
 # Lukas Grünzweil
 
-> Lukas Grünzweil is a student at HTL Leonding, a higher technical college in Leonding, Austria. He builds backend systems, AI tooling and games, mainly in C#, Unity and Python. He graduates in June 2027 and is open to a backend internship or thesis project. Contact: lukas.gruenzweil@liwest.at.
+> Lukas Grünzweil is a student at HTL Leonding, a higher technical college in Leonding, Austria. He builds backend systems, AI tooling and games, mainly in C#, Unity and Python. He is currently in year 4 of 5, graduates in June 2028, and is open to a backend internship. Contact: lukas.gruenzweil@liwest.at.
 
 This file summarises https://gruenzweil.cc/ for language models. The website and the résumé PDFs are the source of truth; the facts below are kept in sync with them.
 
 ## Key facts
 
 - Name: Lukas Grünzweil (also written Lukas Gruenzweil; GitHub: lGruenzweilHTL)
-- Status: student at HTL Leonding (Höhere Technische Lehranstalt), graduating June 2027
+- Status: student at HTL Leonding (Höhere Technische Lehranstalt), currently year 4 of 5, graduating June 2028
 - Based in: Linz area, Upper Austria
-- Looking for: a backend internship or thesis project
+- Looking for: a backend internship
 - Languages spoken: German (native), English (professional working proficiency)
 - Email: lukas.gruenzweil@liwest.at
 - GitHub: https://github.com/lGruenzweilHTL

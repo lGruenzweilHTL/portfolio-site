@@ -20,7 +20,7 @@ personal:
   status: "Student, HTL Leonding"
   # Shown under the name on both résumé PDFs and as the hero line on the site.
   # A short availability statement reads better than an empty slot here.
-  availability: "Graduating June 2027 · open to a backend internship or thesis project"
+  availability: "4/5 at HTL Leonding · graduating June 2028 · open to a backend internship"
   # Relative to backend/templates/, drawn as a circle. Swap in a real portrait
   # (assets/photo.jpg) when you have one.
   photo: "assets/placeholder.webp"
@@ -35,13 +35,12 @@ education:
   - school: "HTL Leonding"
     location: "Leonding, Austria"
     start: 2022-09
-    end: 2027-06
+    end: 2028-06
     notes: "Higher technical college (Höhere Technische Lehranstalt)"
     # Set date_label instead if you'd rather write the range by hand.
     # Worth adding here if you have them — they carry more signal than
     # another school would:
     # prak_where: "..."
-    # thesis: "Diplomarbeit topic"
 
 # Professional experience, most-recent first.
 # Rendered by both résumé PDFs. The public HTML site has its own richer copy

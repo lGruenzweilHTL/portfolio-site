@@ -9,16 +9,16 @@ meta:
 
 head:
   title: "Lukas Grünzweil · Backend- & KI-Entwickler, Schüler an der HTL Leonding"
-  description: "Lukas Grünzweil, Schüler an der HTL Leonding in Österreich, entwickelt Backend-Systeme, KI-Tools und Unity-Spiele in C#, Python und TypeScript. Abschluss im Juni 2027, offen für ein Backend-Praktikum oder eine Diplomarbeit."
+  description: "Lukas Grünzweil, Schüler an der HTL Leonding in Österreich, entwickelt Backend-Systeme, KI-Tools und Unity-Spiele in C#, Python und TypeScript. Aktuell im 4. von 5 Jahren, Abschluss im Juni 2028, offen für ein Backend-Praktikum."
   og_title: "Lukas Grünzweil · Backend- & KI-Entwickler"
-  og_description: "Schüler an der HTL Leonding, Österreich. Backend-Systeme, KI-Tools und Spiele in C#, Python und TypeScript. Offen für ein Backend-Praktikum oder eine Diplomarbeit."
+  og_description: "Schüler an der HTL Leonding, Österreich (4. von 5 Jahren). Backend-Systeme, KI-Tools und Spiele in C#, Python und TypeScript. Offen für ein Backend-Praktikum."
   og_image_alt: "Lukas Grünzweil: Backend-Systeme, KI-Tools und Spiele"
 
 ld:
   job_title: Schüler
-  person_description: "Schüler an der HTL Leonding in Österreich, der Backend-Systeme, KI-Tools und Spiele entwickelt, vor allem in C#, Unity und Python. Abschluss im Juni 2027, offen für ein Backend-Praktikum oder eine Diplomarbeit."
-  seeks_name: "Backend-Praktikum oder Diplomarbeit"
-  seeks_description: "Offen für ein Backend-Praktikum oder eine Diplomarbeit; Abschluss an der HTL Leonding im Juni 2027."
+  person_description: "Schüler an der HTL Leonding in Österreich, der Backend-Systeme, KI-Tools und Spiele entwickelt, vor allem in C#, Unity und Python. Aktuell im 4. von 5 Jahren, Abschluss im Juni 2028, offen für ein Backend-Praktikum."
+  seeks_name: "Backend-Praktikum"
+  seeks_description: "Offen für ein Backend-Praktikum; aktuell im 4. von 5 Jahren an der HTL Leonding, Abschluss im Juni 2028."
   projects_name: "Projekte von Lukas Grünzweil"
   vektorgrid: "Ein selbst gehosteter Sprachassistent als verteiltes System: C++-Edge-Relays nehmen Sprache auf, ein C#-Orchestrator steuert eine Python-Pipeline aus Spracherkennung, Intent-Routing, LLM und Sprachausgabe, und eine Kotlin-App gibt riskante Tool-Aufrufe per Biometrie frei."
   sceneforge: "Ein KI-Plugin für den Unity Editor, das aus einer Szenenbeschreibung in Klartext GameObjects und Komponenten erzeugt."
@@ -50,8 +50,8 @@ nav:
 hero:
   unit: Controller
   line1: "Backend-Entwickler, meistens in C# und Python"
-  line2: "Abschlussjahr an der HTL Leonding, bei Linz"
-  line3: "Abschluss im Juni 2027, auf der Suche nach einem Backend-Praktikum oder einer Diplomarbeit"
+  line2: "4. von 5 Jahren an der HTL Leonding, bei Linz"
+  line3: "Abschluss im Juni 2028, auf der Suche nach einem Backend-Praktikum"
   quote: "„Eines der besten Projekte, die hier je in einem Praktikum entstanden sind.“"
   quote_by_html: '— Leiter der Entwicklung bei der <a href="#experience">SlideLizard Software GmbH</a>, Linz, über mein Praktikum dort im August 2026'
   front_panel: Frontpanel
@@ -66,7 +66,7 @@ hero:
   translation_note: ""
   facts: Eckdaten
   bay: Schacht
-  bay0: "Höhere Technische Lehranstalt · 2022–2027"
+  bay0: "Höhere Technische Lehranstalt · 2022–2028"
   bay1: "Praktikant Softwareentwicklung · 08/2026"
   bay2: "Sprachassistent · in aktiver Entwicklung"
   bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
