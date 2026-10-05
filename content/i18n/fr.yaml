@@ -10,16 +10,16 @@ meta:
 
 head:
   title: "Lukas Grünzweil · Développeur backend & IA, élève à la HTL Leonding"
-  description: "Lukas Grünzweil, élève à la HTL Leonding en Autriche, développe des systèmes backend, des outils d'IA et des jeux Unity en C#, Python et TypeScript. Diplômé en juin 2027, ouvert à un stage backend ou à un projet de fin d'études."
+  description: "Lukas Grünzweil, élève à la HTL Leonding en Autriche, développe des systèmes backend, des outils d'IA et des jeux Unity en C#, Python et TypeScript. Actuellement en 4e année sur 5, diplômé en juin 2028, ouvert à un stage backend."
   og_title: "Lukas Grünzweil · Développeur backend & IA"
-  og_description: "Élève à la HTL Leonding, en Autriche. Systèmes backend, outils d'IA et jeux en C#, Python et TypeScript. Ouvert à un stage backend ou à un projet de fin d'études."
+  og_description: "Élève à la HTL Leonding, en Autriche (4e année sur 5). Systèmes backend, outils d'IA et jeux en C#, Python et TypeScript. Ouvert à un stage backend."
   og_image_alt: "Lukas Grünzweil : systèmes backend, outils d'IA et jeux"
 
 ld:
   job_title: Élève ingénieur
-  person_description: "Élève à la HTL Leonding en Autriche qui développe des systèmes backend, des outils d'IA et des jeux, principalement en C#, Unity et Python. Diplômé en juin 2027, ouvert à un stage backend ou à un projet de fin d'études."
-  seeks_name: "Stage backend ou projet de fin d'études"
-  seeks_description: "Ouvert à un stage backend ou à un projet de fin d'études (Diplomarbeit) ; diplômé de la HTL Leonding en juin 2027."
+  person_description: "Élève à la HTL Leonding en Autriche qui développe des systèmes backend, des outils d'IA et des jeux, principalement en C#, Unity et Python. Actuellement en 4e année sur 5, diplômé en juin 2028, ouvert à un stage backend."
+  seeks_name: "Stage backend"
+  seeks_description: "Ouvert à un stage backend ; actuellement en 4e année sur 5 à la HTL Leonding, diplômé en juin 2028."
   projects_name: "Projets de Lukas Grünzweil"
   vektorgrid: "Un assistant vocal auto-hébergé conçu comme un système distribué : des relais edge en C++ captent la parole, un orchestrateur C# pilote une chaîne Python de reconnaissance vocale, routage d'intention, LLM et synthèse vocale, et une application Kotlin valide les appels d'outils risqués par biométrie."
   sceneforge: "Un plugin d'IA pour l'éditeur Unity qui transforme une description de scène en texte libre en GameObjects et composants."
@@ -51,8 +51,8 @@ nav:
 hero:
   unit: Contrôleur
   line1: "Développeur backend, surtout en C# et Python"
-  line2: "Dernière année à la HTL Leonding, près de Linz, Autriche"
-  line3: "Diplômé en juin 2027, je cherche un stage backend ou un projet de fin d'études"
+  line2: "4e année sur 5 à la HTL Leonding, près de Linz, Autriche"
+  line3: "Diplômé en juin 2028, je cherche un stage backend"
   quote: "« L'un des meilleurs projets jamais réalisés ici pendant un stage. »"
   quote_by_html: '— Responsable du développement chez <a href="#experience">SlideLizard Software GmbH</a>, Linz, à propos de mon stage chez eux en août 2026'
   front_panel: Façade
@@ -67,7 +67,7 @@ hero:
   translation_note: "Page traduite de l'anglais. Lukas travaille en allemand et en anglais."
   facts: Points clés
   bay: Baie
-  bay0: "Lycée technique supérieur · 2022–2027"
+  bay0: "Lycée technique supérieur · 2022–2028"
   bay1: "Stagiaire en génie logiciel · 08/2026"
   bay2: "Assistant vocal · en développement actif"
   bay3: "3 nœuds Proxmox · servent cette page"

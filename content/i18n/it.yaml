@@ -11,16 +11,16 @@ meta:
 
 head:
   title: "Lukas Grünzweil · Sviluppatore backend e IA, studente alla HTL Leonding"
-  description: "Lukas Grünzweil, studente alla HTL Leonding in Austria, sviluppa sistemi backend, strumenti di IA e giochi Unity in C#, Python e TypeScript. Si diploma a giugno 2027 ed è disponibile per un tirocinio backend o un progetto di tesi."
+  description: "Lukas Grünzweil, studente alla HTL Leonding in Austria, sviluppa sistemi backend, strumenti di IA e giochi Unity in C#, Python e TypeScript. Attualmente è al 4° anno su 5, si diploma a giugno 2028 ed è disponibile per un tirocinio backend."
   og_title: "Lukas Grünzweil · Sviluppatore backend e IA"
-  og_description: "Studente alla HTL Leonding, Austria. Sistemi backend, strumenti di IA e giochi in C#, Python e TypeScript. Disponibile per un tirocinio backend o un progetto di tesi."
+  og_description: "Studente alla HTL Leonding, Austria (4° anno su 5). Sistemi backend, strumenti di IA e giochi in C#, Python e TypeScript. Disponibile per un tirocinio backend."
   og_image_alt: "Lukas Grünzweil: sistemi backend, strumenti di IA e giochi"
 
 ld:
   job_title: Studente
-  person_description: "Studente alla HTL Leonding in Austria che sviluppa sistemi backend, strumenti di IA e giochi, soprattutto in C#, Unity e Python. Si diploma a giugno 2027 ed è disponibile per un tirocinio backend o un progetto di tesi."
-  seeks_name: "Tirocinio backend o progetto di tesi"
-  seeks_description: "Disponibile per un tirocinio backend o un progetto di tesi (Diplomarbeit); diploma alla HTL Leonding a giugno 2027."
+  person_description: "Studente alla HTL Leonding in Austria che sviluppa sistemi backend, strumenti di IA e giochi, soprattutto in C#, Unity e Python. Attualmente è al 4° anno su 5, si diploma a giugno 2028 ed è disponibile per un tirocinio backend."
+  seeks_name: "Tirocinio backend"
+  seeks_description: "Disponibile per un tirocinio backend; attualmente al 4° anno su 5 alla HTL Leonding, diploma a giugno 2028."
   projects_name: "Progetti di Lukas Grünzweil"
   vektorgrid: "Un assistente vocale self-hosted costruito come sistema distribuito: relay edge in C++ catturano la voce, un orchestratore C# gestisce una pipeline Python di riconoscimento vocale, instradamento degli intenti, LLM e sintesi vocale, e un'app Kotlin approva con la biometria le chiamate a strumenti rischiose."
   sceneforge: "Un plugin di IA per l'editor di Unity che trasforma la descrizione testuale di una scena in GameObject e componenti."
@@ -52,8 +52,8 @@ nav:
 hero:
   unit: Controller
   line1: "Sviluppatore backend, soprattutto in C# e Python"
-  line2: "Ultimo anno alla HTL Leonding, vicino a Linz, Austria"
-  line3: "Mi diplomo a giugno 2027 e cerco un tirocinio backend o un progetto di tesi"
+  line2: "4° anno su 5 alla HTL Leonding, vicino a Linz, Austria"
+  line3: "Mi diplomo a giugno 2028 e cerco un tirocinio backend"
   quote: "«Uno dei migliori progetti mai nati da un tirocinio qui»."
   quote_by_html: '— Responsabile dello sviluppo di <a href="#experience">SlideLizard Software GmbH</a>, Linz, sul mio tirocinio da loro ad agosto 2026'
   front_panel: Pannello frontale
@@ -68,7 +68,7 @@ hero:
   translation_note: "Pagina tradotta dall'inglese. Lukas lavora in tedesco e in inglese."
   facts: Dati principali
   bay: Alloggiamento
-  bay0: "Istituto tecnico superiore · 2022–2027"
+  bay0: "Istituto tecnico superiore · 2022–2028"
   bay1: "Tirocinante in ingegneria del software · 08/2026"
   bay2: "Assistente vocale · in sviluppo attivo"
   bay3: "3 nodi Proxmox · servono questa pagina"

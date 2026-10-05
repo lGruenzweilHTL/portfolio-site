@@ -14,16 +14,16 @@ meta:
 
 head:
   title: "Lukas Grünzweil · Backend & AI developer, student at HTL Leonding"
-  description: "Lukas Grünzweil, a student at HTL Leonding in Austria, builds backend systems, AI tooling and Unity games in C#, Python and TypeScript. Graduating June 2027 and open to a backend internship or thesis project."
+  description: "Lukas Grünzweil, a student at HTL Leonding in Austria, builds backend systems, AI tooling and Unity games in C#, Python and TypeScript. Currently in year 4 of 5, graduating June 2028, and open to a backend internship."
   og_title: "Lukas Grünzweil · Backend & AI developer"
-  og_description: "Student at HTL Leonding, Austria. Backend systems, AI tooling and games in C#, Python and TypeScript. Open to a backend internship or thesis project."
+  og_description: "Student at HTL Leonding, Austria (year 4 of 5). Backend systems, AI tooling and games in C#, Python and TypeScript. Open to a backend internship."
   og_image_alt: "Lukas Grünzweil: backend systems, AI tooling and games"
 
 ld:
   job_title: Student
-  person_description: "Student at HTL Leonding in Austria who builds backend systems, AI tooling and games, mainly in C#, Unity and Python. Graduating June 2027 and open to a backend internship or thesis project."
-  seeks_name: "Backend internship or thesis project"
-  seeks_description: "Open to a backend internship or a thesis (Diplomarbeit) project; graduating from HTL Leonding in June 2027."
+  person_description: "Student at HTL Leonding in Austria who builds backend systems, AI tooling and games, mainly in C#, Unity and Python. Currently in year 4 of 5, graduating June 2028, and open to a backend internship."
+  seeks_name: "Backend internship"
+  seeks_description: "Open to a backend internship; currently in year 4 of 5 at HTL Leonding, graduating in June 2028."
   projects_name: "Projects by Lukas Grünzweil"
   vektorgrid: "A self-hosted voice assistant built as a distributed system: C++ edge relays capture speech, a C# orchestrator runs a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin phone app approves risky tool calls with biometrics."
   sceneforge: "An AI plugin for the Unity Editor that turns a plain-text scene description into GameObjects and components."
@@ -55,8 +55,8 @@ nav:
 hero:
   unit: Controller
   line1: "Backend developer, mostly in C# and Python"
-  line2: "Final year at HTL Leonding, near Linz, Austria"
-  line3: "Graduating June 2027 and looking for a backend internship or thesis project"
+  line2: "Year 4 of 5 at HTL Leonding, near Linz, Austria"
+  line3: "Graduating June 2028 and looking for a backend internship"
   quote: "“One of the best projects to come out of an internship here.”"
   quote_by_html: '— Head of Development at <a href="#experience">SlideLizard Software GmbH</a>, Linz, about my internship there in August 2026'
   front_panel: Front panel
@@ -72,7 +72,7 @@ hero:
   translation_note: ""
   facts: Key facts
   bay: Bay
-  bay0: "Higher technical college · 2022–2027"
+  bay0: "Higher technical college · 2022–2028"
   bay1: "Software engineering intern · 08/2026"
   bay2: "Voice assistant · in active development"
   bay3: "3 Proxmox nodes · serves this page"
