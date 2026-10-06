@@ -35,6 +35,7 @@
     // {reason, message} and we prefer its `message` if present.
     rate_limited:        { text: tr('reason.rate_limited'), email: true },
     captcha_failed:      { text: tr('reason.captcha_failed'), email: false },
+    message_too_long:    { text: tr('reason.message_too_long'), email: false },
     bad_request:         { text: tr('reason.bad_request'), email: true },
     // Stream-level (SSE) — the backend always sends its own message text,
     // so the copy here is the rare fallback for an empty payload.
@@ -160,7 +161,10 @@
       document.body.appendChild(panel);
       this.panel = panel;
 
-      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + ' · OpenRouter'; };
+      // /api/status names the model the next chat starts with; a chat reply
+      // names the model that answered it ('model' SSE event).
+      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + ' · ' + (s.provider || 'OpenRouter'); };
+      this.setModel = setModel;
       setModel(window.__rackStatus);
       document.addEventListener('rack:status', (e) => setModel(e.detail));
 
@@ -324,8 +328,22 @@
         const reason = (body && body.reason) ||
           (resp.status === 429 ? 'rate_limited' :
            resp.status === 403 ? 'captcha_failed' :
+           resp.status === 413 ? 'message_too_long' :
            resp.status === 400 ? 'bad_request' : 'server_error');
-        this.showError(reason, body && body.message);
+        if (reason === 'message_too_long' && body && body.limit) {
+          // Local copy instead of the backend's English one, with the
+          // numbers filled in. Then hand the text back so the user can
+          // shorten it, and drop the echoed command: it was never sent.
+          this.showError(reason, tr('reason.message_too_long', { length: body.length, limit: body.limit }));
+          const cmds = this.out.querySelectorAll('.ln--cmd');
+          if (cmds.length) cmds[cmds.length - 1].remove();
+          if (!this.input.value) {
+            this.input.value = text;
+            this.input.dispatchEvent(new Event('input'));
+          }
+        } else {
+          this.showError(reason, body && body.message);
+        }
         this.setBusy(false);
         return;
       }
@@ -356,7 +374,9 @@
         let evt;
         try { evt = JSON.parse(json); } catch (_) { return; }
 
-        if (evt.type === 'token') {
+        if (evt.type === 'model') {
+          this.setModel(evt);
+        } else if (evt.type === 'token') {
           sawAnyEvent = true;
           if (!outDiv) {
             wait.remove();
