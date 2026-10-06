@@ -23,10 +23,12 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import AsyncIterator
+from urllib.parse import urlparse
 
 import httpx
 import sqlite3
@@ -45,6 +47,46 @@ from .db.models import get_db
 _KEEPALIVE_INTERVAL_S = 15.0
 
 log = logging.getLogger(__name__)
+
+
+# --- Model cooldown --------------------------------------------------------
+
+# Per-process. A model that answers 429 or errors is skipped by later
+# requests until its cooldown runs out, so each request doesn't walk the
+# same dead models (and sit through the backoff) again. Once the cooldown
+# ends the model is back at its place in the list.
+_cooldown_until: dict[str, float] = {}
+
+
+def _available_models() -> list[str]:
+    """Configured models not in cooldown, in order. If every model is
+    cooling down, all of them: a request should still get its try."""
+    now = time.monotonic()
+    models = settings.chat_models
+    return [m for m in models if _cooldown_until.get(m, 0.0) <= now] or models
+
+
+def _cool_down(model: str) -> None:
+    _cooldown_until[model] = time.monotonic() + settings.chat_model_cooldown_seconds
+
+
+def model_label(model: str) -> str:
+    """Model id for display: provider prefix and :free suffix stripped."""
+    return model.split("/", 1)[-1].split(":", 1)[0]
+
+
+def active_model_label() -> str:
+    """The model the next request starts with."""
+    return model_label(_available_models()[0])
+
+
+def provider_label() -> str:
+    host = urlparse(settings.openrouter_base_url).hostname or ""
+    if "openrouter" in host:
+        return "OpenRouter"
+    if host.endswith("googleapis.com"):
+        return "Gemini API"
+    return host
 
 
 # --- Error / sentinel types ------------------------------------------------
@@ -258,6 +300,7 @@ async def stream_chat_response(
     """Public entry point. Yields SSE-formatted strings: 'data: {...}\\n\\n'.
 
     Wire format:
+      data: {"type":"model","model":"...","provider":"..."}   (once, before the first token)
       data: {"type":"token","text":"..."}
       data: {"type":"fallback","reason":"...","message":"..."}
       data: {"type":"error","reason":"...","message":"..."}
@@ -320,7 +363,7 @@ async def stream_chat_response(
         # is used up, every model that answered 429 gets one more try after
         # a 2s backoff (helps with burst limits, not per-minute ones). Then
         # hard fallback.
-        plan = list(settings.chat_models)
+        plan = list(_available_models())
         rate_limited: list[str] = []
         backoff_used = False
         i = 0
@@ -389,7 +432,11 @@ async def stream_chat_response(
                         if isinstance(item, _UpstreamResult):
                             # Final result of the stream.
                             break
-                        # Token delta
+                        # Token delta. Tell the client which model is
+                        # answering before its first token; models only
+                        # switch before any token, so this fires once.
+                        if not attempt_text:
+                            yield f"data: {json.dumps({'type': 'model', 'model': model_label(model), 'provider': provider_label()})}\n\n"
                         attempt_text.append(item)
                         yield f"data: {json.dumps({'type': 'token', 'text': item})}\n\n"
                 finally:
@@ -411,6 +458,7 @@ async def stream_chat_response(
                 attempt_fallback = ChatFallback(reason="upstream_error", message="empty reply")
 
             if attempt_fallback is None:
+                _cooldown_until.pop(model, None)
                 accumulated_text = "".join(attempt_text)
                 fallback = None
                 break
@@ -421,6 +469,8 @@ async def stream_chat_response(
             if attempt_text:
                 fallback = attempt_fallback
                 break
+            if attempt_fallback.reason in ("rate_limit", "upstream_error"):
+                _cool_down(model)
             if attempt_fallback.reason == "rate_limit":
                 rate_limited.append(model)
             if attempt_fallback.reason in ("rate_limit", "upstream_error") and i + 1 < len(plan):

@@ -107,6 +107,9 @@ class Settings(BaseSettings):
     # history that is resent on every later turn). Recruiter questions are
     # a sentence or two; 1000 chars leaves plenty of room.
     chat_max_message_chars: int = 1000
+    # How long a model that answered 429 or errored is skipped by later
+    # requests, in seconds. Free-tier quotas are per minute.
+    chat_model_cooldown_seconds: float = 60.0
 
     @property
     def chat_models(self) -> list[str]:

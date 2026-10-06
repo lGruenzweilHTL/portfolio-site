@@ -161,7 +161,10 @@
       document.body.appendChild(panel);
       this.panel = panel;
 
-      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + ' · OpenRouter'; };
+      // /api/status names the model the next chat starts with; a chat reply
+      // names the model that answered it ('model' SSE event).
+      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + ' · ' + (s.provider || 'OpenRouter'); };
+      this.setModel = setModel;
       setModel(window.__rackStatus);
       document.addEventListener('rack:status', (e) => setModel(e.detail));
 
@@ -371,7 +374,9 @@
         let evt;
         try { evt = JSON.parse(json); } catch (_) { return; }
 
-        if (evt.type === 'token') {
+        if (evt.type === 'model') {
+          this.setModel(evt);
+        } else if (evt.type === 'token') {
           sawAnyEvent = true;
           if (!outDiv) {
             wait.remove();
