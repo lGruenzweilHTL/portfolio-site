@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     openrouter_model: str = "google/gemma-4-26b-a4b-it:free"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    # Comma-separated model ids tried in order when the primary model is
+    # rate-limited or errors. Each model usually has its own quota bucket,
+    # so this multiplies the free-tier headroom. Empty = primary only.
+    openrouter_fallback_models: str = ""
 
     # --- Turnstile ---
     turnstile_sitekey: str = "2x00000000000000000000AA"  # Always fail by default
@@ -96,6 +100,18 @@ class Settings(BaseSettings):
     chat_max_tokens: int = 600
     chat_max_history_messages: int = 20
     chat_request_timeout_seconds: float = 30.0
+    # Longest user message accepted, in characters. Longer messages are
+    # rejected before they reach the model (and before they land in the
+    # history that is resent on every later turn). Recruiter questions are
+    # a sentence or two; 1000 chars leaves plenty of room.
+    chat_max_message_chars: int = 1000
+
+    @property
+    def chat_models(self) -> list[str]:
+        """Primary model followed by the fallbacks, deduplicated, in order."""
+        models = [self.openrouter_model]
+        models += [m.strip() for m in self.openrouter_fallback_models.split(",")]
+        return list(dict.fromkeys(m for m in models if m))
 
 
 settings = Settings()

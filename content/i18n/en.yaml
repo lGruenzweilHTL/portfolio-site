@@ -263,6 +263,7 @@ js:
   reason:
     rate_limited: "You're sending messages too fast. Wait a moment, or email me."
     captcha_failed: Captcha check failed. Refresh and try again.
+    message_too_long: "That message is too long ({length} characters, the limit is {limit}). Shorten it and send it again."
     bad_request: "Your message didn't go through. Try rephrasing, or email me if it keeps failing."
     server_misconfigured: "The chatbot is down because of a config problem on my end. Email me and I'll fix it."
     server_error: "The chatbot hit an unexpected error. Try again, or email me if it keeps happening."
