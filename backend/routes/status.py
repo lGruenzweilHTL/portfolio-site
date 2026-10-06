@@ -96,7 +96,7 @@ def _edge(request: Request) -> str | None:
 
 
 def _model_label() -> str:
-    model = settings.openrouter_model.split("/", 1)[-1]
+    model = settings.chat_models[0].split("/", 1)[-1]
     return model.split(":", 1)[0]
 
 

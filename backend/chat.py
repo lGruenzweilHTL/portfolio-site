@@ -6,9 +6,9 @@ stream tokens, log to the DB, and decide when to give up.
 
 Key behaviours (per agreed spec):
   - Model fallback: on 429 / upstream error / empty reply before any
-    token streamed, try the next model in OPENROUTER_FALLBACK_MODELS.
-  - One backoff retry of the primary model (2s wait) once every model
-    has answered 429.
+    token streamed, try the next model in OPENROUTER_MODELS.
+  - Once the list is used up, one backoff retry (2s wait) of every model
+    that answered 429.
   - Hard fallback after that: return a structured error the frontend
     renders as 'service busy, email me instead'.
   - Hard cap on chat history length (settings.chat_max_history_messages)
@@ -314,14 +314,14 @@ async def stream_chat_response(
         messages.extend(history)
         messages.append({"role": "user", "content": user_message})
 
-        # Model fallback: try the primary model, then each configured
-        # fallback in turn when one is rate-limited or errors upstream. Each
-        # model has its own quota bucket, so the next one usually has room.
-        # When every model is rate-limited, one 2s backoff retry of the
-        # primary follows (helps with burst limits, not per-minute ones).
-        # Then hard fallback.
-        models = settings.chat_models
-        plan = list(models)
+        # Model fallback: try each configured model in turn when one is
+        # rate-limited, errors upstream or replies empty. Each model has its
+        # own quota bucket, so the next one usually has room. Once the list
+        # is used up, every model that answered 429 gets one more try after
+        # a 2s backoff (helps with burst limits, not per-minute ones). Then
+        # hard fallback.
+        plan = list(settings.chat_models)
+        rate_limited: list[str] = []
         backoff_used = False
         i = 0
         while i < len(plan):
@@ -421,6 +421,8 @@ async def stream_chat_response(
             if attempt_text:
                 fallback = attempt_fallback
                 break
+            if attempt_fallback.reason == "rate_limit":
+                rate_limited.append(model)
             if attempt_fallback.reason in ("rate_limit", "upstream_error") and i + 1 < len(plan):
                 log.info(
                     "model %s failed (%s), falling back to %s (session=%s)",
@@ -428,16 +430,21 @@ async def stream_chat_response(
                 )
                 i += 1
                 continue
-            if attempt_fallback.reason == "rate_limit" and not backoff_used:
-                log.info("all models rate-limited, retrying %s after 2s backoff (session=%s)", models[0], session_id)
+            if attempt_fallback.reason in ("rate_limit", "upstream_error") and rate_limited and not backoff_used:
+                log.info(
+                    "models exhausted, retrying %d rate-limited model(s) after 2s backoff (session=%s)",
+                    len(rate_limited), session_id,
+                )
                 backoff_used = True
-                plan.append(models[0])
+                plan.extend(rate_limited)
                 # Keep the wire warm during the backoff.
                 await asyncio.sleep(2.0)
                 yield ": keepalive\n\n"
                 i += 1
                 continue
-            fallback = attempt_fallback
+            # Report a rate limit if any model hit one: "try again in a
+            # minute" is more useful than the last model's error.
+            fallback = ChatFallback(reason="rate_limit", message="") if rate_limited else attempt_fallback
             break
     except (ContentError, RuntimeError) as e:
         # Content not loaded, malformed YAML, or anything else that says

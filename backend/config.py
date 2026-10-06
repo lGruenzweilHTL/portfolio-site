@@ -26,12 +26,14 @@ class Settings(BaseSettings):
 
     # --- OpenRouter ---
     openrouter_api_key: str = ""
+    # Comma-separated model ids, tried in order: when one is rate-limited
+    # or errors, the next runs. Each model usually has its own quota
+    # bucket, so every entry adds free-tier headroom.
+    openrouter_models: str = ""
+    # Deprecated single-model setting, used only when OPENROUTER_MODELS is
+    # empty so older .env files keep working.
     openrouter_model: str = "google/gemma-4-26b-a4b-it:free"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    # Comma-separated model ids tried in order when the primary model is
-    # rate-limited or errors. Each model usually has its own quota bucket,
-    # so this multiplies the free-tier headroom. Empty = primary only.
-    openrouter_fallback_models: str = ""
 
     # --- Turnstile ---
     turnstile_sitekey: str = "2x00000000000000000000AA"  # Always fail by default
@@ -108,10 +110,10 @@ class Settings(BaseSettings):
 
     @property
     def chat_models(self) -> list[str]:
-        """Primary model followed by the fallbacks, deduplicated, in order."""
-        models = [self.openrouter_model]
-        models += [m.strip() for m in self.openrouter_fallback_models.split(",")]
-        return list(dict.fromkeys(m for m in models if m))
+        """OPENROUTER_MODELS (or the legacy OPENROUTER_MODEL), deduplicated, in order."""
+        models = [m.strip() for m in self.openrouter_models.split(",")]
+        models = list(dict.fromkeys(m for m in models if m))
+        return models or [self.openrouter_model]
 
 
 settings = Settings()
