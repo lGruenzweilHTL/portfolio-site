@@ -5,7 +5,10 @@ This module does the work: talk to OpenRouter, manage the message history,
 stream tokens, log to the DB, and decide when to give up.
 
 Key behaviours (per agreed spec):
-  - One exponential-backoff retry on HTTP 429 from OpenRouter (2s wait).
+  - Model fallback: on 429 / upstream error / empty reply before any
+    token streamed, try the next model in OPENROUTER_MODELS.
+  - Once the list is used up, one backoff retry (2s wait) of every model
+    that answered 429.
   - Hard fallback after that: return a structured error the frontend
     renders as 'service busy, email me instead'.
   - Hard cap on chat history length (settings.chat_max_history_messages)
@@ -20,10 +23,12 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import AsyncIterator
+from urllib.parse import urlparse
 
 import httpx
 import sqlite3
@@ -42,6 +47,46 @@ from .db.models import get_db
 _KEEPALIVE_INTERVAL_S = 15.0
 
 log = logging.getLogger(__name__)
+
+
+# --- Model cooldown --------------------------------------------------------
+
+# Per-process. A model that answers 429 or errors is skipped by later
+# requests until its cooldown runs out, so each request doesn't walk the
+# same dead models (and sit through the backoff) again. Once the cooldown
+# ends the model is back at its place in the list.
+_cooldown_until: dict[str, float] = {}
+
+
+def _available_models() -> list[str]:
+    """Configured models not in cooldown, in order. If every model is
+    cooling down, all of them: a request should still get its try."""
+    now = time.monotonic()
+    models = settings.chat_models
+    return [m for m in models if _cooldown_until.get(m, 0.0) <= now] or models
+
+
+def _cool_down(model: str) -> None:
+    _cooldown_until[model] = time.monotonic() + settings.chat_model_cooldown_seconds
+
+
+def model_label(model: str) -> str:
+    """Model id for display: provider prefix and :free suffix stripped."""
+    return model.split("/", 1)[-1].split(":", 1)[0]
+
+
+def active_model_label() -> str:
+    """The model the next request starts with."""
+    return model_label(_available_models()[0])
+
+
+def provider_label() -> str:
+    host = urlparse(settings.openrouter_base_url).hostname or ""
+    if "openrouter" in host:
+        return "OpenRouter"
+    if host.endswith("googleapis.com"):
+        return "Gemini API"
+    return host
 
 
 # --- Error / sentinel types ------------------------------------------------
@@ -139,7 +184,7 @@ class _UpstreamResult:
 _SENTINEL_EOF = object()
 
 
-async def _call_openrouter_stream(messages: list[dict], max_tokens: int) -> AsyncIterator[str | _UpstreamResult | ChatFallback]:
+async def _call_openrouter_stream(messages: list[dict], max_tokens: int, model: str) -> AsyncIterator[str | _UpstreamResult | ChatFallback]:
     """Yield token deltas. Yields ChatFallback (a sentinel) if upstream is
     unreachable or rate-limited. Caller is responsible for backoff policy.
     """
@@ -161,7 +206,7 @@ async def _call_openrouter_stream(messages: list[dict], max_tokens: int) -> Asyn
         "X-Title": "Lukas Gruenzweil - Portfolio Chatbot",
     }
     body = {
-        "model": settings.openrouter_model,
+        "model": model,
         "messages": messages,
         "stream": True,
         "max_tokens": max_tokens,
@@ -187,7 +232,7 @@ async def _call_openrouter_stream(messages: list[dict], max_tokens: int) -> Asyn
                         err_body = (await resp.aread()).decode("utf-8", errors="replace")[:512]
                     except Exception:  # noqa: BLE001
                         err_body = ""
-                    log.warning("OpenRouter %s: %s", resp.status_code, err_body)
+                    log.warning("OpenRouter %s (%s): %s", resp.status_code, model, err_body)
                     yield ChatFallback(reason="upstream_error", message="")
                     return
 
@@ -255,6 +300,7 @@ async def stream_chat_response(
     """Public entry point. Yields SSE-formatted strings: 'data: {...}\\n\\n'.
 
     Wire format:
+      data: {"type":"model","model":"...","provider":"..."}   (once, before the first token)
       data: {"type":"token","text":"..."}
       data: {"type":"fallback","reason":"...","message":"..."}
       data: {"type":"error","reason":"...","message":"..."}
@@ -268,9 +314,9 @@ async def stream_chat_response(
         yield f"data: {json.dumps({'type': 'error', 'reason': 'bad_request', 'message': ERROR_MESSAGES['bad_request']})}\n\n"
         return
 
-    # Truncate absurd inputs at the door — the LLM would just ignore them
-    # and they cost tokens.
-    user_message = user_message.strip()[:4000]
+    # The route rejects over-long messages with a proper error; this is only
+    # a backstop for other callers so nothing oversized reaches the model.
+    user_message = user_message.strip()[:settings.chat_max_message_chars]
 
     # Send an SSE comment immediately so the response body starts flowing
     # before any blocking work. Until the first `yield` runs, Starlette's
@@ -311,11 +357,20 @@ async def stream_chat_response(
         messages.extend(history)
         messages.append({"role": "user", "content": user_message})
 
-        # One-shot backoff retry: if the first attempt yields a rate_limit
-        # fallback, sleep 2s and try again. If that also fails, hard fallback.
-        for attempt in (0, 1):
-            # Each attempt gets a fresh accumulator and a fresh message history
-            # (we re-use `messages`, which is fine).
+        # Model fallback: try each configured model in turn when one is
+        # rate-limited, errors upstream or replies empty. Each model has its
+        # own quota bucket, so the next one usually has room. Once the list
+        # is used up, every model that answered 429 gets one more try after
+        # a 2s backoff (helps with burst limits, not per-minute ones). Then
+        # hard fallback.
+        plan = list(_available_models())
+        rate_limited: list[str] = []
+        backoff_used = False
+        i = 0
+        while i < len(plan):
+            model = plan[i]
+            # Each attempt gets a fresh accumulator (we re-use `messages`,
+            # which is fine).
             attempt_text: list[str] = []
             attempt_fallback: ChatFallback | None = None
             try:
@@ -343,7 +398,7 @@ async def stream_chat_response(
                 async def _pump_upstream() -> None:
                     try:
                         async for item in _call_openrouter_stream(
-                            messages, settings.chat_max_tokens,
+                            messages, settings.chat_max_tokens, model,
                         ):
                             await item_queue.put(item)
                     except Exception as e:  # noqa: BLE001
@@ -377,7 +432,11 @@ async def stream_chat_response(
                         if isinstance(item, _UpstreamResult):
                             # Final result of the stream.
                             break
-                        # Token delta
+                        # Token delta. Tell the client which model is
+                        # answering before its first token; models only
+                        # switch before any token, so this fires once.
+                        if not attempt_text:
+                            yield f"data: {json.dumps({'type': 'model', 'model': model_label(model), 'provider': provider_label()})}\n\n"
                         attempt_text.append(item)
                         yield f"data: {json.dumps({'type': 'token', 'text': item})}\n\n"
                 finally:
@@ -391,19 +450,51 @@ async def stream_chat_response(
                 log.exception("stream_chat_response iteration failed")
                 attempt_fallback = ChatFallback(reason="upstream_error", message=str(e))
 
+            if attempt_fallback is None and not "".join(attempt_text).strip():
+                # Clean stream but no text. Thinking models can spend the
+                # whole max_tokens budget on reasoning and return nothing;
+                # treat that like an upstream error so the next model runs.
+                log.warning("model %s returned an empty reply (session=%s)", model, session_id)
+                attempt_fallback = ChatFallback(reason="upstream_error", message="empty reply")
+
             if attempt_fallback is None:
+                _cooldown_until.pop(model, None)
                 accumulated_text = "".join(attempt_text)
                 fallback = None
                 break
 
-            # Got a fallback. Retry only on rate_limit, only once, with a backoff.
-            if attempt_fallback.reason == "rate_limit" and attempt == 0:
-                log.info("OpenRouter 429, retrying after 2s backoff (session=%s)", session_id)
+            # Got a fallback. Switching models is only safe before any token
+            # reached the client; a mid-stream failure would otherwise splice
+            # two different answers together.
+            if attempt_text:
+                fallback = attempt_fallback
+                break
+            if attempt_fallback.reason in ("rate_limit", "upstream_error"):
+                _cool_down(model)
+            if attempt_fallback.reason == "rate_limit":
+                rate_limited.append(model)
+            if attempt_fallback.reason in ("rate_limit", "upstream_error") and i + 1 < len(plan):
+                log.info(
+                    "model %s failed (%s), falling back to %s (session=%s)",
+                    model, attempt_fallback.reason, plan[i + 1], session_id,
+                )
+                i += 1
+                continue
+            if attempt_fallback.reason in ("rate_limit", "upstream_error") and rate_limited and not backoff_used:
+                log.info(
+                    "models exhausted, retrying %d rate-limited model(s) after 2s backoff (session=%s)",
+                    len(rate_limited), session_id,
+                )
+                backoff_used = True
+                plan.extend(rate_limited)
                 # Keep the wire warm during the backoff.
                 await asyncio.sleep(2.0)
                 yield ": keepalive\n\n"
+                i += 1
                 continue
-            fallback = attempt_fallback
+            # Report a rate limit if any model hit one: "try again in a
+            # minute" is more useful than the last model's error.
+            fallback = ChatFallback(reason="rate_limit", message="") if rate_limited else attempt_fallback
             break
     except (ContentError, RuntimeError) as e:
         # Content not loaded, malformed YAML, or anything else that says

@@ -26,6 +26,12 @@ class Settings(BaseSettings):
 
     # --- OpenRouter ---
     openrouter_api_key: str = ""
+    # Comma-separated model ids, tried in order: when one is rate-limited
+    # or errors, the next runs. Each model usually has its own quota
+    # bucket, so every entry adds free-tier headroom.
+    openrouter_models: str = ""
+    # Deprecated single-model setting, used only when OPENROUTER_MODELS is
+    # empty so older .env files keep working.
     openrouter_model: str = "google/gemma-4-26b-a4b-it:free"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
 
@@ -96,6 +102,21 @@ class Settings(BaseSettings):
     chat_max_tokens: int = 600
     chat_max_history_messages: int = 20
     chat_request_timeout_seconds: float = 30.0
+    # Longest user message accepted, in characters. Longer messages are
+    # rejected before they reach the model (and before they land in the
+    # history that is resent on every later turn). Recruiter questions are
+    # a sentence or two; 1000 chars leaves plenty of room.
+    chat_max_message_chars: int = 1000
+    # How long a model that answered 429 or errored is skipped by later
+    # requests, in seconds. Free-tier quotas are per minute.
+    chat_model_cooldown_seconds: float = 60.0
+
+    @property
+    def chat_models(self) -> list[str]:
+        """OPENROUTER_MODELS (or the legacy OPENROUTER_MODEL), deduplicated, in order."""
+        models = [m.strip() for m in self.openrouter_models.split(",")]
+        models = list(dict.fromkeys(m for m in models if m))
+        return models or [self.openrouter_model]
 
 
 settings = Settings()

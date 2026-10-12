@@ -3,7 +3,7 @@
 Request:
   {
     "session_id": "<uuid>",          # client-generated, reused across the session
-    "message": "user's question",     # <= 4000 chars
+    "message": "user's question",     # <= CHAT_MAX_MESSAGE_CHARS chars
     "turnstile_token": "<token>"      # from the client widget
   }
 
@@ -34,7 +34,10 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     session_id: str = Field(..., min_length=1, max_length=64)
-    message: str = Field(..., min_length=1, max_length=4000)
+    # No max_length here: Pydantic would answer an over-long message with a
+    # bare 422 the frontend can't explain. The configurable cap is checked
+    # in the route instead; this ceiling only stops absurd bodies.
+    message: str = Field(..., min_length=1, max_length=100_000)
     turnstile_token: str | None = None
 
 
@@ -67,6 +70,7 @@ def _rate_limited(ip: str, *, max_calls: int, window_seconds: int) -> bool:
 _ROUTE_ERROR_MESSAGES = {
     "rate_limited": "You're sending messages too fast. Wait a moment, or email me.",
     "captcha_failed": "Captcha check failed. Refresh and try again.",
+    "message_too_long": "That message is too long ({length} characters, the limit is {limit}). Please shorten it and send it again.",
 }
 
 
@@ -78,6 +82,22 @@ async def chat(req: ChatRequest, request: Request):
         return JSONResponse(
             status_code=429,
             content={"reason": "rate_limited", "message": _ROUTE_ERROR_MESSAGES["rate_limited"]},
+        )
+
+    # Length cap. Checked before Turnstile so an over-long message doesn't
+    # burn a token, and before the model so it never costs tokens or lands
+    # in the history that is resent on every later turn.
+    length = len(req.message.strip())
+    limit = settings.chat_max_message_chars
+    if length > limit:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "reason": "message_too_long",
+                "message": _ROUTE_ERROR_MESSAGES["message_too_long"].format(length=length, limit=limit),
+                "length": length,
+                "limit": limit,
+            },
         )
 
     # Turnstile (skipped in dev with TURNSTILE_DEV_BYPASS=1).

@@ -13,7 +13,8 @@ Response:
     "rev_time": "2026-09-30T08:12:00+00:00",
     "edge": "VIE",                  # Cloudflare colo that served this request
     "nodes": 3,                     # settings.homelab_nodes
-    "model": "gemma-4-26b-a4b-it",  # chatbot model, provider prefix and :free stripped
+    "model": "gemma-4-26b-a4b-it",  # model the next chat starts with (skips models in cooldown)
+    "provider": "OpenRouter",       # derived from OPENROUTER_BASE_URL
     "projects": {"sceneforge-ai": "2026-09-18T10:04:11Z", ...}  # GitHub pushed_at
   }
 
@@ -37,6 +38,7 @@ import httpx
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
+from ..chat import active_model_label, provider_label
 from ..config import WORKSPACE_ROOT, settings
 from ..projects import GITHUB_HEADERS, github_projects
 
@@ -95,11 +97,6 @@ def _edge(request: Request) -> str | None:
     return None
 
 
-def _model_label() -> str:
-    model = settings.openrouter_model.split("/", 1)[-1]
-    return model.split(":", 1)[0]
-
-
 def _fetch_github() -> None:
     global _gh_projects, _gh_fetched_at, _gh_running
     found: dict[str, str] = {}
@@ -148,7 +145,8 @@ def status(request: Request) -> JSONResponse:
         "rev_time": rev_time,
         "edge": _edge(request),
         "nodes": settings.homelab_nodes,
-        "model": _model_label(),
+        "model": active_model_label(),
+        "provider": provider_label(),
         "projects": _github_projects(),
     }
     return JSONResponse(body, headers={"cache-control": "no-store"})
