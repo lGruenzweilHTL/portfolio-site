@@ -13,6 +13,7 @@ Reload: call load_content() again. Used by /webhook/deploy after a git pull.
 """
 from __future__ import annotations
 
+import html
 import logging
 import re
 from dataclasses import dataclass
@@ -131,13 +132,38 @@ class Content:
         edu_lines = []
         for ed in self.resume["education"]:
             line = f"- {ed.get('school', '?')}, {ed.get('location', '?')}"
+            when = _date_range(ed)
+            if when:
+                line += f" ({when})"
             if ed.get("notes"):
                 line += f" — {ed['notes']}"
             edu_lines.append(line)
         # Find the {% for ed ... %} {% endfor %} block and substitute.
         out = _render_simple_for(out, "ed in resume.education", edu_lines)
 
-        # Projects
+        # Experience
+        exp_lines = []
+        for ex in self.resume.get("experience") or []:
+            line = f"- {ex.get('role', '?')} at {ex.get('org', '?')}"
+            if ex.get("location"):
+                line += f", {ex['location']}"
+            when = _date_range(ex)
+            if when:
+                line += f" ({when})"
+            summary = (ex.get("summary") or "").strip().replace("\n", " ")
+            if summary:
+                line += f": {summary}"
+            for h in ex.get("highlights") or []:
+                line += f"\n    - {h}"
+            if ex.get("public_tags"):
+                line += f"\n    Tags: {', '.join(ex['public_tags'])}"
+            exp_lines.append(line)
+        out = _render_simple_for(out, "ex in resume.experience", exp_lines)
+
+        # Projects. Imported here: backend.projects imports this module.
+        from .projects import github_source, slugify
+
+        website = (self.resume["personal"].get("website") or "").rstrip("/")
         proj_lines = []
         for proj in self.resume["projects"]:
             line = f"- {proj.get('name', '?')} ({proj.get('status', '?')}): {proj.get('summary', '').strip()}"
@@ -148,6 +174,10 @@ class Content:
                 line += f"\n    Role: {proj['role']}"
             if proj.get("repo_url"):
                 line += f"\n    Repo: {proj['repo_url']}"
+            if github_source(proj.get("repo_url")):
+                line += f"\n    Project page: {website}/projects/{slugify(proj.get('name', ''))}"
+            for h in proj.get("highlights") or []:
+                line += f"\n    - {h}"
             proj_lines.append(line)
         out = _render_simple_for(out, "p in resume.projects", proj_lines)
 
@@ -158,12 +188,22 @@ class Content:
         tool_lines = [f"- {t}" for t in self.resume["skills"].get("tools_and_infra", [])]
         out = _render_simple_for(out, "tool in resume.skills.tools_and_infra", tool_lines)
 
+        spoken_lines = [
+            f"- {sp.get('language', '?')}: {sp.get('level', '?')}"
+            for sp in self.resume["skills"].get("spoken") or []
+        ]
+        out = _render_simple_for(out, "sp in resume.skills.spoken", spoken_lines)
+
         # Beyond code
         bc_lines = []
         for item in self.resume["beyond_code"]:
             body = (item.get("body") or "").strip().replace("\n", " ")
             bc_lines.append(f"- {item.get('topic', '?')}: {body}")
         out = _render_simple_for(out, "item in resume.beyond_code", bc_lines)
+
+        # Main-page copy and site links (see _site_copy / _site_links).
+        out = _render_simple_for(out, "line in site.copy", [f"- {l}" for l in _site_copy()])
+        out = _render_simple_for(out, "link in site.links", [f"- {l}" for l in _site_links(website)])
 
         # Persona
         out = out.replace("{{ persona.name }}", self.persona.get("name", "Lukas's assistant"))
@@ -173,6 +213,76 @@ class Content:
         out = _render_simple_for(out, "rule in persona.rules", rule_lines)
 
         return out
+
+
+def _date_range(entry: dict) -> str:
+    """A résumé entry's dates as the PDFs print them: date_label, else start – end."""
+    if entry.get("date_label"):
+        return str(entry["date_label"])
+    # Imported here: backend.resume imports this module.
+    from .resume import fmt_date
+
+    start, end = fmt_date(entry.get("start")), fmt_date(entry.get("end"))
+    if start:
+        return f"{start} – {end or 'present'}"
+    return end
+
+
+# Main-page copy (content/i18n/en.yaml) that carries facts resume.yaml doesn't:
+# the vektorgrid component names, how the SlideLizard project was staffed,
+# where Lukas lives, why he built things. Add a key here when the main page
+# gains a fact the chatbot should know.
+_SITE_COPY_KEYS = (
+    "hero.line1",
+    "hero.line2",
+    "hero.line3",
+    "hero.bio",
+    "vg.flow_html",
+    "exp.sl_desc",
+    "about.p1",
+    "about.p2_html",
+    "contact.body",
+)
+
+_TAG_RE = re.compile(r"<[^>]+>")
+_TITLE_RE = re.compile(r"<title>(.*?)</title>", re.S | re.I)
+
+
+def _plain(text: str) -> str:
+    return " ".join(html.unescape(_TAG_RE.sub("", text)).split())
+
+
+def _site_copy() -> list[str]:
+    # Imported here so a broken catalog can't stop content.py from importing.
+    from .i18n import DEFAULT_LANG, catalogs
+
+    strings = catalogs()[DEFAULT_LANG].strings
+    lines = [_plain(strings[k]) for k in _SITE_COPY_KEYS if strings.get(k)]
+    quote, by = strings.get("hero.quote"), strings.get("hero.quote_by_html")
+    if quote and by:
+        lines.append(f"{_plain(quote)} {_plain(by)}")
+    return lines
+
+
+def _site_links(website: str) -> list[str]:
+    from .i18n import DEFAULT_LANG, languages
+
+    langs = ", ".join(f"{l.name} {website}{l.path}" for l in languages() if l.code != DEFAULT_LANG)
+    links = [
+        f"Website: {website}/ (also in {langs})",
+        f"Résumé PDF, designed: {website}/resume.pdf",
+        f"Résumé PDF, ATS-friendly plain text: {website}/resume-ats.pdf",
+    ]
+    notes_dir = Path(settings.site_dir) / "notes"
+    titles = []
+    for f in sorted(notes_dir.rglob("*.html")):
+        if f.name == "index.html":
+            continue
+        m = _TITLE_RE.search(f.read_text(encoding="utf-8", errors="replace")[:4096])
+        titles.append(_plain(m.group(1)) if m else f.stem)
+    if titles:
+        links.append(f"Study notes (school cheatsheets): {website}/notes/ — {'; '.join(titles)}")
+    return links
 
 
 def _render_simple_for(template: str, iter_expr: str, lines: list[str]) -> str:
@@ -190,10 +300,9 @@ def _render_simple_for(template: str, iter_expr: str, lines: list[str]) -> str:
         return template
     pre, rest = template.split(marker_open, 1)
     body, post = rest.split(marker_close, 1)
-    # Indent the lines to match the indentation of the {% for %} tag.
-    indent = pre[len(pre.rstrip("\n")):]  # whitespace at start of for-line
-    rendered = "\n".join(indent + line for line in lines)
-    return pre + rendered + post
+    # pre ends with the newline before the tag and post starts with the one
+    # after {% endfor %}, so the lines slot in without blank lines between.
+    return pre + "\n".join(lines) + post
 
 
 def _check_required(data: dict, required: set, where: str) -> None:
