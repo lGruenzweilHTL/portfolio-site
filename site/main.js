@@ -43,8 +43,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Rack grid: number the rails in U, and on wide screens round every unit up
 // to a whole number of rack units (44px, minus the 2px gap between units) so
-// faceplates line up with the rail holes. The unit's model label shows its
-// size ("12U", or "Event log · 3U" when it has a label).
+// faceplates line up with the rail holes.
 (function () {
   const U = 44;
   const units = [...document.querySelectorAll('.units > .unit, .units-main > .unit')];
@@ -60,8 +59,6 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const n = Math.max(1, Math.ceil((heights[i] + 2) / U));
       total += n;
       if (wide.matches) u.style.minHeight = (n * U - 2) + 'px';
-      const size = u.querySelector('.u-size');
-      if (size) { size.textContent = n + 'U'; size.classList.toggle('sep', !!size.previousSibling); }
     });
     if (!wide.matches) return;
     rails.forEach(rail => {
@@ -97,8 +94,9 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 // Units get racked as they scroll into view: pushed in, then screwed to the
-// rails (the motion is CSS, keyed on .in). Units that arrive together are
-// racked one after the other, top to bottom.
+// rails (the motion is CSS, keyed on .in). Units are racked just before
+// they scroll in, so a fast scroll never lands on an empty rack. Units that
+// arrive together are racked one after the other, top to bottom.
 (function () {
   const units = document.querySelectorAll('.unit.rv');
   if (reducedMotion || !('IntersectionObserver' in window)) {
@@ -111,7 +109,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       e.target.classList.add('in');
       io.unobserve(e.target);
     });
-  }, { rootMargin: '0px 0px -12% 0px' });
+  }, { rootMargin: '0px 0px 10% 0px' });
   units.forEach(el => io.observe(el));
 })();
 
@@ -169,18 +167,6 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   list.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); }
-  });
-})();
-
-// Résumé switch: the radios and :has() do the work; this only lets a click
-// on the decorative track flip it too.
-(function () {
-  const track = document.querySelector('.switch-track');
-  if (!track) return;
-  track.addEventListener('click', () => {
-    const ats = document.getElementById('rf-ats');
-    const classic = document.getElementById('rf-classic');
-    (ats.checked ? classic : ats).checked = true;
   });
 })();
 
@@ -250,17 +236,15 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 })();
 
 // Live status from /api/status: PDU readouts, "last push" chips on the
-// blades, the hero LAT readout and the console's model name. Refreshes every
+// blades and the console's model name. Refreshes every
 // 60s while the tab is visible; on failure the PDU goes amber and shows "--".
 // LEDs with data-led show real state: "status" is green while this endpoint
 // answers and amber when it doesn't; "push:<slug>" is green if that project
-// was pushed to in the last two weeks, amber if not. The hero ACT LED blinks
-// once per poll.
+// was pushed to in the last two weeks, amber if not.
 (function () {
   const $ = sel => document.querySelector(sel);
   const pduState = $('#pdu-state');
   const pduLabel = pduState && pduState.querySelector('.pdu-state-label');
-  const lat = $('#lat');
 
   function ago(iso) {
     const t = Date.parse(iso);
@@ -302,16 +286,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       }
     });
   }
-  const act = $('.led--act');
-  function blinkAct() {
-    if (!act || reducedMotion) return;
-    act.classList.add('led--amber');
-    setTimeout(() => act.classList.remove('led--amber'), 140);
-  }
-
   async function poll() {
-    blinkAct();
-    const t0 = performance.now();
     let s;
     try {
       const r = await fetch('/api/status', { cache: 'no-store' });
@@ -319,20 +294,23 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
       s = await r.json();
     } catch (_) {
       document.querySelectorAll('[data-status]').forEach(el => set(el, '--'));
-      if (lat) lat.textContent = 'LAT --';
       leds(null);
       setState('stale', tr('status.stale'));
       return;
     }
-    if (lat) lat.textContent = 'LAT ' + Math.round(performance.now() - t0) + 'ms';
     set($('[data-status="uptime"]'), uptime(s.uptime_s));
     set($('[data-status="rev"]'), s.rev ? s.rev + (s.rev_time ? ' · ' + tr('time.ago', { t: ago(s.rev_time) }) : '') : '--');
     set($('[data-status="edge"]'), s.edge || '--');
     set($('[data-status="nodes"]'), s.nodes != null ? String(s.nodes) : '--');
     const projects = s.projects || {};
+    // A "last push" line is only worth showing while it's recent: a stale
+    // date reads as an abandoned project, so its row stays hidden.
     document.querySelectorAll('[data-push]').forEach(el => {
       const when = projects[el.dataset.push];
+      const t = when && Date.parse(when);
       if (when) set(el, ago(when));
+      const row = el.closest('[data-push-row]');
+      if (row) row.hidden = !(t && Date.now() - t < 90 * 86400000);
     });
     leds(s);
     setState('live', tr('status.online'));
@@ -416,4 +394,15 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   show(1);
   sync();
+})();
+
+// While the hero is on screen its own keys are the way to get in touch, so
+// on phones the console tab (chat.js) steps aside instead of covering them.
+(function () {
+  const hero = document.getElementById('hero');
+  if (!hero || !('IntersectionObserver' in window)) return;
+  const h = document.documentElement;
+  new IntersectionObserver(entries => {
+    h.classList.toggle('hero-in-view', entries[entries.length - 1].isIntersecting);
+  }, { rootMargin: '0px 0px -30% 0px' }).observe(hero);
 })();

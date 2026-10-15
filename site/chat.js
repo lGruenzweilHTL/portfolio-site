@@ -3,7 +3,6 @@
    - Per-session UUID in localStorage; "clear" starts a new conversation
    - Calls POST /api/chat and parses the SSE stream
    - Renders failures as red "error:" lines with the email link
-   - While a reply streams, html.console-busy makes the hero ACT LED flicker
 
    Styles live in styles.css ("Console" section); this file only builds the
    markup. Copy comes from window.I18N (content/i18n/<lang>.yaml, "js.con"
@@ -278,7 +277,6 @@
     setBusy(busy) {
       this.busy = busy;
       this.sendBtn.disabled = busy;
-      document.documentElement.classList.toggle('console-busy', busy);
     },
 
     async send() {

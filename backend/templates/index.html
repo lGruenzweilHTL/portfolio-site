@@ -134,38 +134,38 @@ window.I18N = {{ js_strings | tojson }};
           "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 2, "item": {
+          "@type": "CreativeWork", "name": "Forkcast",
+          "description": {{ t('ld.forkcast') | tojson }},
+          "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 3, "item": {
+          "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
+          "description": {{ t('ld.roboducks') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
+          "programmingLanguage": ["Python", "C"],
+          "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 4, "item": {
           "@type": "SoftwareSourceCode", "name": "SceneForge AI", "url": "https://gruenzweil.cc/projects/sceneforge-ai",
           "description": {{ t('ld.sceneforge') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/SceneForge-AI",
           "programmingLanguage": "C#", "runtimePlatform": "Unity Editor",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 3, "item": {
+        { "@type": "ListItem", "position": 5, "item": {
           "@type": "SoftwareSourceCode", "name": "UniConsole", "url": "https://gruenzweil.cc/projects/uniconsole",
           "description": {{ t('ld.uniconsole') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/UniConsole",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 4, "item": {
-          "@type": "CreativeWork", "name": "Forkcast",
-          "description": {{ t('ld.forkcast') | tojson }},
-          "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 5, "item": {
+        { "@type": "ListItem", "position": 6, "item": {
           "@type": "SoftwareSourceCode", "name": "Space Defenders", "url": "https://gruenzweil.cc/projects/space-defenders",
           "description": {{ t('ld.space_defenders') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/Space-Defenders",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 6, "item": {
+        { "@type": "ListItem", "position": 7, "item": {
           "@type": "CreativeWork", "name": "P.I.G.E.O.N. — Covert Ops",
           "description": {{ t('ld.pigeon') | tojson }},
           "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
-          "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 7, "item": {
-          "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
-          "description": {{ t('ld.roboducks') | tojson }},
-          "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
-          "programmingLanguage": ["Python", "C"],
-          "contributor": { "@id": "https://gruenzweil.cc/#person" } } }
+          "author": { "@id": "https://gruenzweil.cc/#person" } } }
       ]
     }
   ]
@@ -198,6 +198,7 @@ window.I18N = {{ js_strings | tojson }};
             <li><a class="port" href="#experience"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.experience') }}</span></a></li>
             <li><a class="port" href="#about"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.about') }}</span></a></li>
             <li><a class="port" href="#contact"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.contact') }}</span></a></li>
+            <li><a class="port" href="/resume.pdf" target="_blank" rel="noopener"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.resume') }}</span><span class="sr-only"> {{ t('hero.classic_sr') }}</span></a></li>
           </ul>
           {# Language switch: plain links, so crawlers find every version. #}
           <details class="lang">
@@ -213,77 +214,48 @@ window.I18N = {{ js_strings | tojson }};
 
       <main id="main" class="units-main" tabindex="-1">
 
-        {# CTRL: hero. VFD front display, control cluster, drive bays. #}
+        {# CTRL: hero. The front display carries who and what in plain type;
+             the controls next to it are the three things a visitor came for:
+             email, résumé, code. Drive bays hold the key facts. #}
         <section class="unit" id="hero" aria-labelledby="hero-name">
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <p class="silk">{{ t('hero.unit') }}</p>
-              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
-              <div class="unit-head-r" aria-hidden="true">
-                <span class="ind"><span class="led led--green"></span>PWR</span>
-                <span class="ind"><span class="led led--act"></span>ACT</span>
-                <span class="ind"><span class="led" data-led="status"></span>NET</span>
-                <span class="lcd lcd--chip" id="lat">LAT --</span>
-              </div>
+              <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('hero.available') }}</p>
             </div>
 
             <div class="ctrl">
               <div class="ctrl-display">
                 <div class="vfd-bezel">
                   <div class="vfd">
+                    <p class="vfd-kicker">{{ t('hero.line1') }}</p>
                     <h1 class="vfd-name" id="hero-name">Lukas Grünzweil</h1>
-                    <p class="vfd-line">{{ t('hero.line1') }}</p>
-                    <p class="vfd-line">{{ t('hero.line2') }}</p>
-                    <p class="vfd-line">{{ t('hero.line3') }}</p>
+                    <p class="vfd-pitch">{{ t('hero.line2') }}. {{ t('hero.line3') }}.</p>
                   </div>
                 </div>
-                {# LCD strip: the SlideLizard quote on its own readout. #}
                 <figure class="quote">
-                  <blockquote class="lcd-strip">{{ t('hero.quote') }}</blockquote>
+                  <blockquote>{{ t('hero.quote') }}</blockquote>
                   <figcaption class="quote-by">{{ t('hero.quote_by_html') }}</figcaption>
                 </figure>
               </div>
 
               <div class="panel-ctl">
-                <p class="silk silk--dim" aria-hidden="true">{{ t('hero.front_panel') }}</p>
-                <div class="power">
-                  <span class="power-btn" aria-hidden="true"></span>
-                  <div>
-                    <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('hero.online') }}</p>
-                    <p class="power-text">{{ t('hero.bio') }}</p>
-                  </div>
-                </div>
-                <div class="keys">
+                <p class="hero-bio">{{ t('hero.bio') }}</p>
+                <div class="keys hero-keys">
                   <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
+                  <a class="key" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.classic_sr') }}</span></a>
                   <a class="key" href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('hero.github_sr') }}</span></a>
                 </div>
-                {# Résumé: a two-position switch (radio group) plus one download
-                     key. CSS shows the key for the checked format, so it works
-                     without JS. #}
-                <fieldset class="resume">
-                  <legend class="silk silk--dim">{{ t('hero.resume') }}</legend>
-                  <div class="switch">
-                    <input type="radio" name="resume-format" id="rf-classic" value="classic" checked>
-                    <label for="rf-classic"><span class="led" aria-hidden="true"></span>{{ t('hero.classic') }}</label>
-                    <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
-                    <input type="radio" name="resume-format" id="rf-ats" value="ats">
-                    <label for="rf-ats"><span class="led" aria-hidden="true"></span>ATS</label>
-                  </div>
-                  <div class="resume-dl">
-                  <a class="key dl dl--classic" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.classic_sr') }}</span></a>
-                  <a class="key dl dl--ats" href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.ats_sr') }}</span></a>
-                  </div>
-                </fieldset>
+                <p class="resume-alt"><a href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.plain') }}<span class="sr-only"> {{ t('hero.ats_sr') }}</span></a></p>
                 {% if t('hero.translation_note') %}<p class="translation-note silk silk--dim">{{ t('hero.translation_note') }}</p>{% endif %}
               </div>
             </div>
 
             <ul class="bays" aria-label="{{ t('hero.facts') }}">
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 0</span><strong>HTL Leonding</strong><span>{{ t('hero.bay0') }}</span></div><span class="led" aria-hidden="true"></span></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 1</span><strong>SlideLizard</strong><span>{{ t('hero.bay1') }}</span></div><span class="led" aria-hidden="true"></span></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 2</span><strong>vektorgrid</strong><span>{{ t('hero.bay2') }}</span></div><span class="led" data-led="push:vektorgrid" aria-hidden="true"></span></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><span class="silk silk--dim" aria-hidden="true">{{ t('hero.bay') }} 3</span><strong>Homelab</strong><span>{{ t('hero.bay3') }}</span></div><span class="led" data-led="status" aria-hidden="true"></span></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>HTL Leonding</strong><span>{{ t('hero.bay0') }}</span></div></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>SlideLizard</strong><span>{{ t('hero.bay1') }}</span></div></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>vektorgrid</strong><span>{{ t('hero.bay2') }}</span></div></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>Homelab</strong><span>{{ t('hero.bay3') }}</span></div><span class="led" data-led="status" aria-hidden="true"></span></li>
             </ul>
           </div>
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
@@ -292,12 +264,14 @@ window.I18N = {{ js_strings | tojson }};
         {# CHASSIS: vektorgrid. Front = hot-swap modules, rear = the
              interactive wiring diagram. JS hides one side and flips between
              them; without JS both are shown. #}
-        <section class="unit rv" id="projects" aria-labelledby="vektorgrid-title">
+        <section class="unit unit--featured rv" id="projects" aria-labelledby="vektorgrid-title">
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="vektorgrid-title">vektorgrid</h2>
-              <span class="model" aria-hidden="true">{{ t('vg.model') }}<span class="u-size"></span></span>
+              <div class="unit-title">
+                <p class="silk silk--dim">{{ t('vg.featured') }}</p>
+                <h2 id="vektorgrid-title">vektorgrid</h2>
+              </div>
               <div class="unit-head-r">
                 <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('vg.status') }}</p>
                 <div class="seg" role="group" aria-label="{{ t('vg.view_label') }}">
@@ -325,28 +299,24 @@ window.I18N = {{ js_strings | tojson }};
                   <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-origin" target="_blank" rel="noopener">{{ t('vg.origin_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
                   <p>{{ t('vg.origin_desc') }}</p>
                   <ul class="cables"><li class="cable cable--cs">C#</li></ul>
-                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
                 </li>
                 <li class="module" style="--stripe: var(--lang-cpp)">
                   <p class="silk">Relay</p>
                   <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-relay" target="_blank" rel="noopener">{{ t('vg.relay_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
                   <p>{{ t('vg.relay_desc') }}</p>
                   <ul class="cables"><li class="cable cable--cpp">C++</li></ul>
-                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
                 </li>
                 <li class="module" style="--stripe: var(--lang-kt)">
                   <p class="silk">Gate</p>
                   <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-gate" target="_blank" rel="noopener">{{ t('vg.gate_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
                   <p>{{ t('vg.gate_desc') }}</p>
                   <ul class="cables"><li class="cable cable--kt">Kotlin</li></ul>
-                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
                 </li>
                 <li class="module" style="--stripe: var(--lang-py)">
                   <p class="silk">Scalars</p>
                   <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-scalars" target="_blank" rel="noopener">{{ t('vg.scalars_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
                   <p>{{ t('vg.scalars_desc') }}</p>
                   <ul class="cables"><li class="cable cable--py">Python</li></ul>
-                  <div class="module-foot" aria-hidden="true"><span class="pull">{{ t('vg.pull') }}</span></div>
                 </li>
               </ul>
 
@@ -478,18 +448,47 @@ window.I18N = {{ js_strings | tojson }};
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="blades-title">{{ t('blades.title') }}</h2>
-              <span class="model" aria-hidden="true">{{ t('blades.model') }}<span class="u-size"></span></span>
-              <p class="unit-head-r silk silk--dim" aria-hidden="true">{{ t('blades.hint') }}</p>
+              <h2 id="blades-title">{{ t('blades.title') }}</h2>
             </div>
 
+            {# Work first: what's closest to backend work leads. Games follow
+                 in their own, smaller group. A "last push" line only shows when
+                 /api/status reports a push in the last 90 days (main.js). #}
             <ul class="blades">
+              <li class="blade blade--static">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/forkcast.webp" width="1200" height="668" loading="lazy" decoding="async" alt="{{ t('blades.forkcast_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3>Forkcast</h3><p class="status"><span class="led led--blue" aria-hidden="true"></span>{{ t('blades.private') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.forkcast_meta') }}</span></p>
+                  <p class="blade-desc">{{ t('blades.forkcast_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--ts">TypeScript</li><li class="cable">Vue</li><li class="cable">REST API</li></ul>
+                    <span class="blade-note">{{ t('blades.private_repo') }}</span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="blade blade--noshot">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/roboducks-rescuemaze">RoboDucks — RescueMaze</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
+                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.roboducks_meta') }}</span></p>
+                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="roboducks-rescuemaze">--</span></p>
+                  <p class="blade-desc">{{ t('blades.roboducks_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--py">Python</li><li class="cable cable--c">C</li><li class="cable">{{ t('blades.tag_robotics') }}</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/roboducks-rescuemaze">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='RoboDucks') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='RoboDucks') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
               <li class="blade">
                 <span class="blade-handle" aria-hidden="true"></span>
                 <div class="blade-shot"><img src="/img/sceneforge.webp" width="1200" height="458" loading="lazy" decoding="async" alt="{{ t('blades.sceneforge_alt') }}"></div>
                 <div class="blade-info">
                   <div class="blade-top"><h3><a class="card-link" href="/projects/sceneforge-ai">SceneForge AI</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="sceneforge-ai">--</span></p>
+                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="sceneforge-ai">--</span></p>
                   <p class="blade-desc">{{ t('blades.sceneforge_desc') }}</p>
                   <div class="blade-foot">
                     <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_editor') }}</li></ul>
@@ -503,7 +502,7 @@ window.I18N = {{ js_strings | tojson }};
                 <div class="blade-shot"><img src="/img/uniconsole.webp" width="553" height="451" loading="lazy" decoding="async" alt="{{ t('blades.uniconsole_alt') }}"></div>
                 <div class="blade-info">
                   <div class="blade-top"><h3><a class="card-link" href="/projects/uniconsole">UniConsole</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="uniconsole">--</span></p>
+                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="uniconsole">--</span></p>
                   <p class="blade-desc">{{ t('blades.uniconsole_desc_html') }}</p>
                   <div class="blade-foot">
                     <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_devtools') }}</li></ul>
@@ -511,60 +510,31 @@ window.I18N = {{ js_strings | tojson }};
                   </div>
                 </div>
               </li>
+            </ul>
 
-              <li class="blade blade--static">
+            <h3 class="silk silk--dim blades-sub" id="games-title">{{ t('blades.fun_title') }}</h3>
+            <ul class="blades blades--compact" aria-labelledby="games-title">
+              <li class="blade blade--noshot">
                 <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/forkcast.webp" width="1200" height="668" loading="lazy" decoding="async" alt="{{ t('blades.forkcast_alt') }}"></div>
                 <div class="blade-info">
-                  <div class="blade-top"><h3>Forkcast</h3><p class="status"><span class="led led--blue" aria-hidden="true"></span>{{ t('blades.private') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.forkcast_meta') }}</span></p>
-                  <p class="blade-desc">{{ t('blades.forkcast_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--ts">TypeScript</li><li class="cable">Vue</li><li class="cable">REST API</li></ul>
-                    <span class="blank-plate">{{ t('blades.private_repo') }}</span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot blade-shot--empty" aria-hidden="true"><span>{{ t('blades.no_signal') }}</span></div>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/roboducks-rescuemaze">RoboDucks — RescueMaze</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="roboducks-rescuemaze">--</span> <span class="silk silk--dim">· {{ t('blades.roboducks_meta') }}</span></p>
-                  <p class="blade-desc">{{ t('blades.roboducks_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--py">Python</li><li class="cable cable--c">C</li><li class="cable">{{ t('blades.tag_robotics') }}</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/roboducks-rescuemaze">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='RoboDucks') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='RoboDucks') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/space-defenders.webp" width="1200" height="670" loading="lazy" decoding="async" alt="{{ t('blades.space_alt') }}"></div>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/space-defenders">Space Defenders</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="space-defenders">--</span></p>
+                  <div class="blade-top"><h4><a class="card-link" href="/projects/space-defenders">Space Defenders</a></h4><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
                   <p class="blade-desc">{{ t('blades.space_desc') }}</p>
                   <div class="blade-foot">
                     <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_mobile') }}</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/space-defenders">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='Space Defenders') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Space Defenders') }}</span></a></span>
+                    <span class="keys"><a class="key key--sm" href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Space Defenders') }}</span></a></span>
                   </div>
                 </div>
               </li>
 
-              <li class="blade blade--static">
+              <li class="blade blade--noshot blade--static">
                 <span class="blade-handle" aria-hidden="true"></span>
-                {#- Add a screenshot with: <div class="blade-shot"><img src="/img/pigeon.webp" width="…" height="…" loading="lazy" alt="…"></div> #}
-                <div class="blade-shot blade-shot--empty" aria-hidden="true"><span>{{ t('blades.no_signal') }}</span></div>
                 <div class="blade-info">
-                  <div class="blade-top"><h3>P.I.G.E.O.N. — Covert Ops</h3><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
+                  <div class="blade-top"><h4>P.I.G.E.O.N. — Covert Ops</h4><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
                   <p class="blade-desc">{{ t('blades.pigeon_desc') }}</p>
                   <div class="blade-foot">
                     <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_game') }}</li></ul>
                     {#- TODO: swap for a Repo key once the repo is public #}
-                    <span class="blank-plate">{{ t('blades.not_public') }}</span>
+                    <span class="blade-note">{{ t('blades.not_public') }}</span>
                   </div>
                 </div>
               </li>
@@ -580,9 +550,7 @@ window.I18N = {{ js_strings | tojson }};
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="experience-title">{{ t('exp.title') }}</h2>
-              <span class="model" aria-hidden="true">{{ t('exp.model') }}<span class="u-size"></span></span>
-              <p class="unit-head-r silk silk--dim" aria-hidden="true">{{ t('exp.count') }}</p>
+              <h2 id="experience-title">{{ t('exp.title') }}</h2>
             </div>
             <ol class="log">
               <li>
@@ -602,7 +570,7 @@ window.I18N = {{ js_strings | tojson }};
                 </details>
               </li>
               <li>
-                <details class="log-row" open>
+                <details class="log-row">
                   <summary data-open="{{ t('exp.open') }}" data-close="{{ t('exp.close') }}">
                     <time class="lcd" datetime="2025-07">2025-07</time>
                     <h3 class="log-org">{{ t('exp.caritas_org') }}</h3>
@@ -625,8 +593,7 @@ window.I18N = {{ js_strings | tojson }};
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="stack-title">Stack</h2>
-              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+              <h2 id="stack-title">Stack</h2>
             </div>
             <div class="patch">
               <h3 class="silk silk--dim" id="stack-lang">{{ t('stack.languages') }}</h3>
@@ -649,8 +616,7 @@ window.I18N = {{ js_strings | tojson }};
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="about-title">{{ t('about.title') }}</h2>
-              <span class="model" aria-hidden="true">{{ t('about.model') }}<span class="u-size"></span></span>
+              <h2 id="about-title">{{ t('about.title') }}</h2>
             </div>
             <div class="about">
               <p>{{ t('about.p1') }}</p>
@@ -684,8 +650,7 @@ window.I18N = {{ js_strings | tojson }};
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
-              <h2 class="silk" id="contact-title">{{ t('contact.title') }}</h2>
-              <span class="model" aria-hidden="true"><span class="u-size"></span></span>
+              <h2 id="contact-title">{{ t('contact.title') }}</h2>
               <p class="unit-head-r status" id="fault-status"><span class="led" aria-hidden="true"></span><span class="fault-label">{{ t('js.fault.idle') }}</span></p>
             </div>
             <div class="contact">

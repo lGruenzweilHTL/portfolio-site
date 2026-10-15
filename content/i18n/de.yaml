@@ -45,34 +45,31 @@ nav:
   experience: Erfahrung
   about: Über mich
   contact: Kontakt
+  resume: "Lebenslauf"
   lang_label: Sprache
 
 hero:
-  unit: Controller
-  line1: "Backend-Entwickler, meistens in C# und Python"
+  available: "Offen für ein Backend-Praktikum"
+  line1: "Backend- & KI-Entwickler, meistens in C# und Python"
   line2: "4. von 5 Jahren an der HTL Leonding, bei Linz"
   line3: "Abschluss im Juni 2028, auf der Suche nach einem Backend-Praktikum"
   quote: "„Eines der besten Projekte, die hier je in einem Praktikum entstanden sind.“"
   quote_by_html: '— Leiter der Entwicklung bei der <a href="#experience">SlideLizard Software GmbH</a>, Linz, über mein Praktikum dort im August 2026'
-  front_panel: Frontpanel
-  online: Online
   bio: "Das meiste, was ich baue, läuft auf einem Server, und in letzter Zeit hängt oft ein Sprachmodell mit drin. Den Rest der Zeit verbringe ich in Unity, und daraus wird oft ein Werkzeug für andere Unity-Entwickler."
   github_sr: "Profil (öffnet in einem neuen Tab)"
-  resume: Lebenslauf (Englisch)
-  classic: Klassisch
-  download: "Lebenslauf herunterladen"
+  download: "Lebenslauf (PDF, Englisch)"
+  plain: "Lebenslauf als reiner Text für Jobportale"
   classic_sr: "Lebenslauf, zweispaltig, öffnet in einem neuen Tab"
   ats_sr: "Lebenslauf, reiner Text für Jobportale, öffnet in einem neuen Tab"
   translation_note: ""
   facts: Eckdaten
-  bay: Schacht
   bay0: "Höhere Technische Lehranstalt · 2022–2028"
   bay1: "Praktikant Softwareentwicklung · 08/2026"
   bay2: "Sprachassistent · in aktiver Entwicklung"
   bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
 
 vg:
-  model: "Chassis · Hot-Swap"
+  featured: "Hauptprojekt"
   status: Aktiv
   view_label: Chassis-Ansicht
   front: Vorne
@@ -92,7 +89,6 @@ vg:
   gate_desc: "Riskante Tool-Aufrufe warten, bis sie per Biometrie am Handy freigegeben werden. Funktioniert auch als eigenständiges Relay."
   scalars_role: Modell-Pipeline
   scalars_desc: "Spracherkennung, Intent-Router, Experten-LLM und Sprachausgabe, von Origin der Reihe nach aufgerufen."
-  pull: Ziehen
   rear_cap: "Rückansicht · Verkabelung"
   steps_label: Die Anfrage-Pipeline Schritt für Schritt
   step1: Aufnahme
@@ -121,8 +117,7 @@ vg:
 
 blades:
   title: Weitere Projekte
-  model: "Blade-Gehäuse · 6 Einschübe"
-  hint: 'Einschub anklicken für die ganze Projektseite'
+  fun_title: "Spiele, aus Spaß gemacht"
   last_push: Letzter Push
   details: Details
   details_sr: "zu {name}"
@@ -130,7 +125,6 @@ blades:
   shipped: Fertig
   private: Privat
   in_progress: In Arbeit
-  no_signal: Kein Signal
   private_repo: Privates Repo
   not_public: Noch nicht öffentlich
   tag_editor: Editor-Tools
@@ -153,8 +147,6 @@ blades:
 
 exp:
   title: Erfahrung
-  model: Ereignisprotokoll
-  count: 2 Einträge
   open: 'Details +'
   close: 'Schließen −'
   sl_role: Praktikant Softwareentwicklung
@@ -177,7 +169,6 @@ stack:
 
 about:
   title: Über mich
-  model: "Regal · abseits vom Code"
   p1: "Ich bin Lukas, Schüler an der HTL Leonding. Die meiste Zeit stecke ich in Servercode und Spiele, und ab und zu in einen Raspberry Pi, der für einen Wettbewerb auf einen LEGO-Roboter geschraubt ist."
   p2_html: "Die meisten meiner Projekte sind entstanden, weil mich etwas genervt hat. <strong>SceneForge AI</strong> habe ich gebaut, weil es mühsam ist, Szenen von Hand aufzubauen, und das serielle Protokoll hinter <strong>RoboDucks</strong>, weil es keinen sauberen Weg gab, einen LEGO SPIKE von einem Raspberry Pi aus zu steuern."
   homelab: "Drei Proxmox-Knoten (umfunktionierte Desktop-PCs, ein vierter ist unterwegs) mit Nextcloud, Vaultwarden, Jellyfin samt *arr-Stack, einem Minecraft-Server, Pi-hole und dieser Website, alles auch von außerhalb meines Netzwerks erreichbar."
@@ -190,7 +181,7 @@ contact:
   title: Kontakt
   lead: Per E-Mail erreichen Sie mich am schnellsten.
   body: "Ich bin offen für Praktika und spannende Projekte und beantworte alles, was kein Spam ist."
-  report: Fehler melden
+  report: "Fehler auf der Seite melden"
   feedback_sub: "Einen Tippfehler oder Bug entdeckt? Hier melden. Für alles andere ist E-Mail schneller."
   name_label: Name (optional)
   email_label: "E-Mail (optional, für eine Antwort)"
@@ -204,6 +195,7 @@ pdu:
   deployed: Deployt
   edge: Edge
   nodes: Knoten
+  how: "Diese Seite läuft in meinem Proxmox-Homelab: ein FastAPI-Prozess hinter einem Cloudflare Tunnel, der bei jedem Push per GitHub-Webhook neu deployt wird."
   notes: Lernunterlagen
   top: Nach oben
 
