@@ -23,7 +23,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
 /site                      Static assets + notes (served under /, /notes/)
   styles.css               Rack design system (tokens mirror the Figma variables) + console styles
   main.js                  Nav ports, U grid, chassis flip, feedback drawer, live status polling, racking units on scroll
-  chat.js                  Chatbot as a terminal ("ask-lukas") opened from a console tab
+  chat.js                  Chatbot as a terminal ("ask-lukas") opened from a console tab, the hero ask field or the Contact key
   turnstile.js             On-demand Turnstile tokens (separate chat + feedback widgets)
   notes/                   Study cheatsheets (moved from /study)
   files/                   Public downloads — listed by routes/files.py, not the static mount

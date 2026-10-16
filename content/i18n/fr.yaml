@@ -68,6 +68,10 @@ hero:
   bay1: "Stagiaire en génie logiciel · 08/2026"
   bay2: "Assistant vocal · en développement actif"
   bay3: "3 nœuds Proxmox · servent cette page"
+  ask_title: "Posez vos questions à mon assistant IA"
+  ask_lead: "Il connaît mon CV, mes projets et mes disponibilités, et répond en quelques secondes."
+  ask_placeholder: "p. ex. Quand est-il disponible ?"
+  ask_send: "Demander"
 
 vg:
   featured: "Projet phare"
@@ -183,6 +187,7 @@ contact:
   lead: L'e-mail est le moyen le plus rapide de me joindre.
   body: "Je suis ouvert aux stages et aux projets intéressants, et je réponds à tout ce qui n'est pas du spam."
   report: "Signaler un bug sur le site"
+  ask: "Demander à l'assistant IA"
   feedback_sub: "Vous avez repéré une faute ou un bug ? Dites-le ici. Pour tout le reste, l'e-mail est plus rapide."
   name_label: Nom (facultatif)
   email_label: "E-mail (facultatif, pour une réponse)"
@@ -227,7 +232,8 @@ js:
     note6: "<b>TTS :</b> Origin envoie le texte de la réponse au TTS, qui renvoie de l'audio."
     note7: "<b>Réponse :</b> Origin renvoie la réponse parlée via le Relay."
   con:
-    tab_label: "Ouvrir la console : poser des questions sur Lukas"
+    tab: "Demander à mon IA"
+    tab_label: "Ouvrir l'assistant IA : poser des questions sur Lukas"
     close: Fermer la console
     clear_title: Nouvelle conversation
     output_label: Sortie de la console
