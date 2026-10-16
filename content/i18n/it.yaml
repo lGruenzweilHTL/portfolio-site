@@ -70,7 +70,7 @@ hero:
   bay2: "Assistente vocale · in sviluppo attivo"
   bay3: "3 nodi Proxmox · servono questa pagina"
   ask_title: "Chiedi al mio assistente IA"
-  ask_lead: "Conosce il mio CV, i miei progetti e la mia disponibilità, e risponde in pochi secondi."
+  ask_lead: "Sa più di quanto c'è su questa pagina: perché costruisco le cose, come lavoro e cosa cerco."
   ask_placeholder: "es. Quando è disponibile?"
   ask_send: "Chiedi"
 

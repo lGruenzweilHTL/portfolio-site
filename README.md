@@ -46,7 +46,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   templates/               resume.html (designed) + resume_ats.html (ATS), assets/,
                            admin.html, error.html, services.html
 /content                   Single source of truth (YAML)
-  resume.yaml              Personal, projects, skills, beyond_code
+  resume.yaml              Personal, projects, skills, beyond_code, chat_only (chatbot-only background)
   chatbot_personality.yaml Persona + system prompt template
   services.yaml            Public/home-network service catalog
 /deploy                    systemd units + tmpfiles.d drop-in for the deploy webhook

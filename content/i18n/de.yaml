@@ -68,7 +68,7 @@ hero:
   bay2: "Sprachassistent · in aktiver Entwicklung"
   bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
   ask_title: "Fragen Sie meinen KI-Assistenten"
-  ask_lead: "Er kennt meinen Lebenslauf, meine Projekte und meine Verfügbarkeit und antwortet in Sekunden."
+  ask_lead: "Er weiß mehr, als auf dieser Seite steht: warum ich Dinge baue, wie ich arbeite und was ich suche."
   ask_placeholder: "z. B. Ab wann ist er verfügbar?"
   ask_send: "Fragen"
 

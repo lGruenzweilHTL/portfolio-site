@@ -201,6 +201,13 @@ class Content:
             bc_lines.append(f"- {item.get('topic', '?')}: {body}")
         out = _render_simple_for(out, "item in resume.beyond_code", bc_lines)
 
+        # Background the chatbot knows but the site doesn't show (optional).
+        co_lines = [
+            f"- {item['topic'].strip()}: {item['body'].strip().replace(chr(10), ' ')}"
+            for item in self.resume.get("chat_only") or []
+        ]
+        out = _render_simple_for(out, "item in resume.chat_only", co_lines)
+
         # Main-page copy and site links (see _site_copy / _site_links).
         out = _render_simple_for(out, "line in site.copy", [f"- {l}" for l in _site_copy()])
         out = _render_simple_for(out, "link in site.links", [f"- {l}" for l in _site_links(website)])
@@ -492,6 +499,19 @@ def load_services(content_dir: str | Path | None = None) -> tuple[ServiceCategor
     return _parse_categories(root["categories"])
 
 
+def _validate_chat_only(items: Any) -> None:
+    """resume.yaml:chat_only is optional: a list of {topic, body} strings."""
+    if items is None:
+        return
+    if not isinstance(items, list):
+        raise ContentError("resume.yaml:chat_only must be a list")
+    for i, item in enumerate(items):
+        where = f"resume.yaml:chat_only[{i}]"
+        _require_mapping(item, where)
+        _required_string(item, "topic", where)
+        _required_string(item, "body", where)
+
+
 def load_content(content_dir: str | Path | None = None) -> Content:
     """Load the content bundle, validate it, and populate the singleton.
 
@@ -521,6 +541,7 @@ def load_content(content_dir: str | Path | None = None) -> Content:
     _check_required(resume, REQUIRED_RESUME_KEYS, "resume.yaml")
     _check_required(resume.get("personal", {}), REQUIRED_PERSONAL_KEYS, "resume.yaml:personal")
     _check_required(resume.get("skills", {}), REQUIRED_SKILLS_KEYS, "resume.yaml:skills")
+    _validate_chat_only(resume.get("chat_only"))
 
     if "persona" not in persona:
         raise ContentError("chatbot_personality.yaml missing 'persona' key")
@@ -531,11 +552,12 @@ def load_content(content_dir: str | Path | None = None) -> Content:
     service_count = sum(1 + len(category.services) for category in services)
     link_count = sum(len(category.urls) + sum(len(service.urls) for service in category.services) for category in services)
     log.info(
-        "Content loaded: %d projects, %d skills, %d beyond-code items, %d service categories, %d services, %d links",
+        "Content loaded: %d projects, %d skills, %d beyond-code items, %d chat-only items, %d service categories, %d services, %d links",
         len(resume.get("projects", [])),
         len(resume.get("skills", {}).get("languages", []))
         + len(resume.get("skills", {}).get("tools_and_infra", [])),
         len(resume.get("beyond_code", [])),
+        len(resume.get("chat_only") or []),
         len(services),
         service_count,
         link_count,
