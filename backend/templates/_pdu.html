@@ -6,7 +6,7 @@
   <div class="face">
     <div class="unit-head">
       <h2 class="silk" id="pdu-title">{{ t('pdu.title') }}</h2>
-      <span class="model" aria-hidden="true">/api/status<span class="u-size"></span></span>
+      <span class="model" aria-hidden="true">/api/status</span>
       <p class="unit-head-r status" id="pdu-state"><span class="led" aria-hidden="true"></span><span class="pdu-state-label">{{ t('js.status.connecting') }}</span></p>
     </div>
     <div class="pdu">
@@ -16,6 +16,7 @@
         <div><dt class="silk silk--dim">{{ t('pdu.edge') }}</dt><dd class="lcd lcd--chip" data-status="edge">--</dd></div>
         <div><dt class="silk silk--dim">{{ t('pdu.nodes') }}</dt><dd class="lcd lcd--chip" data-status="nodes">--</dd></div>
       </dl>
+      <p class="pdu-how">{{ t('pdu.how') }}</p>
     </div>
     <p class="pdu-foot silk silk--dim">
       © 2026 Lukas Grünzweil ·{% if home %} <a href="{{ home }}">Portfolio</a> ·{% endif %} <a href="/notes/">{{ t('pdu.notes') }}</a> · <a href="#main">{{ t('pdu.top') }} <span aria-hidden="true">↑</span></a>

@@ -56,7 +56,7 @@ document.documentElement.classList.add('js');
           <div class="face">
             <div class="unit-head">
               <p class="silk">Service directory</p>
-              <span class="model" aria-hidden="true">Homelab · {{ categories | length }} groups<span class="u-size"></span></span>
+              <span class="model" aria-hidden="true">Homelab · {{ categories | length }} groups</span>
             </div>
             <div class="project">
               <div class="ctrl-display">
@@ -89,7 +89,7 @@ document.documentElement.classList.add('js');
           <div class="face">
             <div class="unit-head">
               <h2 class="silk" id="category-{{ category.id }}">{{ category.name }}</h2>
-              <span class="model" aria-hidden="true">{{ category.id }}<span class="u-size"></span></span>
+              <span class="model" aria-hidden="true">{{ category.id }}</span>
               <p class="unit-head-r status">{{ vis_led(category.visibility) }}{{ category.visibility_label }}</p>
             </div>
             {% if category.description %}<p class="svc-desc">{{ category.description }}</p>{% endif %}

@@ -1,6 +1,6 @@
 # UI strings for the main page, Italian (/it/). Keys mirror en.yaml.
 # Machine-assisted translation, not reviewed by a native speaker; the
-# translation note under the résumé switch says so. Readers get "tu", as is
+# translation note under the résumé links says so. Readers get "tu", as is
 # common on developer sites.
 
 meta:
@@ -47,34 +47,31 @@ nav:
   experience: Esperienza
   about: Chi sono
   contact: Contatti
+  resume: "CV"
   lang_label: Lingua
 
 hero:
-  unit: Controller
-  line1: "Sviluppatore backend, soprattutto in C# e Python"
+  available: "Disponibile per un tirocinio backend"
+  line1: "Sviluppatore backend e IA, soprattutto in C# e Python"
   line2: "4° anno su 5 alla HTL Leonding, vicino a Linz, Austria"
   line3: "Mi diplomo a giugno 2028 e cerco un tirocinio backend"
   quote: "«Uno dei migliori progetti mai nati da un tirocinio qui»."
   quote_by_html: '— Responsabile dello sviluppo di <a href="#experience">SlideLizard Software GmbH</a>, Linz, sul mio tirocinio da loro ad agosto 2026'
-  front_panel: Pannello frontale
-  online: Online
   bio: "Quasi tutto ciò che costruisco gira su un server, e ultimamente spesso c'è di mezzo un modello linguistico. Il resto del tempo sono in Unity, e spesso ne esce uno strumento per altri sviluppatori Unity."
   github_sr: "profilo (si apre in una nuova scheda)"
-  resume: CV (in inglese)
-  classic: Classico
-  download: "Scarica il CV"
+  download: "CV (PDF, in inglese)"
+  plain: "CV in testo semplice per i portali di lavoro"
   classic_sr: "CV, a due colonne, si apre in una nuova scheda"
   ats_sr: "CV, testo semplice per i portali di lavoro, si apre in una nuova scheda"
   translation_note: "Pagina tradotta dall'inglese. Lukas lavora in tedesco e in inglese."
   facts: Dati principali
-  bay: Alloggiamento
   bay0: "Istituto tecnico superiore · 2022–2028"
   bay1: "Tirocinante in ingegneria del software · 08/2026"
   bay2: "Assistente vocale · in sviluppo attivo"
   bay3: "3 nodi Proxmox · servono questa pagina"
 
 vg:
-  model: "Chassis · hot-swap"
+  featured: "Progetto principale"
   status: Attivo
   view_label: Vista dello chassis
   front: Fronte
@@ -94,7 +91,6 @@ vg:
   gate_desc: "Le chiamate a strumenti rischiose restano in attesa finché non vengono approvate con la biometria sul telefono. Funziona anche come relay autonomo."
   scalars_role: Pipeline dei modelli
   scalars_desc: "Riconoscimento vocale, router degli intenti, LLM esperto e sintesi vocale, chiamati in sequenza da Origin."
-  pull: Estrai
   rear_cap: "Vista posteriore · cablaggio"
   steps_label: Segui la pipeline della richiesta passo per passo
   step1: Acquisizione
@@ -123,8 +119,7 @@ vg:
 
 blades:
   title: Altri progetti
-  model: "Chassis blade · 6 slitte"
-  hint: 'Clicca su una slitta per la pagina completa del progetto'
+  fun_title: "Giochi, fatti per divertimento"
   last_push: Ultimo push
   details: Dettagli
   details_sr: "su {name}"
@@ -132,7 +127,6 @@ blades:
   shipped: Pubblicato
   private: Privato
   in_progress: In lavorazione
-  no_signal: Nessun segnale
   private_repo: Repo privato
   not_public: Non ancora pubblico
   tag_editor: Strumenti per l'editor
@@ -155,8 +149,6 @@ blades:
 
 exp:
   title: Esperienza
-  model: Registro eventi
-  count: 2 voci
   open: 'Dettagli +'
   close: 'Chiudi −'
   sl_role: Tirocinante in ingegneria del software
@@ -179,7 +171,6 @@ stack:
 
 about:
   title: Chi sono
-  model: "Scaffale · oltre il codice"
   p1: "Sono Lukas, studente alla HTL Leonding. Passo la maggior parte del tempo tra codice server e giochi e, ogni tanto, su un Raspberry Pi avvitato a un robot LEGO per una competizione."
   p2_html: "La maggior parte dei miei progetti è nata perché qualcosa mi dava fastidio. Ho creato <strong>SceneForge AI</strong> perché allestire le scene a mano è noioso, e il protocollo seriale dietro <strong>RoboDucks</strong> perché non c'era un modo pulito per comandare un LEGO SPIKE da un Raspberry Pi."
   homelab: "Tre nodi Proxmox (desktop riutilizzati, con un quarto in arrivo) che ospitano Nextcloud, Vaultwarden, Jellyfin con lo stack *arr, un server Minecraft, Pi-hole e questo sito, tutti raggiungibili dall'esterno della mia rete."
@@ -192,7 +183,7 @@ contact:
   title: Contatti
   lead: L'e-mail è il modo più veloce per contattarmi.
   body: "Sono aperto a tirocini e progetti interessanti, e rispondo a tutto ciò che non è spam."
-  report: Segnala un problema
+  report: "Segnala un problema sul sito"
   feedback_sub: "Hai notato un refuso o un bug? Dimmelo qui. Per tutto il resto l'e-mail è più veloce."
   name_label: Nome (facoltativo)
   email_label: "E-mail (facoltativa, per una risposta)"
@@ -206,6 +197,7 @@ pdu:
   deployed: Deploy
   edge: Edge
   nodes: Nodi
+  how: "Questo sito gira nel mio homelab Proxmox: un processo FastAPI dietro un Cloudflare Tunnel, ridistribuito da un webhook GitHub a ogni push."
   notes: Appunti di studio
   top: Torna su
 

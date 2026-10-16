@@ -1,6 +1,6 @@
 # UI strings for the main page, French (/fr/). Keys mirror en.yaml.
 # Machine-assisted translation, not reviewed by a native speaker; the
-# translation note under the résumé switch says so. Readers get "vous".
+# translation note under the résumé links says so. Readers get "vous".
 
 meta:
   name: Français
@@ -46,34 +46,31 @@ nav:
   experience: Expérience
   about: À propos
   contact: Contact
+  resume: "CV"
   lang_label: Langue
 
 hero:
-  unit: Contrôleur
-  line1: "Développeur backend, surtout en C# et Python"
+  available: "Ouvert à un stage backend"
+  line1: "Développeur backend et IA, surtout en C# et Python"
   line2: "4e année sur 5 à la HTL Leonding, près de Linz, Autriche"
   line3: "Diplômé en juin 2028, je cherche un stage backend"
   quote: "« L'un des meilleurs projets jamais réalisés ici pendant un stage. »"
   quote_by_html: '— Responsable du développement chez <a href="#experience">SlideLizard Software GmbH</a>, Linz, à propos de mon stage chez eux en août 2026'
-  front_panel: Façade
-  online: En ligne
   bio: "La plupart de ce que je construis tourne sur un serveur, et ces derniers temps il y a souvent un modèle de langage dans la boucle. Le reste du temps, je suis dans Unity, et ça finit souvent en outil pour d'autres développeurs Unity."
   github_sr: "profil (s'ouvre dans un nouvel onglet)"
-  resume: CV (en anglais)
-  classic: Classique
-  download: "Télécharger le CV"
+  download: "CV (PDF, en anglais)"
+  plain: "CV en texte brut pour les portails d'emploi"
   classic_sr: "CV, deux colonnes, s'ouvre dans un nouvel onglet"
   ats_sr: "CV, texte brut pour les portails d'emploi, s'ouvre dans un nouvel onglet"
   translation_note: "Page traduite de l'anglais. Lukas travaille en allemand et en anglais."
   facts: Points clés
-  bay: Baie
   bay0: "Lycée technique supérieur · 2022–2028"
   bay1: "Stagiaire en génie logiciel · 08/2026"
   bay2: "Assistant vocal · en développement actif"
   bay3: "3 nœuds Proxmox · servent cette page"
 
 vg:
-  model: "Châssis · hot-swap"
+  featured: "Projet phare"
   status: Actif
   view_label: Vue du châssis
   front: Avant
@@ -93,7 +90,6 @@ vg:
   gate_desc: "Les appels d'outils risqués attendent d'être validés par biométrie sur le téléphone. Fonctionne aussi comme relais autonome."
   scalars_role: Chaîne de modèles
   scalars_desc: "Reconnaissance vocale, routeur d'intention, LLM expert et synthèse vocale, appelés dans l'ordre par Origin."
-  pull: Tirer
   rear_cap: "Vue arrière · câblage"
   steps_label: Parcourir la chaîne de traitement étape par étape
   step1: Capture
@@ -122,8 +118,7 @@ vg:
 
 blades:
   title: Autres projets
-  model: "Châssis lames · 6 tiroirs"
-  hint: 'Cliquez sur un tiroir pour la page complète du projet'
+  fun_title: "Jeux, faits pour le plaisir"
   last_push: Dernier push
   details: Détails
   details_sr: "sur {name}"
@@ -131,7 +126,6 @@ blades:
   shipped: Livré
   private: Privé
   in_progress: En cours
-  no_signal: Pas de signal
   private_repo: Dépôt privé
   not_public: Pas encore public
   tag_editor: Outils d'éditeur
@@ -154,8 +148,6 @@ blades:
 
 exp:
   title: Expérience
-  model: Journal d'événements
-  count: 2 entrées
   open: 'Détails +'
   close: 'Fermer −'
   sl_role: Stagiaire en génie logiciel
@@ -178,7 +170,6 @@ stack:
 
 about:
   title: À propos
-  model: "Étagère · hors du code"
   p1: "Je suis Lukas, élève à la HTL Leonding. Je passe l'essentiel de mon temps sur du code serveur et des jeux, et de temps en temps sur un Raspberry Pi vissé sur un robot LEGO pour une compétition."
   p2_html: "La plupart de mes projets sont nés d'un agacement. J'ai créé <strong>SceneForge AI</strong> parce que monter des scènes à la main est fastidieux, et le protocole série derrière <strong>RoboDucks</strong> parce qu'il n'existait pas de moyen propre de piloter un LEGO SPIKE depuis un Raspberry Pi."
   homelab: "Trois nœuds Proxmox (des PC de bureau reconvertis, un quatrième en route) qui hébergent Nextcloud, Vaultwarden, Jellyfin avec la suite *arr, un serveur Minecraft, Pi-hole et ce site, le tout accessible depuis l'extérieur de mon réseau."
@@ -191,7 +182,7 @@ contact:
   title: Contact
   lead: L'e-mail est le moyen le plus rapide de me joindre.
   body: "Je suis ouvert aux stages et aux projets intéressants, et je réponds à tout ce qui n'est pas du spam."
-  report: Signaler un problème
+  report: "Signaler un bug sur le site"
   feedback_sub: "Vous avez repéré une faute ou un bug ? Dites-le ici. Pour tout le reste, l'e-mail est plus rapide."
   name_label: Nom (facultatif)
   email_label: "E-mail (facultatif, pour une réponse)"
@@ -205,6 +196,7 @@ pdu:
   deployed: Déployé
   edge: Edge
   nodes: Nœuds
+  how: "Ce site tourne sur mon homelab Proxmox : un processus FastAPI derrière un Cloudflare Tunnel, redéployé par un webhook GitHub à chaque push."
   notes: Notes de cours
   top: Haut de page
 
