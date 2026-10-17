@@ -67,6 +67,10 @@ hero:
   bay1: "Praktikant Softwareentwicklung · 08/2026"
   bay2: "Sprachassistent · in aktiver Entwicklung"
   bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
+  ask_title: "Fragen Sie meinen KI-Assistenten"
+  ask_lead: "Er weiß mehr, als auf dieser Seite steht: warum ich Dinge baue, wie ich arbeite und was ich suche."
+  ask_placeholder: "z. B. Ab wann ist er verfügbar?"
+  ask_send: "Fragen"
 
 vg:
   featured: "Hauptprojekt"
@@ -182,6 +186,7 @@ contact:
   lead: Per E-Mail erreichen Sie mich am schnellsten.
   body: "Ich bin offen für Praktika und spannende Projekte und beantworte alles, was kein Spam ist."
   report: "Fehler auf der Seite melden"
+  ask: "KI-Assistenten fragen"
   feedback_sub: "Einen Tippfehler oder Bug entdeckt? Hier melden. Für alles andere ist E-Mail schneller."
   name_label: Name (optional)
   email_label: "E-Mail (optional, für eine Antwort)"
@@ -226,7 +231,8 @@ js:
     note6: "<b>TTS:</b> Origin schickt den Antworttext an TTS, das Audio zurückgibt."
     note7: "<b>Antwort:</b> Origin streamt die gesprochene Antwort über das Relay zurück."
   con:
-    tab_label: "Konsole öffnen: Fragen über Lukas stellen"
+    tab: "KI fragen"
+    tab_label: "KI-Assistenten öffnen: Fragen über Lukas stellen"
     close: Konsole schließen
     clear_title: Neues Gespräch beginnen
     output_label: Konsolenausgabe

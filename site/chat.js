@@ -1,5 +1,6 @@
 /* Chatbot UI: a plain terminal ("ask-lukas") opened from a console tab in the
-   bottom-right corner.
+   bottom-right corner, from the hero's ask field ([data-ask-form], which
+   sends its question right away) or from any [data-ask] key.
    - Per-session UUID in localStorage; "clear" starts a new conversation
    - Calls POST /api/chat and parses the SSE stream
    - Renders failures as red "error:" lines with the email link
@@ -94,10 +95,10 @@
     init() {
       const tab = el('button', { type: 'button', class: 'con-tab', 'aria-label': tr('con.tab_label'), 'aria-expanded': 'false', 'aria-controls': 'console', 'aria-haspopup': 'dialog' }, [
         el('span', { class: 'con-tab-p', 'aria-hidden': 'true', text: '>_' }),
-        el('span', { text: 'ask-lukas' }),
+        el('span', { text: tr('con.tab') }),
         cursor(),
       ]);
-      tab.addEventListener('click', () => this.toggle());
+      tab.addEventListener('click', () => this.toggle('tab'));
       document.body.appendChild(tab);
       this.tab = tab;
 
@@ -168,6 +169,27 @@
       document.addEventListener('rack:status', (e) => setModel(e.detail));
 
       this.greet(true);
+
+      // The other ways in are hidden in the markup until this point, since
+      // without JS there is no console for them to open.
+      for (const form of document.querySelectorAll('[data-ask-form]')) {
+        form.hidden = false;
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const field = form.elements.q;
+          const q = field.value.trim();
+          this.openPanel('hero');
+          if (q && !this.busy) {
+            field.value = '';
+            this.input.value = q;
+            this.send();
+          }
+        });
+      }
+      for (const key of document.querySelectorAll('[data-ask]')) {
+        key.hidden = false;
+        key.addEventListener('click', () => this.openPanel(key.dataset.ask || 'contact'));
+      }
     },
 
     greet(first) {
@@ -189,16 +211,20 @@
       }
     },
 
-    toggle() {
-      if (this.open) this.close(); else this.openPanel();
+    toggle(source) {
+      if (this.open) this.close(); else this.openPanel(source);
     },
-    openPanel() {
+    openPanel(source) {
+      if (this.open) { this.input.focus(); return; }
+      // Focus goes back to whatever opened the console; the tab is hidden
+      // on phones while the hero is on screen.
+      this.opener = document.activeElement;
       this.panel.inert = false;
       this.panel.classList.add('open');
       this.tab.setAttribute('aria-expanded', 'true');
       this.open = true;
       this.input.focus();
-      this.track('chatbot_opened');
+      this.track('chatbot_opened', { source: source || 'tab' });
     },
     close() {
       if (!this.open) return;
@@ -206,7 +232,8 @@
       this.open = false;
       this.panel.inert = true;
       this.panel.classList.remove('open');
-      this.tab.focus();
+      const back = this.opener && this.opener.isConnected && this.opener !== document.body ? this.opener : this.tab;
+      back.focus();
     },
 
     announce(text) {

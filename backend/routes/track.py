@@ -1,7 +1,7 @@
 """POST /api/track — custom event beacon from the client.
 
 Use cases (wire from the frontend as needed):
-  - chatbot_opened        (chatbot UI shown)
+  - chatbot_opened        (chatbot UI shown; {source}: tab, hero or contact)
   - resume_downloaded     (user clicked the Résumé link)
   - contact_clicked       (email link clicked)
   - project_link_clicked  (with {slug} in data)
