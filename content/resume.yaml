@@ -271,6 +271,48 @@ chat_only:
       was still up, so I connected remotely and had it fixed in about an hour.
       The cause was a stalled drive operation that left the drive unusable and
       took every service on it down.
+  - topic: "How the homelab started"
+    body: >
+      I saw a video about Home Assistant, thought it looked cool and put it on
+      a Raspberry Pi. Soon after I moved it to an old PC from our basement, and
+      about a year later I grew it to three Proxmox nodes.
+  - topic: "What the homelab taught me"
+    body: >
+      Pretty much all of my hands-on Linux, Docker, networking, monitoring and
+      backup experience. It turned things I only knew in theory, like
+      networking and monitoring, into practice.
+  - topic: "What changed after the outage"
+    body: >
+      The drive that failed was shared across the nodes and held the
+      high-availability services without any replication. I replaced all of my
+      bulk storage with one larger drive and reused the freed-up drives for
+      backups and for the high-availability services, which are now replicated
+      with ZFS.
+  - topic: "What's next for the homelab"
+    body: >
+      I've bought most of the hardware for a fourth node and am only waiting on
+      the CPU and motherboard, so it's coming very soon. It will probably
+      replace one of the existing nodes and is mostly there to balance services
+      better. Some day, much further out, I'd like a dedicated AI node with an
+      RTX 3090.
+  - topic: "What I automate with Home Assistant"
+    body: >
+      Not many of my devices support automation, but I automate everything the
+      hardware allows: the 3D printer, the solar panels with a full energy
+      dashboard, every light that can be controlled remotely, Zigbee smart
+      plugs, and the robot lawn mower.
+  - topic: "Who uses the homelab"
+    body: >
+      My family relies on the Pi-hole and Nextcloud, and some friends use
+      Jellyfin and the Minecraft server.
+  - topic: "The Ender of Theseus, in detail"
+    body: >
+      Mods so far on my Ender 3 Pro: a direct drive extruder, a BTT SKR Mini E3
+      V3 motherboard, a glass print bed, a custom filament spool holder, and a
+      Raspberry Pi running Klipper. It's integrated into Home Assistant and
+      watched by a night vision camera. Next on the list: a better motherboard
+      enclosure for airflow, switching the printer on and off remotely so it
+      powers down when a print is done, and a dual Z-screw kit.
   - topic: "How I work in a team"
     body: >
       I don't have enough team experience to name a preference; it depends on
