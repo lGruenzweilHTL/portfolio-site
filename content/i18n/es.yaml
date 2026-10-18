@@ -205,8 +205,11 @@ pdu:
   how: "Esta web se ejecuta en mi homelab Proxmox: un proceso FastAPI detrás de un Cloudflare Tunnel, que un webhook de GitHub vuelve a desplegar con cada push."
   notes: Apuntes
   top: Volver arriba
+  privacy: "Privacidad"
 
 js:
+  # Privacy policy for this language (/de/privacy for German, /privacy otherwise).
+  privacy_path: /privacy
   status:
     connecting: Conectando
     online: En línea
@@ -253,6 +256,8 @@ js:
     connecting: "[conectando"
     error: "error:"
     error_sr: "Error:"
+    privacy: "Los chats se guardan para mejorar el bot."
+    privacy_link: "Política de privacidad (en inglés)"
   reason:
     rate_limited: "Estás enviando mensajes demasiado rápido. Espera un momento o escríbeme."
     captcha_failed: Falló la comprobación del captcha. Recarga la página e inténtalo de nuevo.
@@ -263,6 +268,7 @@ js:
     stream_interrupted: "La conexión se cortó antes de terminar la respuesta. Inténtalo de nuevo o escríbeme si vuelve a pasar."
     network_error: "Error de red. Inténtalo de nuevo o escríbeme directamente."
     unknown: "Algo ha ido mal. Inténtalo de nuevo o escríbeme."
+    moderated: "Con eso no puedo ayudar. Pregúntame mejor por los proyectos, las habilidades o la experiencia de Lukas."
   fb:
     empty: Escribe primero un mensaje.
     bad_email: "Esa dirección de correo no parece correcta. Corrígela o déjala vacía."

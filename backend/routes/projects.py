@@ -5,7 +5,8 @@
                             with its facts, JSON-LD and the repo README
   GET /sitemap.xml       -> generated: the main page in every language (with
                             hreflang alternates), project pages, résumés,
-                            llms.txt, and every study note on disk
+                            llms.txt, the privacy policy (en + de) and every
+                            study note on disk
 
 Project pages exist for search engines and LLM crawlers as much as for
 people: each one is a self-contained, citable page about a single project.
@@ -25,6 +26,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from ..config import settings
 from ..i18n import DEFAULT_LANG, catalogs, languages
 from ..projects import find_project, get_readme, github_projects
+from .privacy import PATHS as PRIVACY_PATHS
 
 router = APIRouter()
 
@@ -145,6 +147,7 @@ def sitemap() -> Response:
         ("/resume.pdf", _mtime(resume_yaml), "0.8"),
         ("/resume-ats.pdf", _mtime(resume_yaml), "0.5"),
         ("/llms.txt", _mtime(site / "llms.txt"), "0.3"),
+        *[(path, _mtime(Path(settings.templates_dir) / "privacy.html"), "0.2") for path in PRIVACY_PATHS.values()],
     ]
     notes = site / "notes"
     if (notes / "index.html").exists():
@@ -159,13 +162,17 @@ def sitemap() -> Response:
         f'<xhtml:link rel="alternate" hreflang="{lang.hreflang}" href="{escape(ORIGIN + lang.path)}"/>' for lang in langs
     ) + f'<xhtml:link rel="alternate" hreflang="x-default" href="{escape(ORIGIN)}/"/>'
     home_paths = {lang.path for lang in langs}
+    privacy_alternates = "".join(
+        f'<xhtml:link rel="alternate" hreflang="{code}" href="{escape(ORIGIN + path)}"/>' for code, path in PRIVACY_PATHS.items()
+    ) + f'<xhtml:link rel="alternate" hreflang="x-default" href="{escape(ORIGIN + PRIVACY_PATHS["en"])}"/>'
+
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ]
     for path, lastmod, prio in urls:
         mod = f"<lastmod>{lastmod}</lastmod>" if lastmod else ""
-        alt = alternates if path in home_paths else ""
+        alt = alternates if path in home_paths else privacy_alternates if path in PRIVACY_PATHS.values() else ""
         lines.append(f"  <url><loc>{escape(ORIGIN + path)}</loc>{mod}<priority>{prio}</priority>{alt}</url>")
     lines.append("</urlset>")
     return Response("\n".join(lines) + "\n", media_type="application/xml", headers={"cache-control": "no-cache"})

@@ -13,6 +13,7 @@ Architecture:
     /api/...        -> JSON API routes (chat, feedback, track, status)
     /resume.pdf     -> generated on demand (with on-disk cache)
     /webhook/...    -> deploy trigger
+    /privacy        -> privacy policy (English; /de/privacy in German)
     /admin          -> combined feedback + analytics view (Cloudflare Access gated)
 
 The static mount must come AFTER API routes so /api/*, /services, /resume.pdf,
@@ -20,7 +21,9 @@ The static mount must come AFTER API routes so /api/*, /services, /resume.pdf,
 """
 from __future__ import annotations
 
+import asyncio
 import logging
+import secrets
 import sqlite3
 import time
 from datetime import datetime, timezone
@@ -36,6 +39,7 @@ from starlette.types import ASGIApp
 from .config import settings
 from .content import load_content, get_content
 from .db.models import init_db
+from .net import client_ip
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +48,7 @@ log = logging.getLogger(__name__)
 
 # Paths we never log as pageviews. Static asset requests are noise;
 # API and webhook paths are noise too (logged via their own routes if needed).
-_SKIP_LOG_PREFIXES = ("/static", "/favicon", "/_next", "/api/", "/webhook/", "/_api/")
+_SKIP_LOG_PREFIXES = ("/static", "/favicon", "/_next", "/api/", "/webhook/", "/_api/", "/admin/api/")
 _SKIP_LOG_EXACT = {"/healthz", "/admin/regenerate-resume"}
 # File extensions treated as static assets — skipped at the middleware so
 # they never enter the events table, and filtered in the admin top-paths
@@ -67,16 +71,30 @@ def _is_static_asset(path: str) -> bool:
     return last.rsplit(".", 1)[1].lower() in _STATIC_ASSET_EXTS
 
 
+# Daily salt for the visitor hash: random, held in memory only, replaced when
+# the UTC date changes. Without it sha256(ip + ua + date) could be reversed
+# by hashing all 2^32 IPv4 addresses. A restart mid-day draws a new salt and
+# so splits that day's visitor count; accepted.
+_salt: tuple[str, str] = ("", "")
+
+
+def _daily_salt(today: str) -> str:
+    global _salt
+    if _salt[0] != today:
+        _salt = (today, secrets.token_hex(16))
+    return _salt[1]
+
+
 def _visitor_hash(ip: str, user_agent: str) -> str:
     """Pseudo-unique visitor id, rotated daily. No cookies, no PII stored.
 
-    SHA-256 of (ip + ua + date) truncated to 16 hex chars. Date bucket means
-    a returning visitor the next day looks like a new visitor — by design for
-    "daily uniques" metric. We don't link across days, and the hash isn't
-    reversible without the same input triple.
+    SHA-256 of (salt + ip + ua + date) truncated to 16 hex chars. The salt
+    is never stored, so once the day is over the hash can't be linked back
+    to an IP, not even by us. A returning visitor the next day looks like a
+    new visitor, by design for the "daily uniques" metric.
     """
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    digest = sha256(f"{ip}|{user_agent}|{today}".encode("utf-8")).hexdigest()
+    digest = sha256(f"{_daily_salt(today)}|{ip}|{user_agent}|{today}".encode("utf-8")).hexdigest()
     return digest[:16]
 
 
@@ -241,7 +259,7 @@ class AnalyticsMiddleware(BaseHTTPMiddleware):
         # Even 404s get logged — someone trying to reach /foo is signal.
         # The status code is captured so the admin "Top paths" view can
         # filter to accepted (2xx/3xx) responses only.
-        ip = request.client.host if request.client else ""
+        ip = client_ip(request)
         ua = request.headers.get("user-agent", "")
         referrer = request.headers.get("referer", "")
         conn = sqlite3.connect(settings.database_path, timeout=5.0)
@@ -323,6 +341,19 @@ def create_app() -> FastAPI:
                 log.warning("Resume PDF generation deferred: %s", e)
         threading.Thread(target=_render_resumes_bg, daemon=True, name="resume-gen").start()
 
+    # Retention: delete personal data older than DATA_RETENTION_DAYS now and
+    # then daily. Async so the task lives on the server's event loop.
+    @app.on_event("startup")
+    async def _start_retention() -> None:
+        from .retention import retention_loop
+        app.state.retention_task = asyncio.create_task(retention_loop())
+
+    @app.on_event("shutdown")
+    async def _stop_retention() -> None:
+        task = getattr(app.state, "retention_task", None)
+        if task is not None:
+            task.cancel()
+
     # --- Healthcheck (not logged as a pageview) ---
     @app.get("/healthz")
     def healthz() -> dict:
@@ -341,6 +372,8 @@ def create_app() -> FastAPI:
     from .routes import status
     from .routes import projects
     from .routes import home
+    from .routes import privacy
+    from .routes import chat_models_admin
     app.include_router(chat.router)
     app.include_router(feedback.router)
     app.include_router(track.router)
@@ -354,6 +387,8 @@ def create_app() -> FastAPI:
     app.include_router(status.router)
     app.include_router(projects.router)
     app.include_router(home.router)
+    app.include_router(privacy.router)
+    app.include_router(chat_models_admin.router)
 
     # --- Exception handlers: styled HTML for browsers, JSON for API clients ---
     _install_error_handlers(app)

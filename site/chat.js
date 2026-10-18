@@ -42,6 +42,10 @@
     server_misconfigured:{ text: tr('reason.server_misconfigured'), email: true },
     server_error:        { text: tr('reason.server_error'), email: true },
     stream_interrupted:  { text: tr('reason.stream_interrupted'), email: true },
+    // Model-level (SSE fallback). A blocked message is a refusal, not a
+    // fault: no email link. English pages show the backend's copy, the
+    // others this catalog's (the backend only speaks English).
+    moderated:           { text: tr('reason.moderated'), email: false, localized: true },
     // Pure client-side failures.
     network_error:       { text: tr('reason.network_error'), email: true },
     unknown:             { text: tr('reason.unknown'), email: true },
@@ -149,11 +153,17 @@
       ]);
       form.addEventListener('submit', (e) => { e.preventDefault(); this.send(); });
 
-      const modelLabel = el('span', { text: tr('con.free_model') + ' · OpenRouter' });
+      const modelLabel = el('span', { class: 'con-model', text: tr('con.free_model') });
       this.modelLabel = modelLabel;
-      const status = el('div', { class: 'con-status', 'aria-hidden': 'true' }, [modelLabel, el('span', { text: tr('con.hint') })]);
+      const status = el('div', { class: 'con-status', 'aria-hidden': 'true' }, [modelLabel, el('span', { class: 'con-hint', text: tr('con.hint') })]);
 
-      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title' }, [bar, out, live, turnstileBox, form, status]);
+      // Chats are logged; say so where people type, with the policy link.
+      const note = el('p', { class: 'con-note' }, [
+        tr('con.privacy') + ' ',
+        el('a', { href: tr('privacy_path'), text: tr('con.privacy_link') }),
+      ]);
+
+      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title' }, [bar, out, live, turnstileBox, form, note, status]);
       panel.inert = true;
       panel.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { e.stopPropagation(); this.close(); }
@@ -163,7 +173,7 @@
 
       // /api/status names the model the next chat starts with; a chat reply
       // names the model that answered it ('model' SSE event).
-      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + ' · ' + (s.provider || 'OpenRouter'); };
+      const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + (s.provider ? ' · ' + s.provider : ''); };
       this.setModel = setModel;
       setModel(window.__rackStatus);
       document.addEventListener('rack:status', (e) => setModel(e.detail));
@@ -275,13 +285,21 @@
       const wait = this.out.querySelector('.ln--wait');
       if (wait) wait.remove();
       // Drop the half-streamed reply, if any — it never finished. Only the
-      // one still streaming: earlier replies stay.
+      // one still streaming: earlier replies stay. A reply blocked half-way
+      // stays on screen, with the refusal after it.
       const partial = this.out.querySelector('.ln--out.streaming');
-      if (partial) partial.remove();
+      if (partial && reason === 'moderated') {
+        partial.classList.remove('streaming');
+        partial.textContent = partial.textContent; // drops the caret
+      } else if (partial) {
+        partial.remove();
+      }
 
       const cfg = REASON_MESSAGES[reason] || REASON_MESSAGES.unknown;
-      // Trust the server's copy when it sent one — it has more context.
-      const text = (serverMessage && serverMessage.trim()) || cfg.text;
+      // Trust the server's copy when it sent one — it has more context —
+      // except for localized reasons on non-English pages.
+      const server = serverMessage && serverMessage.trim();
+      const text = (cfg.localized && LANG !== 'en' ? cfg.text : server) || cfg.text;
       const div = el('div', { class: 'ln ln--err' }, [tr('con.error') + ' ' + text]);
       if (cfg.email) div.append(' ', el('a', { href: 'mailto:' + EMAIL, text: EMAIL }));
       this.out.appendChild(div);
@@ -415,9 +433,9 @@
         } else if (evt.type === 'fallback') {
           sawAnyEvent = true;
           // The backend already sends the user-facing copy. We pass the
-          // upstream reason (rate_limit, timeout, upstream_error, no_key)
-          // for analytics; it won't be in REASON_MESSAGES so the unknown
-          // fallback (email: true) is used for the link.
+          // upstream reason (rate_limit, timeout, upstream_error, no_key,
+          // server_misconfigured, moderated) for analytics; reasons not in
+          // REASON_MESSAGES use the unknown fallback (email: true).
           this.showError(evt.reason || 'model_fallback', evt.message);
           this.track('chatbot_fallback', { reason: evt.reason });
         } else if (evt.type === 'error') {
