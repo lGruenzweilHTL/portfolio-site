@@ -17,8 +17,6 @@ Rate limit: 5/min per IP (per settings.feedback_rate_limit).
 from __future__ import annotations
 
 import logging
-import time
-from collections import defaultdict, deque
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Request, Response
@@ -27,25 +25,15 @@ from pydantic import BaseModel, Field, EmailStr
 
 from ..config import settings
 from ..db.models import get_db
+from ..net import client_ip
+from ..ratelimit import RateLimiter
 from ..turnstile import verify_turnstile
 
 log = logging.getLogger(__name__)
 
 router = APIRouter()
 
-_RATE_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
-
-
-def _rate_limited(ip: str, *, max_calls: int, window_seconds: int) -> bool:
-    now = time.monotonic()
-    bucket = _RATE_BUCKETS[ip]
-    cutoff = now - window_seconds
-    while bucket and bucket[0] < cutoff:
-        bucket.popleft()
-    if len(bucket) >= max_calls:
-        return True
-    bucket.append(now)
-    return False
+_LIMITER = RateLimiter(max_calls=5, window_seconds=60)
 
 
 class FeedbackRequest(BaseModel):
@@ -57,8 +45,7 @@ class FeedbackRequest(BaseModel):
 
 @router.post("/api/feedback")
 async def submit_feedback(req: FeedbackRequest, request: Request) -> JSONResponse:
-    ip = request.client.host if request.client else "unknown"
-    if _rate_limited(ip, max_calls=5, window_seconds=60):
+    if _LIMITER.limited(client_ip(request, "unknown")):
         raise HTTPException(status_code=429, detail="rate-limited")
 
     # Soft email format check if provided (EmailStr would 422 on invalid; we
@@ -74,18 +61,19 @@ async def submit_feedback(req: FeedbackRequest, request: Request) -> JSONRespons
     ua = request.headers.get("user-agent", "")
     with get_db() as conn:
         conn.execute(
+            # No IP: it is only needed for the rate limit, which keeps it in
+            # memory. The column stays for old DBs and is always NULL.
             "INSERT INTO feedback (name, email, message, ip, user_agent, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, NULL, ?, ?)",
             (
                 req.name or None,
                 req.email or None,
                 req.message,
-                ip,
                 (ua[:512]) if ua else None,
                 datetime.now(timezone.utc).isoformat(timespec="seconds"),
             ),
         )
-    log.info("Feedback received from %s (%s chars)", ip, len(req.message))
+    log.info("Feedback received (%s chars)", len(req.message))
 
     # Notify. We send the body because the whole point of the form is
     # that it warrants a reply. Name/email are first lines if present so

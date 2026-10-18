@@ -8,6 +8,10 @@ Security:
   - If the secret is empty AND we're not in dev bypass mode, the endpoint
     refuses all requests.
 
+Only `push` events for refs/heads/<DEPLOY_BRANCH> (default master) deploy.
+`ping` answers "ok · pong"; any other event or ref answers 200
+"ok · skipped (<ref>)" and does nothing.
+
 Actions triggered (idempotent — safe to call repeatedly):
   1. (Production only) `git pull --ff-only` in the project dir.
   2. Reload /content (cheap; safe to do even without a git pull).
@@ -25,11 +29,10 @@ Returns 200 with a one-line summary of what happened.
 from __future__ import annotations
 
 import hashlib
+import json
 import hmac
 import logging
 import subprocess
-import time
-from collections import defaultdict, deque
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
@@ -37,25 +40,15 @@ from fastapi.responses import PlainTextResponse
 
 from ..config import settings
 from ..content import reload_content
+from ..net import client_ip
+from ..ratelimit import RateLimiter
 from ..resume import regenerate_resume_pdfs
 
 log = logging.getLogger(__name__)
 
 router = APIRouter()
 
-_RATE_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
-
-
-def _rate_limited(ip: str, *, max_calls: int, window_seconds: int) -> bool:
-    now = time.monotonic()
-    bucket = _RATE_BUCKETS[ip]
-    cutoff = now - window_seconds
-    while bucket and bucket[0] < cutoff:
-        bucket.popleft()
-    if len(bucket) >= max_calls:
-        return True
-    bucket.append(now)
-    return False
+_LIMITER = RateLimiter(max_calls=10, window_seconds=60)
 
 
 def _verify_signature(secret: str, body: bytes, signature_header: str | None) -> bool:
@@ -92,8 +85,7 @@ def _run(cmd: list[str], cwd: str | None = None, timeout: int = 30) -> tuple[int
 
 @router.post("/webhook/deploy")
 async def deploy(request: Request) -> PlainTextResponse:
-    ip = request.client.host if request.client else "unknown"
-    if _rate_limited(ip, max_calls=10, window_seconds=60):
+    if _LIMITER.limited(client_ip(request, "unknown")):
         raise HTTPException(status_code=429, detail="rate-limited")
 
     # Read raw body for signature verification
@@ -105,10 +97,27 @@ async def deploy(request: Request) -> PlainTextResponse:
         log.warning("DEPLOY_WEBHOOK_SECRET not set — accepting request without HMAC verify")
     else:
         if not _verify_signature(settings.deploy_webhook_secret, body, sig):
-            log.warning("Webhook signature mismatch from %s", ip)
+            log.warning("Webhook signature mismatch")
             raise HTTPException(status_code=401, detail="signature mismatch")
 
-    log.info("Deploy webhook received from %s (body=%d bytes)", ip, len(body))
+    # Only a push to the deploy branch deploys. Without this filter every
+    # push to any branch pulled, re-rendered and restarted production.
+    event = request.headers.get("X-GitHub-Event", "")
+    if event == "ping":
+        return PlainTextResponse("ok · pong\n")
+    ref = ""
+    if event == "push":
+        try:
+            payload = json.loads(body or b"{}")
+            ref = str(payload.get("ref") or "") if isinstance(payload, dict) else ""
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            ref = ""
+    if event != "push" or ref != f"refs/heads/{settings.deploy_branch}":
+        what = ref or event or "no event"
+        log.info("Deploy webhook skipped (%s)", what)
+        return PlainTextResponse(f"ok · skipped ({what})\n")
+
+    log.info("Deploy webhook received (%s, body=%d bytes)", ref, len(body))
 
     steps: list[str] = []
 
