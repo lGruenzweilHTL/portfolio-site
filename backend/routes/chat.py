@@ -1,4 +1,4 @@
-"""POST /api/chat — SSE-streamed OpenRouter response.
+"""POST /api/chat — SSE-streamed chat response (Gemini API or OpenRouter).
 
 Request:
   {
@@ -25,6 +25,8 @@ from pydantic import BaseModel, Field
 
 from ..chat import stream_chat_response
 from ..config import settings
+from ..net import client_ip
+from ..ratelimit import RateLimiter
 from ..turnstile import verify_turnstile
 
 log = logging.getLogger(__name__)
@@ -41,27 +43,9 @@ class ChatRequest(BaseModel):
     turnstile_token: str | None = None
 
 
-# In-memory rate limit (per IP). No Redis needed for a portfolio site.
-# We keep a small deque of timestamps per IP and reject if too recent.
-# A more robust solution is slowapi, but this avoids another dep just for chat.
-import time
-from collections import deque, defaultdict
-_RATE_BUCKETS: dict[str, deque[float]] = defaultdict(deque)
-
-
-def _rate_limited(ip: str, *, max_calls: int, window_seconds: int) -> bool:
-    """Returns True if this IP has exceeded the rate limit. Records the call
-    either way. The bucket is cleaned of expired entries on every call.
-    """
-    now = time.monotonic()
-    bucket = _RATE_BUCKETS[ip]
-    cutoff = now - window_seconds
-    while bucket and bucket[0] < cutoff:
-        bucket.popleft()
-    if len(bucket) >= max_calls:
-        return True
-    bucket.append(now)
-    return False
+# Per-IP rate limit, in memory only. 10/minute is a reasonable default for a
+# free chatbot.
+_LIMITER = RateLimiter(max_calls=10, window_seconds=60)
 
 
 # User-facing copy for the pre-stream errors. Mirrors the tone of
@@ -76,9 +60,8 @@ _ROUTE_ERROR_MESSAGES = {
 
 @router.post("/api/chat")
 async def chat(req: ChatRequest, request: Request):
-    # Per-IP rate limit. 10/minute is a reasonable default for a free chatbot.
-    ip = request.client.host if request.client else "unknown"
-    if _rate_limited(ip, max_calls=10, window_seconds=60):
+    ip = client_ip(request, "unknown")
+    if _LIMITER.limited(ip):
         return JSONResponse(
             status_code=429,
             content={"reason": "rate_limited", "message": _ROUTE_ERROR_MESSAGES["rate_limited"]},
@@ -112,7 +95,7 @@ async def chat(req: ChatRequest, request: Request):
     ua = request.headers.get("user-agent", "")
 
     async def event_source() -> AsyncIterator[str]:
-        async for chunk in stream_chat_response(req.session_id, req.message, ip, ua):
+        async for chunk in stream_chat_response(req.session_id, req.message, ua):
             yield chunk
 
     return StreamingResponse(
