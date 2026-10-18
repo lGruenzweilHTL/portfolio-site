@@ -36,7 +36,12 @@ the only ingress; the tunnel's `config.yml` just repointed from
   main.py                  App factory, middlewares, static mount, error handlers
   config.py                Pydantic settings (env / .env)
   content.py               /content loader + system-prompt renderer
-  chat.py                  OpenRouter streaming + fallback policy
+  chat.py                  Provider streaming (Gemini API or OpenRouter) + fallback loop
+  chat_errors.py           Outcome kinds per model attempt: classification, cooldown and fallback rules
+  chat_models.py           The fallback model list (SQLite, edited on /admin, cached in memory)
+  net.py                   client_ip(): CF-Connecting-IP, trusted only from TRUSTED_PROXY_IPS
+  ratelimit.py             In-memory per-IP sliding-window rate limiter
+  retention.py             Deletes personal data older than DATA_RETENTION_DAYS (startup + daily)
   turnstile.py             siteverify helper with dev bypass + per-widget action check
   resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
   i18n.py                  Translation catalogs for the main page (content/i18n/*.yaml)
@@ -44,7 +49,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers
   templates/               resume.html (designed) + resume_ats.html (ATS), assets/,
-                           admin.html, error.html, services.html
+                           admin.html, error.html, services.html, privacy.html
 /content                   Single source of truth (YAML)
   resume.yaml              Personal, projects, skills, beyond_code, chat_only (chatbot-only background)
   chatbot_personality.yaml Persona + system prompt template
@@ -52,8 +57,11 @@ the only ingress; the tunnel's `config.yml` just repointed from
 /deploy                    systemd units + tmpfiles.d drop-in for the deploy webhook
 /scripts                   One-off dev tooling (devicon subsetting, résumé preview render)
 /static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
+/tests                     pytest suite (no network: provider mocked with respx)
+/.github/workflows         CI: pytest on every push and PR (Python 3.10 + 3.13)
 .env.example               Copy to .env; all required env vars documented
 requirements.txt           Pinned Python dependencies
+requirements-dev.txt       requirements.txt + pytest, pytest-asyncio, respx
 ```
 
 ## System dependencies
@@ -90,6 +98,54 @@ The dev bypass values in `.env.example` (`TURNSTILE_DEV_BYPASS=1`,
 `ADMIN_DEV_BYPASS=1`, empty `DEPLOY_WEBHOOK_SECRET`) let you exercise every
 endpoint without real keys. **Never set those in production.**
 
+### Tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+The suite needs no network, no API key and no WeasyPrint system libs: the
+chat provider is mocked with `respx`, Turnstile is bypassed through
+settings, and every test gets its own temporary SQLite DB (`tests/conftest.py`).
+GitHub Actions runs it on every push and pull request
+(`.github/workflows/test.yml`).
+
+## Chatbot
+
+`backend/chat.py` streams from any OpenAI-compatible endpoint at
+`OPENROUTER_BASE_URL`. Production uses the Gemini API directly; OpenRouter
+works when the base URL points at it (the `OPENROUTER_*` names are
+historical). Models are tried in the order of the **model list on
+`/admin`**, which lives in the `chat_models` table. `OPENROUTER_MODELS` is
+read exactly once, to seed that table on the first boot; after that `.env`
+is never read for the list again, so deleting every model in the admin
+doesn't bring the `.env` list back on restart.
+
+Every model attempt ends in one outcome kind (`backend/chat_errors.py`):
+
+| Outcome | Next model? | Cooldown | Visitor sees |
+| --- | --- | --- | --- |
+| `rate_limit` (429, `RESOURCE_EXHAUSTED`) | yes | `CHAT_MODEL_COOLDOWN_SECONDS` | rate-limited |
+| `model_unavailable` (404, `NOT_FOUND`) | yes | `CHAT_MODEL_UNAVAILABLE_COOLDOWN_SECONDS` (1h) + ntfy | upstream error |
+| `overloaded` (5xx, `UNAVAILABLE`, `INTERNAL`) / `network` | yes | normal | upstream error |
+| `timeout` / `bad_request` / `empty_reply` | yes | none | timeout / upstream error |
+| `provider_auth` (401/402/403) | no, stop + ntfy (hourly) | none | config issue |
+| `moderated` | no, stop | none | refusal, no email link |
+
+A message counts as moderated when the provider says so (a safety
+`finish_reason`, or an error mentioning a safety block, including
+OpenRouter's moderation 403), or when two models in a row return an empty
+reply that wasn't cut off by `max_tokens`. A moderated message is answered
+with a refusal and marked `error = 'moderated'`, so it is never resent in
+the session's history. After the list is used up, rate-limited models get
+one more try after a 2s backoff; the whole request is capped at
+`CHAT_TOTAL_TIMEOUT_SECONDS`.
+
+The admin's "Chat sessions" view shows, under each assistant reply, the
+model that answered and every failed attempt with the provider's raw
+error text. Visitors never see provider text.
+
 ## Endpoints
 
 | Path | Method | Notes |
@@ -111,15 +167,18 @@ endpoint without real keys. **Never set those in production.**
 | `/resume.pdf` | GET | Cached PDF, two-column styled version. Regenerated on startup + deploy |
 | `/resume-ats.pdf` | GET | Single-column ATS-friendly version |
 | `/resume-themed.pdf` | GET | 301 → `/resume.pdf`. Retired dark variant, kept for old bookmarks |
-| `/api/chat` | POST | SSE stream from OpenRouter. Turnstile-gated. 10/min/IP. |
+| `/api/chat` | POST | SSE stream from the chat provider (Gemini API or OpenRouter). Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
 | `/api/status` | GET | Coarse live values for the rack UI: host uptime, deployed short SHA, Cloudflare edge colo (from `CF-Ray`), `HOMELAB_NODES`, chatbot model, per-project GitHub `pushed_at` (fetched in the background, cached `GITHUB_CACHE_SECONDS`). `no-store`. |
-| `/webhook/deploy` | POST | GitHub HMAC. 10/min/IP. Pulls + restarts. |
+| `/privacy`, `/de/privacy` | GET | Privacy policy, English and Austrian German (`templates/privacy.html`). Linked from the PDU footer on every page. |
+| `/webhook/deploy` | POST | GitHub HMAC. 10/min/IP. Pulls + restarts on pushes to `DEPLOY_BRANCH` only. |
 | `/admin` | GET | Cloudflare Access gated. Combined dashboard. |
 | `/admin/secure-links` | POST | Create a secure download link (returns full URL) |
 | `/admin/secure-links/<id>/revoke` | POST | Revoke a link (idempotent) |
 | `/admin/regenerate-resume` | POST | Manual PDF re-render. |
+| `/admin/api/models` | GET, POST | Chat model list; POST `{model}` appends. Writes need JSON and a same-site `Origin`. |
+| `/admin/api/models/<id>` | PATCH, DELETE | PATCH `{enabled?, position?}`; DELETE removes. |
 | `/healthz` | GET | Liveness check. |
 | `/_api/docs` | GET | Swagger UI (non-standard path; hide in prod). |
 
@@ -279,7 +338,7 @@ them is safe if you do it everywhere.
 
 ## Notifications (ntfy)
 
-The app can push to a self-hosted ntfy instance on two triggers:
+The app can push to a self-hosted ntfy instance on these triggers:
 
 - **Feedback received** — priority high, tag `speech_balloon`. Message body is
   the form contents (name, email, message). This is the only trigger that
@@ -287,6 +346,10 @@ The app can push to a self-hosted ntfy instance on two triggers:
 - **Deploy success/fail** — priority low on success (tag `white_check_mark`),
   max on any FAILED step (tag `rotating_light`). Single message per deploy
   containing the same summary line the webhook returns.
+
+- **Chat config problems** — priority high: a model the provider answers
+  404 for (once per model per process), and the provider rejecting the key
+  (401/402/403, at most once an hour). Both need the owner to act.
 
 All other events (chatbot, pageviews, secure downloads, fallback) are silent.
 The "don't spam my phone" rule.
@@ -323,7 +386,35 @@ Reference: <https://docs.ntfy.sh/publish/>
 
 Single SQLite file at `resume.db` (gitignored). Created on first run.
 Tables: `events`, `feedback`, `chat_sessions`, `chat_messages`,
-`secure_links`, `secure_link_events`. Schema in `backend/db/models.py`.
+`chat_models`, `secure_links`, `secure_link_events`, `app_meta`. Schema in
+`backend/db/models.py`.
+
+### Privacy and retention
+
+What is stored has to match the policy at `/privacy`:
+
+- No raw IPs for chat or feedback (`chat_sessions.ip` and `feedback.ip`
+  stay as columns but are always NULL; existing values were cleared by a
+  migration). Log lines don't carry IPs either.
+- Rate limits hold IPs in memory only (`backend/ratelimit.py`).
+- Analytics stores `sha256(daily salt + ip + ua + date)[:16]`. The salt is
+  random, in memory only, and changes with the UTC date, so a restart
+  mid-day splits that day's visitor count.
+- The secure-link audit log keeps IP + user agent (a security log).
+- `DATA_RETENTION_DAYS` (default 90): rows older than that are deleted from
+  `chat_messages`, `chat_sessions` (by `last_active_at`), `feedback`,
+  `events` and `secure_link_events` at startup and then every 24h.
+
+### Real client IP
+
+Behind the tunnel every request comes from the cloudflared host.
+`backend/net.py` uses `CF-Connecting-IP` instead, but only when the TCP peer
+is listed in `TRUSTED_PROXY_IPS` (IPs or CIDR ranges). The app binds
+`0.0.0.0`, so trusting the header from anyone would let the LAN spoof it.
+cloudflared runs on a different host, so there is no safe default: **set
+`TRUSTED_PROXY_IPS` to the cloudflared host's address as uvicorn sees it.**
+Until then every visitor shares one rate-limit bucket, and the log shows a
+one-time warning naming the untrusted peer that sent the header.
 
 To inspect:
 ```bash
@@ -336,7 +427,10 @@ sqlite> SELECT * FROM secure_links ORDER BY id DESC LIMIT 10;
 ## Deploy
 
 GitHub webhook → `POST /webhook/deploy` with header
-`X-Hub-Signature-256: sha256=<hmac-of-body>`. On valid signature:
+`X-Hub-Signature-256: sha256=<hmac-of-body>`. Only a `push` to
+`refs/heads/<DEPLOY_BRANCH>` (default `master`) deploys: a `ping` answers
+`ok · pong`, and any other event or branch answers `ok · skipped (<ref>)`
+without pulling, rendering, restarting or notifying. On a valid push:
 
 1. `git pull --ff-only` in the project root
 2. Reload `/content` in-process
