@@ -1,374 +1,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — Lukas Grünzweil</title>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0e0d0b; --bg2: #15140f; --panel: #191712;
-    --line: #232019; --line2: #302c22;
-    --muted: #918c7f; --dim: #aca699; --text: #d0ccc0; --hi: #eceae1;
-    --accent: #eba53a; --accent-soft: rgba(235,165,58,0.10);
-    --accent-line: rgba(235,165,58,0.22); --white: #f6f4ee;
-  }
-  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif;
-         font-size: 14px; line-height: 1.6; padding: 28px 32px; }
-  h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; color: var(--hi); font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; }
-  h2 { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
-       text-transform: uppercase; letter-spacing: 0.08em; margin: 28px 0 10px; }
-  .top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-  .top .who { color: var(--dim); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
-  .top .who b { color: var(--hi); font-weight: 500; }
-  .top .actions a, .top .actions button {
-    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
-    text-decoration: none; border: 1px solid var(--line2); background: var(--bg2);
-    padding: 5px 11px; border-radius: 3px; cursor: pointer; margin-left: 6px;
-  }
-  .top .actions a:hover, .top .actions button:hover { color: var(--accent); border-color: var(--accent-line); }
-  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
-  .tile-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
-                text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .tile-value { font-family: 'Bricolage Grotesque', sans-serif; font-size: 26px; font-weight: 600; color: var(--hi); letter-spacing: -0.01em; }
-  .tile-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 3px; }
-  table { width: 100%; border-collapse: collapse; background: var(--panel);
-          border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { background: var(--bg2); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
-       text-transform: uppercase; color: var(--muted); font-weight: 500; }
-  tr:last-child td { border-bottom: none; }
-  tr:nth-child(even) td { background: rgba(255,255,255,0.012); }
-  .pill { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-          padding: 2px 7px; border-radius: 2px; border: 1px solid var(--line2); color: var(--dim); }
-  .pill.accent { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
-  .pill.err { color: #eb7676; border-color: rgba(235,118,118,0.3); background: rgba(235,118,118,0.08); }
-  .msg { max-width: 460px; word-wrap: break-word; white-space: pre-wrap; color: var(--dim); }
-  .name { color: var(--hi); font-weight: 500; }
-  .muted { color: var(--muted); }
-  .small { font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
-  .empty { padding: 20px; text-align: center; color: var(--muted); font-style: italic; }
-  .chat-row { cursor: pointer; }
-  .chat-row:hover td { background: rgba(235,165,58,0.04); }
-  .chat-row .expand { display: none; }
-  .chat-row.expanded .expand { display: table-row; }
-  .chat-msg-line { padding: 6px 12px; border-bottom: 1px solid var(--line); }
-  .chat-msg-line.user { color: var(--hi); }
-  .chat-msg-line.assistant { color: var(--dim); }
-  .chat-msg-line .role { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-                           color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; }
-  .top-paths { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .row-split { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
-  .form-card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
-  .form-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
-                 text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
-  .form-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-  .form-field > span { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-                       text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-  .form-field input, .form-field select {
-    background: var(--bg); color: var(--text);
-    border: 1px solid var(--line2); border-radius: 3px;
-    padding: 7px 10px; font-family: var(--font-mono); font-size: 12px;
-    outline: none; transition: border-color 0.15s;
-  }
-  .form-field input:focus, .form-field select:focus { border-color: var(--accent-line); }
-  .form-hint { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
-  .form-actions { margin-top: 6px; }
-  .btn-primary {
-    background: var(--accent); color: #17110a; border: none;
-    border-radius: 3px; padding: 7px 14px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-primary:hover { background: #f5be5f; }
-  .btn-link {
-    background: none; border: 1px solid var(--line2); color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;
-    padding: 3px 9px; border-radius: 3px; cursor: pointer;
-  }
-  .btn-link:hover { color: #eb7676; border-color: rgba(235,118,118,0.3); }
-  .form-result { margin-top: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--muted); }
-  .form-result.ok { color: var(--accent); }
-  .form-result.err { color: #eb7676; }
-  .form-result a { color: var(--accent); word-break: break-all; }
-  table.compact th, table.compact td { padding: 7px 10px; }
-  @media (max-width: 900px) { .row-split { grid-template-columns: 1fr; } }
-  .list-card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; }
-  .list-card h3 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
-                  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
-  .list-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
-              padding: 4px 0; border-bottom: 1px solid var(--line); font-size: 12.5px; }
-  .list-row:last-child { border-bottom: none; }
-  .list-row .path { color: var(--hi); font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-                     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .list-row .count { color: var(--dim); font-family: 'IBM Plex Mono', monospace; font-size: 11px; flex-shrink: 0; }
-  @media (max-width: 720px) {
-    body { padding: 20px 16px; }
-    .grid { grid-template-columns: repeat(2, 1fr); }
-    .top-paths { grid-template-columns: 1fr; }
-  }
-</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+{#- Rendered by backend/routes/admin.py behind Cloudflare Access. Same rack
+    anatomy as the main page (site/styles.css, "Admin" section for the
+    tables and forms). English only, never indexed. #}
+<title>Admin · Lukas Grünzweil</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0d0e11" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script>
+window.I18N = {{ js_strings | tojson }};
+document.documentElement.classList.add('js');
+</script>
 </head>
 <body>
 
-<div class="top">
-  <div>
-    <h1>Admin</h1>
-    <div class="who">Signed in as <b>{{ user }}</b>{% if dev_bypass %} <span class="pill accent">DEV BYPASS</span>{% endif %}</div>
-  </div>
-  <div class="actions">
-    <a href="/admin/regenerate-resume" onclick="event.preventDefault(); fetch(this.href, {method:'POST'}).then(r=>r.text()).then(t=>alert(t));">Regenerate résumé PDFs</a>
-    <a href="/resume.pdf" target="_blank" rel="noopener">↗ Classic</a>
-    <a href="/resume-ats.pdf" target="_blank" rel="noopener">↗ ATS</a>
-    <a href="/">↗ View site</a>
-  </div>
-</div>
+{%- macro led_status(color, label) -%}<span class="status"><span class="led{% if color %} led--{{ color }}{% endif %}" aria-hidden="true"></span>{{ label }}</span>{%- endmacro %}
 
-<!-- TILES: snapshot numbers -->
-<div class="grid">
-  <div class="tile">
-    <div class="tile-label">Pageviews (7d)</div>
-    <div class="tile-value">{{ stats.pageviews_7d }}</div>
-    <div class="tile-sub">{{ stats.uniques_7d }} unique visitors</div>
-  </div>
-  <div class="tile">
-    <div class="tile-label">Events (7d)</div>
-    <div class="tile-value">{{ stats.events_7d }}</div>
-    <div class="tile-sub">chatbot, resume, links</div>
-  </div>
-  <div class="tile">
-    <div class="tile-label">Feedback (total)</div>
-    <div class="tile-value">{{ stats.feedback_total }}</div>
-    <div class="tile-sub">{{ stats.feedback_7d }} this week</div>
-  </div>
-  <div class="tile">
-    <div class="tile-label">Chat sessions (7d)</div>
-    <div class="tile-value">{{ stats.chat_sessions_7d }}</div>
-    <div class="tile-sub">{{ stats.chat_messages_7d }} messages</div>
-  </div>
-</div>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<!-- TOP PATHS & EVENTS -->
-<h2>Top paths (7d) · successful only</h2>
-<div class="top-paths">
-  <div class="list-card">
-    <h3>By pageview</h3>
-    {% for row in top_paths %}
-      <div class="list-row">
-        <span class="path">{{ row.path }}</span>
-        <span class="count">{{ row.count }}</span>
-      </div>
-    {% else %}
-      <div class="empty">No data yet.</div>
-    {% endfor %}
-  </div>
-  <div class="list-card">
-    <h3>By event</h3>
-    {% for row in top_events %}
-      <div class="list-row">
-        <span class="path">{{ row.name }}</span>
-        <span class="count">{{ row.count }}</span>
-      </div>
-    {% else %}
-      <div class="empty">No data yet.</div>
-    {% endfor %}
-  </div>
-</div>
+<div class="cabinet">
+  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
+  <div class="cab-body">
+    <div class="rail rail--l" aria-hidden="true"></div>
+    <div class="units">
 
-<!-- SECURE LINKS -->
-<h2>Secure download links</h2>
-<div class="row-split">
-  <form id="secure-link-form" class="form-card" autocomplete="off">
-    <div class="form-title">Create link</div>
-    <label class="form-field">
-      <span>File</span>
-      <select name="filename" required>
-        <option value="">— select a file —</option>
-        {% for f in secure_files %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
-      </select>
-      {% if not secure_files %}<div class="form-hint">No files in /site/files/secure/. Drop a file there and refresh.</div>{% endif %}
-    </label>
-    <label class="form-field">
-      <span>Expires in</span>
-      <input type="text" name="expires_in" value="7d" required pattern="[0-9]+[smhdw]?" placeholder="7d, 2h, 30m, 1w" />
-      <div class="form-hint">e.g. 30m, 2h, 1d, 3w, or raw seconds.</div>
-    </label>
-    <label class="form-field">
-      <span>Max uses (0 = unlimited)</span>
-      <input type="number" name="max_uses" value="5" min="0" max="10000" />
-    </label>
-    <div class="form-actions">
-      <button type="submit" class="btn-primary">Generate link</button>
-    </div>
-    <div id="secure-link-result" class="form-result" role="status"></div>
-  </form>
+      <header class="unit unit--nav unit--nohandle">
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        <nav class="face nav" aria-label="Breadcrumb">
+          <ol class="crumbs lcd lcd--chip">
+            <li><a href="/">lukas@lg-rack-01</a></li>
+            <li aria-current="page">admin</li>
+          </ol>
+          <p class="adm-who silk silk--dim">{{ user }}{% if dev_bypass %} · {{ led_status('amber', 'Dev bypass') }}{% endif %}</p>
+        </nav>
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+      </header>
 
-  <div class="form-card">
-    <div class="form-title">Active links</div>
-    {% if secure_links %}
-    <table class="compact">
-      <thead><tr><th>File</th><th>Expires</th><th>Uses</th><th>Status</th><th></th></tr></thead>
-      <tbody>
-        {% for l in secure_links %}
-        <tr>
-          <td>
-            <div class="name small">{{ l.filename }}</div>
-            <div class="muted small">#{{ l.id }} · created {{ l.created_at }}</div>
-          </td>
-          <td class="small muted">{{ l.expires_at }}</td>
-          <td class="small">
-            {% if l.max_uses == 0 %}<span class="muted">∞</span>
-            {% else %}{{ l.uses_remaining }} / {{ l.max_uses }}{% endif %}
-          </td>
-          <td>
-            {% if l.active %}<span class="pill accent">active</span>
-            {% elif l.revoked %}<span class="pill err">revoked</span>
-            {% elif l.expired %}<span class="pill">expired</span>
-            {% elif l.exhausted %}<span class="pill">exhausted</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if l.active %}
-              <button class="btn-link" data-revoke="{{ l.id }}">revoke</button>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <div class="empty">No links generated yet.</div>
-    {% endif %}
-  </div>
-</div>
+      <main id="main" class="units-main" tabindex="-1">
 
-<!-- RECENT FEEDBACK -->
-<h2>Recent feedback</h2>
-{% if feedback %}
-<table>
-  <thead><tr><th>When</th><th>From</th><th>Message</th></tr></thead>
-  <tbody>
-    {% for f in feedback %}
-    <tr>
-      <td class="small muted">{{ f.created_at }}</td>
-      <td>
-        <div class="name">{% if f.name %}{{ f.name }}{% else %}<span class="muted">anonymous</span>{% endif %}</div>
-        {% if f.email %}<div class="small muted">{{ f.email }}</div>{% endif %}
-        <div class="small muted">ip: {{ f.ip or "—" }}</div>
-      </td>
-      <td><div class="msg">{{ f.message }}</div></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<div class="empty">No feedback yet.</div>
-{% endif %}
-
-<!-- RECENT CHAT SESSIONS -->
-<h2>Recent chat sessions</h2>
-{% if chat_sessions %}
-<table>
-  <thead><tr><th>Started</th><th>Last active</th><th>Msgs</th><th>Errors</th><th>Session</th></tr></thead>
-  <tbody>
-    {% for s in chat_sessions %}
-    <tr class="chat-row" onclick="this.classList.toggle('expanded')">
-      <td class="small muted">{{ s.created_at }}</td>
-      <td class="small muted">{{ s.last_active_at }}</td>
-      <td>{{ s.message_count }}</td>
-      <td>{% if s.error_count %}<span class="pill err">{{ s.error_count }}</span>{% else %}<span class="muted small">0</span>{% endif %}</td>
-      <td class="small muted">{{ s.session_id[:12] }}…</td>
-    </tr>
-    <tr class="expand"><td colspan="5" style="padding:0;">
-      <div style="padding: 8px 12px;">
-        {% for m in s.messages %}
-          <div class="chat-msg-line {{ m.role }}">
-            <span class="role">{{ m.role }}{% if m.error %} · {{ m.error }}{% endif %}</span>{{ m.content }}
+        <section class="unit" aria-labelledby="overview-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h1 class="silk" id="overview-title">Admin</h1>
+              <span class="model" aria-hidden="true">resume.db · last 7 days</span>
+              <div class="unit-head-r keys">
+                <button type="button" class="key key--sm" id="regen-resume">Regenerate PDFs</button>
+                <a class="key key--sm" href="/resume.pdf" target="_blank" rel="noopener">Classic <span aria-hidden="true">↗</span></a>
+                <a class="key key--sm" href="/resume-ats.pdf" target="_blank" rel="noopener">ATS <span aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+            <dl class="readouts adm-readouts">
+              <div><dt class="silk silk--dim">Pageviews</dt><dd class="lcd lcd--chip">{{ stats.pageviews_7d }}</dd><dd class="adm-sub">{{ stats.uniques_7d }} unique</dd></div>
+              <div><dt class="silk silk--dim">Events</dt><dd class="lcd lcd--chip">{{ stats.events_7d }}</dd><dd class="adm-sub">chatbot, résumé, links</dd></div>
+              <div><dt class="silk silk--dim">Feedback</dt><dd class="lcd lcd--chip">{{ stats.feedback_7d }}</dd><dd class="adm-sub">{{ stats.feedback_total }} total</dd></div>
+              <div><dt class="silk silk--dim">Chat sessions</dt><dd class="lcd lcd--chip">{{ stats.chat_sessions_7d }}</dd><dd class="adm-sub">{{ stats.chat_messages_7d }} messages</dd></div>
+            </dl>
+            <p class="adm-sub adm-gen">generated {{ generated_at }}</p>
           </div>
-        {% endfor %}
-      </div>
-    </td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<div class="empty">No chat sessions yet.</div>
-{% endif %}
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
 
-<p class="small muted" style="margin-top: 32px;">generated at {{ generated_at }} · data from resume.db</p>
+        <section class="unit" aria-labelledby="traffic-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 id="traffic-title">Traffic</h2>
+              <span class="model" aria-hidden="true">7d · successful only</span>
+            </div>
+            <div class="adm-cols">
+              <div class="adm-panel">
+                <h3 class="silk silk--dim">By pageview</h3>
+                <ul class="adm-list">
+                  {% for row in top_paths %}<li><span class="adm-path">{{ row.path }}</span><span class="lcd">{{ row.count }}</span></li>
+                  {% else %}<li class="adm-empty">No data yet.</li>{% endfor %}
+                </ul>
+              </div>
+              <div class="adm-panel">
+                <h3 class="silk silk--dim">By event</h3>
+                <ul class="adm-list">
+                  {% for row in top_events %}<li><span class="adm-path">{{ row.name }}</span><span class="lcd">{{ row.count }}</span></li>
+                  {% else %}<li class="adm-empty">No data yet.</li>{% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
 
+        <section class="unit" aria-labelledby="models-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 id="models-title">Chat models</h2>
+              <span class="model" aria-hidden="true">fallback order</span>
+            </div>
+            <div class="adm-split">
+              <form id="model-add-form" class="adm-panel adm-form" autocomplete="off">
+                <h3 class="silk silk--dim">Add model</h3>
+                <label class="field">
+                  <span class="silk silk--dim">Model id</span>
+                  <input type="text" name="model" required maxlength="200" pattern="[^\s,]+" placeholder="gemini-3.5-flash-lite" />
+                </label>
+                <p class="adm-sub">Provider id as sent in the request. Appended to the end of the list.</p>
+                <div class="feedback-actions">
+                  <p id="model-result" class="feedback-status" role="status" aria-live="polite"></p>
+                  <button type="submit" class="key key--sm key--primary">Add</button>
+                </div>
+              </form>
+              <div class="adm-panel">
+                {% if chat_models %}
+                <div class="adm-scroll">
+                  <table class="adm-table">
+                    <thead><tr><th>#</th><th>Model</th><th>Enabled</th><th>State</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                    <tbody>
+                      {% for m in chat_models %}
+                      <tr>
+                        <td class="lcd">{{ loop.index }}</td>
+                        <td class="adm-mono adm-strong">{{ m.model }}</td>
+                        <td><input type="checkbox" class="adm-check" data-model-toggle="{{ m.id }}" aria-label="Enable {{ m.model }}" {% if m.enabled %}checked{% endif %}></td>
+                        <td>
+                          {% if not m.enabled %}{{ led_status('', 'Disabled') }}
+                          {% elif m.cooldown_s %}{{ led_status('amber', 'Cooldown ' ~ m.cooldown_s ~ 's') }}
+                          {% else %}{{ led_status('green', 'Ready') }}{% endif %}
+                        </td>
+                        <td class="adm-actions">
+                          <button type="button" class="key key--sm" data-model-move="{{ m.id }}" data-position="{{ loop.index0 - 1 }}" {% if loop.first %}disabled{% endif %} aria-label="Move {{ m.model }} up">↑</button>
+                          <button type="button" class="key key--sm" data-model-move="{{ m.id }}" data-position="{{ loop.index0 + 1 }}" {% if loop.last %}disabled{% endif %} aria-label="Move {{ m.model }} down">↓</button>
+                          <button type="button" class="key key--sm adm-danger" data-model-delete="{{ m.id }}" data-name="{{ m.model }}">Delete</button>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                {% else %}
+                <p class="adm-empty">No models. The chatbot answers "not configured" until one is added.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        <section class="unit" aria-labelledby="links-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 id="links-title">Secure download links</h2>
+              <span class="model" aria-hidden="true">site/files/secure</span>
+            </div>
+            <div class="adm-split">
+              <form id="secure-link-form" class="adm-panel adm-form" autocomplete="off">
+                <h3 class="silk silk--dim">Create link</h3>
+                <label class="field">
+                  <span class="silk silk--dim">File</span>
+                  <select name="filename" required>
+                    <option value="">— select a file —</option>
+                    {% for f in secure_files %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+                  </select>
+                </label>
+                {% if not secure_files %}<p class="adm-sub">No files in /site/files/secure/. Drop a file there and refresh.</p>{% endif %}
+                <div class="feedback-row">
+                  <label class="field">
+                    <span class="silk silk--dim">Expires in</span>
+                    <input type="text" name="expires_in" value="7d" required pattern="[0-9]+[smhdw]?" placeholder="7d, 2h, 30m, 1w" />
+                  </label>
+                  <label class="field">
+                    <span class="silk silk--dim">Max uses (0 = ∞)</span>
+                    <input type="number" name="max_uses" value="5" min="0" max="10000" />
+                  </label>
+                </div>
+                <p class="adm-sub">e.g. 30m, 2h, 1d, 3w, or raw seconds.</p>
+                <div class="feedback-actions">
+                  <p id="secure-link-result" class="feedback-status" role="status" aria-live="polite"></p>
+                  <button type="submit" class="key key--sm key--primary">Generate link</button>
+                </div>
+              </form>
+              <div class="adm-panel">
+                {% if secure_links %}
+                <div class="adm-scroll">
+                  <table class="adm-table">
+                    <thead><tr><th>File</th><th>Expires</th><th>Uses</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                    <tbody>
+                      {% for l in secure_links %}
+                      <tr>
+                        <td><div class="adm-strong">{{ l.filename }}</div><div class="adm-sub">#{{ l.id }} · created {{ l.created_at }}</div></td>
+                        <td class="adm-sub">{{ l.expires_at }}</td>
+                        <td class="lcd">{% if l.max_uses == 0 %}∞{% else %}{{ l.uses_remaining }}/{{ l.max_uses }}{% endif %}</td>
+                        <td>
+                          {% if l.active %}{{ led_status('green', 'Active') }}
+                          {% elif l.revoked %}{{ led_status('red', 'Revoked') }}
+                          {% elif l.expired %}{{ led_status('', 'Expired') }}
+                          {% elif l.exhausted %}{{ led_status('', 'Exhausted') }}{% endif %}
+                        </td>
+                        <td>{% if l.active %}<button type="button" class="key key--sm adm-danger" data-revoke="{{ l.id }}">Revoke</button>{% endif %}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                {% else %}
+                <p class="adm-empty">No links generated yet.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        <section class="unit" aria-labelledby="feedback-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 id="feedback-title">Feedback</h2>
+              <span class="model" aria-hidden="true">latest 30</span>
+            </div>
+            {% if feedback %}
+            <ul class="adm-feed">
+              {% for f in feedback %}
+              <li class="adm-panel">
+                <p class="adm-meta"><span class="adm-strong">{% if f.name %}{{ f.name }}{% else %}anonymous{% endif %}</span>{% if f.email %} · <a href="mailto:{{ f.email }}">{{ f.email }}</a>{% endif %} <span class="adm-sub">· {{ f.created_at }}</span></p>
+                <p class="adm-msg">{{ f.message }}</p>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="adm-empty">No feedback yet.</p>
+            {% endif %}
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+
+        <section class="unit" aria-labelledby="chats-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h2 id="chats-title">Chat sessions</h2>
+              <span class="model" aria-hidden="true">latest 20</span>
+            </div>
+            {% if chat_sessions %}
+            <div class="adm-sessions">
+              {% for s in chat_sessions %}
+              <details class="adm-session">
+                <summary>
+                  <span class="lcd lcd--chip">{{ s.session_id[:12] }}</span>
+                  <span class="adm-sub">{{ s.created_at }} → {{ s.last_active_at }}</span>
+                  <span class="adm-count">{{ s.message_count }} msgs</span>
+                  {% if s.error_count %}{{ led_status('red', s.error_count ~ ' error' ~ ('s' if s.error_count != 1 else '')) }}{% endif %}
+                </summary>
+                <div class="adm-log">
+                  {% for m in s.messages %}
+                  <div class="adm-line adm-line--{{ m.role }}">
+                    <span class="adm-role">{{ m.role }}{% if m.error %} · {{ m.error }}{% endif %}</span>
+                    <span class="adm-text">{{ m.content }}</span>
+                    {% if m.role == 'assistant' and (m.model or m.attempts) %}
+                    <div class="adm-attempts">
+                      {% if m.model %}<div>answered by <b>{{ m.model }}</b>{% if m.attempts %} after {{ m.attempts | length }} failed attempt{{ 's' if m.attempts | length != 1 }}{% endif %}</div>{% endif %}
+                      {% for a in m.attempts %}
+                      <div class="adm-attempt"><span class="adm-kind{% if a.kind in ('model_unavailable', 'provider_auth') %} adm-kind--bad{% endif %}">{{ a.kind }}</span> {{ a.model }} · status {{ a.status if a.status is not none else '—' }} · finish {{ a.finish or '—' }}{% if a.msg %}<div class="adm-provider">{{ a.msg }}</div>{% endif %}</div>
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </details>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="adm-empty">No chat sessions yet.</p>
+            {% endif %}
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </section>
+      </main>
+
+      {% include "_pdu.html" %}
+
+    </div>
+    <div class="rail rail--r" aria-hidden="true"></div>
+  </div>
+  <div class="cab-plinth" aria-hidden="true"></div>
+</div>
+
+<script src="/main.js" defer></script>
 <script>
-// Secure link form + revoke buttons
 (function () {
-  const form = document.getElementById('secure-link-form');
-  const result = document.getElementById('secure-link-result');
-
-  if (form) {
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      result.textContent = '';
-      result.className = 'form-result';
-      const data = new FormData(form);
-      const body = {
-        filename: (data.get('filename') || '').toString(),
-        expires_in: (data.get('expires_in') || '').toString(),
-        max_uses: parseInt(data.get('max_uses') || '5', 10),
-      };
-      let resp;
-      try {
-        resp = await fetch('/admin/secure-links', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-      } catch (_) {
-        result.textContent = 'Network error.';
-        result.className = 'form-result err';
-        return;
-      }
-      const json = await resp.json().catch(() => ({}));
-      if (resp.ok && json.url) {
-        result.innerHTML = 'Link generated. <a href="' + json.url + '" target="_blank" rel="noopener">' + json.url + '</a> <button class="btn-link" id="copy-link">copy</button>';
-        document.getElementById('copy-link').addEventListener('click', function () {
-          navigator.clipboard && navigator.clipboard.writeText(json.url).then(
-            () => { this.textContent = 'copied'; },
-            () => { this.textContent = 'failed'; }
-          );
-        });
-        result.className = 'form-result ok';
-      } else {
-        result.textContent = json.detail || ('Error ' + resp.status);
-        result.className = 'form-result err';
-      }
-    });
-  }
-
-  // Revoke buttons (delegated)
-  document.addEventListener('click', async function (e) {
-    const btn = e.target.closest && e.target.closest('[data-revoke]');
-    if (!btn) return;
-    if (!confirm('Revoke this link? Anyone with the URL will lose access.')) return;
-    const id = btn.getAttribute('data-revoke');
-    btn.disabled = true;
+  // Shared fetch helper: JSON in, JSON out, {ok, detail} back.
+  async function call(method, url, body) {
     let resp;
     try {
-      resp = await fetch('/admin/secure-links/' + encodeURIComponent(id) + '/revoke', { method: 'POST' });
+      resp = await fetch(url, {
+        method: method,
+        headers: { 'content-type': 'application/json', 'accept': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
     } catch (_) {
-      btn.disabled = false;
-      alert('Network error');
-      return;
+      return { ok: false, detail: 'Network error.', json: {} };
     }
-    if (resp.ok) {
-      location.reload();
-    } else {
-      btn.disabled = false;
-      alert('Failed to revoke');
+    const json = await resp.json().catch(() => ({}));
+    return { ok: resp.ok, detail: json.detail || ('Error ' + resp.status), json: json };
+  }
+  function show(el, text, ok) {
+    if (!el) { if (!ok) alert(text); return; }
+    el.textContent = text;
+    el.className = 'feedback-status ' + (ok ? 'ok' : 'err');
+  }
+
+  // Résumé PDFs
+  const regen = document.getElementById('regen-resume');
+  if (regen) regen.addEventListener('click', async function () {
+    regen.disabled = true;
+    try {
+      const r = await fetch('/admin/regenerate-resume', { method: 'POST' });
+      alert(await r.text());
+    } catch (_) { alert('Network error.'); }
+    regen.disabled = false;
+  });
+
+  // Chat model list: add, toggle, move, delete. Every change reloads.
+  const modelResult = document.getElementById('model-result');
+  const modelForm = document.getElementById('model-add-form');
+  if (modelForm) modelForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const model = (new FormData(modelForm).get('model') || '').toString().trim();
+    const r = await call('POST', '/admin/api/models', { model: model });
+    if (r.ok) location.reload(); else show(modelResult, r.detail, false);
+  });
+  document.addEventListener('change', async function (e) {
+    const box = e.target.closest && e.target.closest('[data-model-toggle]');
+    if (!box) return;
+    box.disabled = true;
+    const r = await call('PATCH', '/admin/api/models/' + encodeURIComponent(box.dataset.modelToggle), { enabled: box.checked });
+    if (r.ok) location.reload(); else { box.disabled = false; box.checked = !box.checked; show(modelResult, r.detail, false); }
+  });
+
+  // Secure links
+  const linkForm = document.getElementById('secure-link-form');
+  const linkResult = document.getElementById('secure-link-result');
+  if (linkForm) linkForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = new FormData(linkForm);
+    const r = await call('POST', '/admin/secure-links', {
+      filename: (data.get('filename') || '').toString(),
+      expires_in: (data.get('expires_in') || '').toString(),
+      max_uses: parseInt(data.get('max_uses') || '5', 10),
+    });
+    if (!r.ok || !r.json.url) { show(linkResult, r.detail, false); return; }
+    const url = r.json.url;
+    linkResult.className = 'feedback-status ok';
+    linkResult.textContent = 'Link generated: ';
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = url;
+    const copy = document.createElement('button');
+    copy.type = 'button'; copy.className = 'key key--sm'; copy.textContent = 'Copy';
+    copy.addEventListener('click', function () {
+      navigator.clipboard && navigator.clipboard.writeText(url).then(
+        () => { copy.textContent = 'Copied'; },
+        () => { copy.textContent = 'Failed'; }
+      );
+    });
+    linkResult.append(a, ' ', copy);
+  });
+
+  document.addEventListener('click', async function (e) {
+    const t = e.target.closest && e.target;
+    if (!t) return;
+    const move = t.closest('[data-model-move]');
+    const del = t.closest('[data-model-delete]');
+    const revoke = t.closest('[data-revoke]');
+    if (move) {
+      move.disabled = true;
+      const r = await call('PATCH', '/admin/api/models/' + encodeURIComponent(move.dataset.modelMove), { position: parseInt(move.dataset.position, 10) });
+      if (r.ok) location.reload(); else { move.disabled = false; show(modelResult, r.detail, false); }
+    } else if (del) {
+      if (!confirm('Delete ' + del.dataset.name + ' from the model list?')) return;
+      del.disabled = true;
+      const r = await call('DELETE', '/admin/api/models/' + encodeURIComponent(del.dataset.modelDelete), {});
+      if (r.ok) location.reload(); else { del.disabled = false; show(modelResult, r.detail, false); }
+    } else if (revoke) {
+      if (!confirm('Revoke this link? Anyone with the URL will lose access.')) return;
+      revoke.disabled = true;
+      const r = await call('POST', '/admin/secure-links/' + encodeURIComponent(revoke.dataset.revoke) + '/revoke');
+      if (r.ok) location.reload(); else { revoke.disabled = false; alert('Failed to revoke'); }
     }
   });
 })();
 </script>
-
 </body>
 </html>

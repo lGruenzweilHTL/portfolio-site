@@ -878,7 +878,9 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1180px) {
-  .ctrl, .project { grid-template-columns: 1fr; }
+  /* minmax(0, …): a bare 1fr column is at least as wide as its widest
+     unbreakable content, which pushed small phones into side-scrolling. */
+  .ctrl, .project { grid-template-columns: minmax(0, 1fr); }
   .bays { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .blades { grid-template-columns: 1fr; }
@@ -910,6 +912,11 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 
   .nav { padding: 0 12px; gap: var(--space-3); position: relative; }
   .nav-host .silk { display: none; }
+  /* The host chip gives way first, so the Ports and language keys always
+     fit (320px phones, longer translated labels). */
+  .nav-host { min-width: 0; }
+  .nav-host .lcd--chip { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .nav-toggle { flex: none; }
   .js .nav-toggle { display: inline-flex; }
   .lang summary { min-width: 0; }
   .js .ports {
@@ -979,6 +986,76 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
   .js .unit.rv:not(.in) { opacity: 1; }
 }
 
+/* ---------- Admin (backend/templates/admin.html) ---------- */
+
+.adm-who { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); text-transform: none; letter-spacing: .02em; overflow-wrap: anywhere; }
+.adm-sub { font: var(--size-mono)/1.5 var(--font-mono); color: var(--text-muted); }
+.adm-gen { margin-top: var(--space-4); }
+.adm-readouts .lcd--chip { align-self: flex-start; font-size: var(--size-lcd-lg); }
+.adm-readouts dd.adm-sub { margin-top: -2px; }
+.adm-panel {
+  min-width: 0; padding: var(--space-4); border-radius: var(--radius-plate);
+  background: var(--metal), var(--face-raised); box-shadow: var(--depth-raised);
+}
+.adm-panel > h3 { margin-bottom: var(--space-3); }
+.adm-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.adm-split { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: var(--space-4); align-items: start; }
+.adm-form { display: flex; flex-direction: column; gap: var(--space-3); }
+.adm-form select {
+  width: 100%; padding: 10px 12px; border-radius: var(--radius-plate);
+  font: var(--size-body)/1.5 var(--font-body); color: var(--text-hi);
+  background: var(--rack-hole); border: 1px solid var(--panel-line); box-shadow: var(--depth-recess);
+}
+.adm-form .feedback-row .field { min-width: 0; }
+.adm-form .feedback-status a { color: var(--lcd-text); overflow-wrap: anywhere; }
+.adm-list li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: 6px 0; border-bottom: 1px solid var(--panel-line); }
+.adm-list li:last-child { border-bottom: 0; }
+.adm-path { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--size-mono)/1.5 var(--font-mono); color: var(--text-hi); }
+.adm-list .lcd { flex: none; }
+.adm-empty { padding: var(--space-3) 0; color: var(--text-muted); font-style: italic; }
+.adm-scroll { overflow-x: auto; }
+.adm-table { width: 100%; border-collapse: collapse; font-size: var(--size-small); }
+.adm-table th { padding: 0 10px 8px; text-align: left; font: 600 var(--size-silk)/1.3 var(--font-silk); text-transform: uppercase; letter-spacing: .06em; color: var(--silk-dim); border-bottom: 1px solid var(--panel-line); }
+.adm-table td { padding: 8px 10px; vertical-align: middle; border-bottom: 1px solid var(--panel-line); }
+.adm-table tr:last-child td { border-bottom: 0; }
+.adm-mono { font: var(--size-mono)/1.5 var(--font-mono); }
+.adm-strong { color: var(--text-hi); font-weight: 600; overflow-wrap: anywhere; }
+.adm-check { width: 18px; height: 18px; accent-color: var(--accent-key); }
+.adm-actions { white-space: nowrap; }
+.adm-actions .key + .key { margin-left: 4px; }
+.adm-danger:hover { color: var(--led-red); }
+.adm-feed { display: flex; flex-direction: column; gap: var(--space-3); }
+.adm-meta { margin-bottom: var(--space-2); overflow-wrap: anywhere; }
+.adm-meta a { color: var(--lcd-text); }
+.adm-msg { white-space: pre-wrap; overflow-wrap: anywhere; }
+.adm-sessions { display: flex; flex-direction: column; gap: var(--space-2); }
+.adm-session { border-radius: var(--radius-plate); background: var(--metal), var(--face-raised); box-shadow: var(--depth-raised); }
+.adm-session summary { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); padding: 10px var(--space-4); cursor: pointer; list-style: none; }
+.adm-session summary::-webkit-details-marker { display: none; }
+.adm-session summary::after { content: '+'; margin-left: auto; font: 600 16px/1 var(--font-mono); color: var(--silk-dim); }
+.adm-session[open] summary::after { content: '−'; }
+.adm-session summary:hover { filter: brightness(1.12); }
+.adm-count { font: var(--size-mono)/1.5 var(--font-mono); color: var(--text-body); }
+.adm-log { margin: 0 var(--space-2) var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-plate); background: var(--rack-hole); box-shadow: var(--depth-recess); font: var(--size-mono)/1.6 var(--font-mono); }
+.adm-line { padding: 6px 0; border-bottom: 1px solid var(--panel-line); overflow-wrap: anywhere; }
+.adm-line:last-child { border-bottom: 0; }
+.adm-line--user .adm-text { color: var(--text-hi); }
+.adm-role { margin-right: var(--space-2); font: 600 var(--size-silk)/1.3 var(--font-silk); text-transform: uppercase; letter-spacing: .06em; color: var(--led-green); }
+.adm-line--assistant .adm-role { color: var(--lcd-text); }
+.adm-text { white-space: pre-wrap; }
+.adm-attempts { margin-top: 4px; color: var(--text-muted); }
+.adm-attempts b { color: var(--text-body); font-weight: 500; }
+.adm-attempt { margin-top: 3px; }
+.adm-kind { padding: 0 6px; border-radius: 2px; background: var(--face-edge); color: var(--lcd-text-dim); }
+.adm-kind--bad { color: var(--led-red); }
+.adm-provider { margin: 2px 0 0 var(--space-3); white-space: pre-wrap; color: var(--text-body); }
+@media (max-width: 900px) {
+  .adm-cols, .adm-split { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .adm-who { display: none; }
+}
+
 /* ---------- Console (chatbot, built by chat.js) ---------- */
 
 .con-tab {
@@ -1043,7 +1120,13 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
   border: 0; background: transparent; color: var(--text-hi); caret-color: var(--text-hi); font: inherit;
 }
 .con-send { flex: none; }
+.con-note { flex: none; margin: 0; padding: 0 16px 8px; font-size: 11px; line-height: 1.4; color: var(--silk-dim); }
+.con-note a { color: var(--lcd-text); }
+/* Flex children default to min-width: auto, so a long model label would
+   push the panel wider than a small phone. */
 .con-status { flex: none; display: flex; justify-content: space-between; gap: var(--space-3); padding: 5px 12px; background: var(--face-edge); color: var(--silk-dim); font-size: 11px; }
+.con-status > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.con-hint { flex: none; }
 
 @media (max-width: 900px) {
   /* main.js sets hero-in-view: the hero has its own contact keys. */
@@ -1051,8 +1134,15 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 }
 @media (max-width: 560px) {
   .con-tab { right: var(--space-3); bottom: var(--space-3); padding: 9px 12px; }
-  .con { right: 0; bottom: 0; width: 100vw; height: 100dvh; border-radius: 0; border: 0; }
+  /* inset, not 100vw: 100vw includes a scrollbar and would overhang. */
+  .con { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
   .con-prompt .p-path { display: none; }
   /* iOS zooms into inputs under 16px on focus. */
   .hero-ask-input { font: 16px/1.4 var(--font-body); }
+  .con-input { font-size: 16px; }
+}
+@media (max-width: 374px) {
+  /* Phone S: keep the input wide; the hint and prompt host are decoration. */
+  .con-hint, .con-prompt { display: none; }
+  .con-in, .con-out { padding-left: 12px; padding-right: 12px; }
 }
