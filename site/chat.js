@@ -82,7 +82,9 @@
   function prompt() {
     return [
       el('span', { class: 'p-user', text: 'guest@' + HOST }),
-      el('span', { class: 'p-path', text: ':~$' }),
+      el('span', { class: 'p-path', text: ':~' }),
+      // Separate so phones can show the prompt as a bare "$".
+      el('span', { class: 'p-path p-sign', text: '$' }),
     ];
   }
   const cursor = () => el('span', { class: 'con-cur', 'aria-hidden': 'true' });
@@ -226,8 +228,7 @@
     },
     openPanel(source) {
       if (this.open) { this.input.focus(); return; }
-      // Focus goes back to whatever opened the console; the tab is hidden
-      // on phones while the hero is on screen.
+      // Focus goes back to whatever opened the console.
       this.opener = document.activeElement;
       this.panel.inert = false;
       this.panel.classList.add('open');

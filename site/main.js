@@ -396,13 +396,3 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   sync();
 })();
 
-// While the hero is on screen its own keys are the way to get in touch, so
-// on phones the console tab (chat.js) steps aside instead of covering them.
-(function () {
-  const hero = document.getElementById('hero');
-  if (!hero || !('IntersectionObserver' in window)) return;
-  const h = document.documentElement;
-  new IntersectionObserver(entries => {
-    h.classList.toggle('hero-in-view', entries[entries.length - 1].isIntersecting);
-  }, { rootMargin: '0px 0px -30% 0px' }).observe(hero);
-})();

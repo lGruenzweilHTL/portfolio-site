@@ -1112,7 +1112,7 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 .ln--wait::after { content: '…]'; animation: blink 1s steps(1) infinite; }
 .ln .con-cur { width: .6em; height: 1.1em; margin-left: 1px; }
 .con-turnstile { flex: none; padding: 0 16px; }
-.con-in { flex: none; display: flex; align-items: flex-start; gap: var(--space-2); padding: 10px 16px; border-top: 1px solid var(--panel-line); }
+.con-in { flex: none; display: flex; align-items: center; gap: var(--space-2); padding: 10px 16px; border-top: 1px solid var(--panel-line); }
 .con-in:focus-within { box-shadow: inset 0 1px 0 var(--accent-key); }
 .con-prompt { flex: none; white-space: nowrap; }
 .con-input {
@@ -1128,21 +1128,19 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 .con-status > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .con-hint { flex: none; }
 
-@media (max-width: 900px) {
-  /* main.js sets hero-in-view: the hero has its own contact keys. */
-  html.hero-in-view .con-tab:not([aria-expanded="true"]) { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity var(--dur-fast), visibility 0s linear var(--dur-fast); }
-}
 @media (max-width: 560px) {
   .con-tab { right: var(--space-3); bottom: var(--space-3); padding: 9px 12px; }
   /* inset, not 100vw: 100vw includes a scrollbar and would overhang. */
   .con { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
-  .con-prompt .p-path { display: none; }
-  /* iOS zooms into inputs under 16px on focus. */
+  /* iOS zooms into inputs under 16px on focus. The whole input row goes
+     to 16px so the prompt and the text share one line box, and the prompt
+     shrinks to "$" so the input keeps its width. */
   .hero-ask-input { font: 16px/1.4 var(--font-body); }
-  .con-input { font-size: 16px; }
+  .con-in { font-size: 16px; }
+  .con-prompt .p-user, .con-prompt .p-path:not(.p-sign) { display: none; }
 }
 @media (max-width: 374px) {
-  /* Phone S: keep the input wide; the hint and prompt host are decoration. */
-  .con-hint, .con-prompt { display: none; }
+  /* Phone S: keep the input wide; the hint is decoration. */
+  .con-hint { display: none; }
   .con-in, .con-out { padding-left: 12px; padding-right: 12px; }
 }
