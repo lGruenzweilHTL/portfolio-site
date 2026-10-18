@@ -1,7 +1,10 @@
 name: tests
 
+# Pull requests test every commit on their branch; push only covers master,
+# so a PR commit isn't tested twice (once as push, once as pull_request).
 on:
   push:
+    branches: [master]
   pull_request:
 
 permissions:

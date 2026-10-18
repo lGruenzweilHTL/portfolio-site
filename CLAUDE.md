@@ -14,7 +14,7 @@ python scripts/render_resume_preview.py   # render résumé templates to backend
 ```
 
 ```bash
-pip install -r requirements-dev.txt && pytest   # tests/, no network (provider mocked with respx); CI runs it on every push/PR
+pip install -r requirements-dev.txt && pytest   # tests/, no network (provider mocked with respx); CI runs it on PRs and pushes to master
 ```
 
 There is no linter or build step. Frontend (`site/`) is hand-written HTML/CSS/JS with no bundler.

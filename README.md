@@ -58,7 +58,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
 /scripts                   One-off dev tooling (devicon subsetting, résumé preview render)
 /static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
 /tests                     pytest suite (no network: provider mocked with respx)
-/.github/workflows         CI: pytest on every push and PR (Python 3.10 + 3.13)
+/.github/workflows         CI: pytest on PRs and pushes to master (Python 3.10 + 3.13)
 .env.example               Copy to .env; all required env vars documented
 requirements.txt           Pinned Python dependencies
 requirements-dev.txt       requirements.txt + pytest, pytest-asyncio, respx
@@ -108,7 +108,7 @@ pytest
 The suite needs no network, no API key and no WeasyPrint system libs: the
 chat provider is mocked with `respx`, Turnstile is bypassed through
 settings, and every test gets its own temporary SQLite DB (`tests/conftest.py`).
-GitHub Actions runs it on every push and pull request
+GitHub Actions runs it on every pull request and every push to master
 (`.github/workflows/test.yml`).
 
 ## Chatbot
