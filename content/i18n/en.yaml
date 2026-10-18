@@ -73,6 +73,10 @@ hero:
   bay1: "Software engineering intern · 08/2026"
   bay2: "Voice assistant · in active development"
   bay3: "3 Proxmox nodes · serves this page"
+  ask_title: "Ask my AI assistant"
+  ask_lead: "It knows more than this page: why I built things, how I work and what I'm looking for."
+  ask_placeholder: "e.g. When is he available?"
+  ask_send: "Ask"
 
 vg:
   featured: "Featured project"
@@ -188,6 +192,7 @@ contact:
   lead: Email is the fastest way to reach me.
   body: "I'm open to internships and interesting projects, and I answer anything that isn't spam."
   report: "Report a bug on this site"
+  ask: "Ask the AI assistant"
   feedback_sub: "Spotted a typo or a bug? Tell me here. For anything else, email is faster."
   name_label: Name (optional)
   email_label: "Email (optional, for a reply)"
@@ -233,7 +238,8 @@ js:
     note6: "<b>TTS:</b> Origin sends the reply text to TTS, which returns audio."
     note7: "<b>Reply:</b> Origin streams the spoken reply back through the Relay."
   con:
-    tab_label: "Open the console: ask questions about Lukas"
+    tab: "Ask my AI"
+    tab_label: "Open the AI assistant: ask questions about Lukas"
     close: Close console
     clear_title: Start a new conversation
     output_label: Console output

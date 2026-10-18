@@ -229,6 +229,117 @@ beyond_code:
     body: >
       Currently on an Aprilia Tuono 125, with plans to move up to something bigger.
 
+# Background only the chatbot knows: things recruiters ask that the site has no
+# room for. Optional; nothing else reads it. Anything here can be coaxed out of
+# the bot, so treat it as published.
+chat_only:
+  - topic: "What I'm looking for"
+    body: >
+      Backend work by preference, full stack when a project needs it. C# is my
+      favourite, but I'm comfortable in every language my projects use. No
+      preference on team size yet; I'm still finding out what suits me. I can
+      work in and around Linz or fully remote, but I can't relocate. After
+      graduating in 2028 I plan to start working rather than go to university.
+  - topic: "Why I built vektorgrid"
+    body: >
+      I'm an Iron Man fan and wanted my own Jarvis. It was also a deliberate
+      chance to learn several languages in one system (C#, Python, C++,
+      Kotlin). Biggest lesson: I wouldn't write the audio processing and the
+      satellite protocol myself again. A successor is in development and not
+      public yet; the one detail I share is that it builds on Home Assistant
+      Assist with a custom integration instead.
+  - topic: "SceneForge AI and UniConsole, honestly"
+    body: >
+      Both started because I needed them for my own projects. They're small and
+      early, and nobody really uses them yet. Looking back the code quality
+      isn't great, which mostly shows how much I've learned since.
+  - topic: "My part in RoboDucks"
+    body: >
+      The team is mostly classmates. My part was the serial protocol between
+      the Raspberry Pi and the LEGO Spike. The team hasn't competed yet; this
+      school year a friend and I lead it, and we plan to enter a competition in
+      April 2027.
+  - topic: "What SlideLizard taught me"
+    body: >
+      Far more solving problems on my own than school asks for. I developed
+      mostly with AI there, so I learned a lot about prompting and steering AI
+      coding tools.
+  - topic: "A homelab outage I fixed from school"
+    body: >
+      My brother texted me that the internet was down while I was at school.
+      Several important services were down, Pi-hole among them, but WireGuard
+      was still up, so I connected remotely and had it fixed in about an hour.
+      The cause was a stalled drive operation that left the drive unusable and
+      took every service on it down.
+  - topic: "How the homelab started"
+    body: >
+      I saw a video about Home Assistant, thought it looked cool and put it on
+      a Raspberry Pi. Soon after I moved it to an old PC from our basement, and
+      about a year later I grew it to three Proxmox nodes.
+  - topic: "What the homelab taught me"
+    body: >
+      Pretty much all of my hands-on Linux, Docker, networking, monitoring and
+      backup experience. It turned things I only knew in theory, like
+      networking and monitoring, into practice.
+  - topic: "What changed after the outage"
+    body: >
+      The drive that failed was shared across the nodes and held the
+      high-availability services without any replication. I replaced all of my
+      bulk storage with one larger drive and reused the freed-up drives for
+      backups and for the high-availability services, which are now replicated
+      with ZFS.
+  - topic: "What's next for the homelab"
+    body: >
+      I've bought most of the hardware for a fourth node and am only waiting on
+      the CPU and motherboard, so it's coming very soon. It will probably
+      replace one of the existing nodes and is mostly there to balance services
+      better. Some day, much further out, I'd like a dedicated AI node with an
+      RTX 3090.
+  - topic: "What I automate with Home Assistant"
+    body: >
+      Not many of my devices support automation, but I automate everything the
+      hardware allows: the 3D printer, the solar panels with a full energy
+      dashboard, every light that can be controlled remotely, Zigbee smart
+      plugs, and the robot lawn mower.
+  - topic: "Who uses the homelab"
+    body: >
+      My family relies on the Pi-hole and Nextcloud, and some friends use
+      Jellyfin and the Minecraft server.
+  - topic: "The Ender of Theseus, in detail"
+    body: >
+      Mods so far on my Ender 3 Pro: a direct drive extruder, a BTT SKR Mini E3
+      V3 motherboard, a glass print bed, a custom filament spool holder, and a
+      Raspberry Pi running Klipper. It's integrated into Home Assistant and
+      watched by a night vision camera. Next on the list: a better motherboard
+      enclosure for airflow, switching the printer on and off remotely so it
+      powers down when a print is done, and a dual Z-screw kit.
+  - topic: "How I work in a team"
+    body: >
+      I don't have enough team experience to name a preference; it depends on
+      the people. I try to fill the gaps: depending on what my teammates are
+      best at, I take the lead or do most of the coding. I care about developer
+      experience: a teammate should get what a tool does in the first ten
+      seconds.
+  - topic: "How I learn"
+    body: >
+      Videos, or I let AI build sample projects that I read and play with, then
+      I build my own thing.
+  - topic: "What I enjoy"
+    body: >
+      Exploring interesting new features. The parts I like least are bug hunts
+      and writing docs.
+  - topic: "School"
+    body: >
+      I'm in the Informatik department at HTL Leonding. My favourite subjects
+      are AI and data science, and network technologies.
+  - topic: "How I got into programming"
+    body: >
+      At 12 or 13, through game dev: a friend recommended Brackeys' Unity
+      tutorials, back when he still made Unity videos.
+  - topic: "Other hobbies"
+    body: >
+      Table tennis, a lot of Trackmania, and I like Chinese food.
+
 # Recruiter-facing summary. Used by the chatbot's "tell me about yourself"
 # answer and the site — NOT the résumé PDFs, which open straight into education
 # and experience. Keep it first-person and specific.

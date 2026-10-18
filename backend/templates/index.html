@@ -247,6 +247,17 @@ window.I18N = {{ js_strings | tojson }};
                   <a class="key" href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('hero.github_sr') }}</span></a>
                 </div>
                 <p class="resume-alt"><a href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.plain') }}<span class="sr-only"> {{ t('hero.ats_sr') }}</span></a></p>
+                {#- Inline entry to the AI console (chat.js). Hidden until chat.js
+                     unhides it, since without JS there is no console to open. #}
+                <form class="hero-ask" data-ask-form hidden>
+                  <label class="hero-ask-title" for="hero-ask-q">{{ t('hero.ask_title') }}</label>
+                  <p class="hero-ask-lead" id="hero-ask-lead">{{ t('hero.ask_lead') }}</p>
+                  <div class="hero-ask-row">
+                    <span class="hero-ask-p" aria-hidden="true">&gt;_</span>
+                    <input class="hero-ask-input" id="hero-ask-q" name="q" type="text" autocomplete="off" spellcheck="false" placeholder="{{ t('hero.ask_placeholder') }}" aria-describedby="hero-ask-lead">
+                    <button type="submit" class="key key--sm key--primary">{{ t('hero.ask_send') }}</button>
+                  </div>
+                </form>
                 {% if t('hero.translation_note') %}<p class="translation-note silk silk--dim">{{ t('hero.translation_note') }}</p>{% endif %}
               </div>
             </div>
@@ -660,6 +671,7 @@ window.I18N = {{ js_strings | tojson }};
               </div>
               <div class="keys">
                 <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
+                <button type="button" class="key" data-ask hidden>{{ t('contact.ask') }}</button>
                 <button type="button" class="key drawer-toggle" aria-expanded="false" aria-controls="drawer">{{ t('contact.report') }}</button>
               </div>
             </div>
