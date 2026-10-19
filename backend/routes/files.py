@@ -27,6 +27,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 
 from ..config import settings
 from ..db.models import get_db
+from ..net import client_ip
 
 log = logging.getLogger(__name__)
 
@@ -307,7 +308,7 @@ def secure_root() -> PlainTextResponse:
 @router.get("/files/secure/{filename}")
 def download_secure(filename: str, request: Request):
     token = request.query_params.get("t", "")
-    ip = request.client.host if request.client else ""
+    ip = client_ip(request)
     ua = request.headers.get("user-agent", "")
 
     link_id, row, reason = _verify_token(token)

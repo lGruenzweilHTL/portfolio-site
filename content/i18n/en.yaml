@@ -209,9 +209,12 @@ pdu:
   how: "This site runs on my Proxmox homelab: one FastAPI process behind a Cloudflare Tunnel, redeployed by a GitHub webhook on every push."
   notes: Study notes
   top: Back to top
+  privacy: "Privacy"
 
 # Strings for main.js, chat.js and feedback.js (window.I18N, without "js.").
 js:
+  # Privacy policy for this language (/de/privacy for German, /privacy otherwise).
+  privacy_path: /privacy
   status:
     connecting: Connecting
     online: Online
@@ -258,6 +261,8 @@ js:
     connecting: "[connecting"
     error: "error:"
     error_sr: "Error:"
+    privacy: "Chats are recorded to improve the bot."
+    privacy_link: "Privacy policy"
   reason:
     rate_limited: "You're sending messages too fast. Wait a moment, or email me."
     captcha_failed: Captcha check failed. Refresh and try again.
@@ -268,6 +273,7 @@ js:
     stream_interrupted: "The connection dropped before the answer finished. Try again, or email me if it keeps happening."
     network_error: "Network error. Try again, or email me directly."
     unknown: "Something went wrong. Try again, or email me."
+    moderated: "I can't help with that one. Ask me about Lukas's projects, skills or experience instead."
   fb:
     empty: Please write a message first.
     bad_email: "That email address doesn't look right. Fix it, or leave it empty."

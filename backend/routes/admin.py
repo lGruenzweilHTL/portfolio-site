@@ -10,6 +10,7 @@ The view is a single page that pulls everything in one DB pass. It does
 """
 from __future__ import annotations
 
+import json
 import logging
 from datetime import datetime, timezone, timedelta
 
@@ -18,6 +19,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from ..config import settings
 from ..db.models import get_db
+from ..i18n import DEFAULT_LANG, catalogs
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +127,7 @@ def _aggregate(conn) -> dict:
     # Recent feedback
     feedback = [
         dict(r) for r in conn.execute(
-            "SELECT name, email, message, ip, created_at FROM feedback "
+            "SELECT name, email, message, created_at FROM feedback "
             "ORDER BY id DESC LIMIT 30"
         ).fetchall()
     ]
@@ -137,9 +139,11 @@ def _aggregate(conn) -> dict:
     ).fetchall():
         sid = s["session_id"]
         msgs = [dict(m) for m in conn.execute(
-            "SELECT role, content, error, created_at FROM chat_messages "
+            "SELECT role, content, error, model, error_detail, created_at FROM chat_messages "
             "WHERE session_id = ? ORDER BY id ASC", (sid,)
         ).fetchall()]
+        for m in msgs:
+            m["attempts"] = _parse_attempts(m.pop("error_detail"))
         # Round-trip the full timestamp strings as-is from SQLite; the
         # template just renders them.
         err_count = sum(1 for m in msgs if m.get("error"))
@@ -160,7 +164,29 @@ def _aggregate(conn) -> dict:
         "chat_sessions": sessions,
         "secure_links": _list_secure_links(conn),
         "secure_files": _list_secure_files(),
+        "chat_models": _list_chat_models(),
     }
+
+
+def _parse_attempts(raw: str | None) -> list[dict]:
+    """chat_messages.error_detail -> list of attempts, [] if absent/bad."""
+    if not raw:
+        return []
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        return []
+    return [a for a in data if isinstance(a, dict)] if isinstance(data, list) else []
+
+
+def _list_chat_models() -> list[dict]:
+    from .. import chat_models
+    from ..chat import cooldown_remaining
+    try:
+        return [{**m, "cooldown_s": round(cooldown_remaining(m["model"]))} for m in chat_models.list_models()]
+    except Exception as e:  # noqa: BLE001
+        log.warning("chat_models list failed: %s", e)
+        return []
 
 
 def _list_secure_links(conn) -> list[dict]:
@@ -221,10 +247,15 @@ def admin(request: Request) -> HTMLResponse:
         autoescape=select_autoescape(["html"]),
     )
     template = env.get_template("admin.html")
+    en = catalogs()[DEFAULT_LANG]
     html = template.render(
+        # The shared PDU partial and main.js need these (English only).
+        t=en.t,
+        js_strings=en.js(),
+        home="/",
         user=user,
         dev_bypass=settings.admin_dev_bypass,
         generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         **data,
     )
-    return HTMLResponse(html)
+    return HTMLResponse(html, headers={"cache-control": "no-store"})

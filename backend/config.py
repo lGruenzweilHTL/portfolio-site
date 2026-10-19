@@ -24,11 +24,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- OpenRouter ---
+    # --- Chat provider (OpenAI-compatible; Gemini API or OpenRouter) ---
+    # The names say OpenRouter for historical reasons; production points
+    # OPENROUTER_BASE_URL at the Gemini API.
     openrouter_api_key: str = ""
-    # Comma-separated model ids, tried in order: when one is rate-limited
-    # or errors, the next runs. Each model usually has its own quota
-    # bucket, so every entry adds free-tier headroom.
+    # Comma-separated model ids. Only read once, to seed the chat_models
+    # table on first boot; after that the list is edited on /admin.
     openrouter_models: str = ""
     # Deprecated single-model setting, used only when OPENROUTER_MODELS is
     # empty so older .env files keep working.
@@ -42,6 +43,8 @@ class Settings(BaseSettings):
 
     # --- Deploy webhook ---
     deploy_webhook_secret: str = ""
+    # Only pushes to this branch deploy; other refs and events are skipped.
+    deploy_branch: str = "master"
     # systemd unit name to restart on deploy. Empty string disables restart.
     deploy_systemd_unit: str = "backend"
     # Where the deploy handler writes the "please restart" trigger. The
@@ -79,6 +82,12 @@ class Settings(BaseSettings):
     # Should be the public origin (no trailing slash), e.g. https://lukasgruenzweil.com
     base_url: str = "http://localhost:8000"
 
+    # --- Client IP ---
+    # Peers allowed to set CF-Connecting-IP (comma-separated IPs or CIDR
+    # ranges). In production: the cloudflared host as uvicorn sees it.
+    # Empty = trust nobody, so every IP is the TCP peer.
+    trusted_proxy_ips: str = ""
+
     # --- App ---
     app_host: str = "0.0.0.0"
     app_port: int = 8000
@@ -107,9 +116,21 @@ class Settings(BaseSettings):
     # history that is resent on every later turn). Recruiter questions are
     # a sentence or two; 1000 chars leaves plenty of room.
     chat_max_message_chars: int = 1000
-    # How long a model that answered 429 or errored is skipped by later
-    # requests, in seconds. Free-tier quotas are per minute.
+    # How long a model that answered 429, is overloaded or unreachable is
+    # skipped by later requests, in seconds. Free-tier quotas are per minute.
     chat_model_cooldown_seconds: float = 60.0
+    # Cooldown for a model the provider says doesn't exist (404): a retired
+    # model won't come back in a minute.
+    chat_model_unavailable_cooldown_seconds: float = 3600.0
+    # Upper bound for one chat request across all model attempts. Timeouts
+    # fall through to the next model, so without it a request could take
+    # len(models) x CHAT_REQUEST_TIMEOUT_SECONDS.
+    chat_total_timeout_seconds: float = 60.0
+
+    # --- Privacy ---
+    # Chat logs, feedback, analytics events and secure-link access logs
+    # older than this are deleted (at startup, then daily).
+    data_retention_days: int = 90
 
     @property
     def chat_models(self) -> list[str]:

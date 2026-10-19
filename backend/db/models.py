@@ -1,9 +1,14 @@
 """SQLite schema and connection helpers.
 
-Single DB (resume.db) holds three logical tables:
+Single DB (resume.db) holds these logical tables:
   - events: pageview + custom event rows (analytics)
   - feedback: feedback form submissions
   - chat_sessions / chat_messages: chatbot log
+  - chat_models: the chatbot's fallback model list (edited in /admin)
+  - secure_links / secure_link_events: token-gated downloads + audit log
+  - app_meta: small key/value flags (e.g. chat_models_seeded)
+
+Personal data is deleted after DATA_RETENTION_DAYS (backend/retention.py).
 
 All timestamps are ISO-8601 strings in UTC. All writes are best-effort and
 must never break a request (the analytics middleware swallows DB errors).
@@ -13,6 +18,7 @@ from __future__ import annotations
 import logging
 import sqlite3
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterator
 
@@ -29,7 +35,7 @@ CREATE TABLE IF NOT EXISTS events (
     name TEXT,                          -- event name (e.g. 'chatbot_opened'); NULL for pageview
     referrer TEXT,
     user_agent TEXT,
-    visitor_hash TEXT NOT NULL,         -- sha256(ip + ua + date)[:16], pseudo-unique per day
+    visitor_hash TEXT NOT NULL,         -- sha256(daily salt + ip + ua + date)[:16], pseudo-unique per day
     status INTEGER,                     -- HTTP response status (pageview only); NULL for events and for pre-migration rows
     created_at TEXT NOT NULL            -- ISO-8601 UTC
 );
@@ -43,7 +49,7 @@ CREATE TABLE IF NOT EXISTS feedback (
     name TEXT,
     email TEXT,
     message TEXT NOT NULL,
-    ip TEXT,
+    ip TEXT,                           -- no longer written (always NULL)
     user_agent TEXT,
     created_at TEXT NOT NULL
 );
@@ -52,7 +58,7 @@ CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at);
 CREATE TABLE IF NOT EXISTS chat_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id TEXT NOT NULL UNIQUE,   -- client-provided UUID
-    ip TEXT,
+    ip TEXT,                           -- no longer written (always NULL)
     user_agent TEXT,
     created_at TEXT NOT NULL,
     last_active_at TEXT NOT NULL,
@@ -66,7 +72,9 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     role TEXT NOT NULL,                -- 'user' | 'assistant' | 'system'
     content TEXT NOT NULL,
     created_at TEXT NOT NULL,
-    error TEXT                         -- NULL on success; populated on stream errors
+    error TEXT,                        -- NULL on success; populated on stream errors and 'moderated'
+    error_detail TEXT,                 -- JSON list of failed model attempts (assistant rows)
+    model TEXT                         -- model that produced the assistant text
 );
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at);
@@ -101,6 +109,22 @@ CREATE TABLE IF NOT EXISTS secure_link_events (
 );
 CREATE INDEX IF NOT EXISTS idx_secure_link_events_link ON secure_link_events(link_id);
 CREATE INDEX IF NOT EXISTS idx_secure_link_events_created_at ON secure_link_events(created_at);
+
+-- The chatbot's fallback model list, tried in `position` order. Seeded once
+-- from OPENROUTER_MODELS; after that only the admin edits it.
+CREATE TABLE IF NOT EXISTS chat_models (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model TEXT NOT NULL UNIQUE,        -- provider model id, as sent in the request
+    position INTEGER NOT NULL,         -- 0-based order in the fallback list
+    enabled INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS app_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 """
 
 
@@ -139,6 +163,32 @@ def _migrate(conn: sqlite3.Connection) -> None:
     # INDEX IF NOT EXISTS in SCHEMA covers fresh DBs; this is the
     # belt-and-braces for DBs that existed before the column landed.
     conn.execute("CREATE INDEX IF NOT EXISTS idx_events_status ON events(status)")
+    # chat_messages.error_detail / model — which models were tried for an
+    # assistant reply and which one answered (admin view only).
+    _add_column_if_missing(conn, "chat_messages", "error_detail", "TEXT")
+    _add_column_if_missing(conn, "chat_messages", "model", "TEXT")
+    # Raw IPs are no longer stored for chat or feedback (see the privacy
+    # policy). Clear the ones written before that; a no-op once done.
+    conn.execute("UPDATE chat_sessions SET ip = NULL WHERE ip IS NOT NULL")
+    conn.execute("UPDATE feedback SET ip = NULL WHERE ip IS NOT NULL")
+    _seed_chat_models(conn)
+
+
+def _seed_chat_models(conn: sqlite3.Connection) -> None:
+    """Copy OPENROUTER_MODELS into chat_models once. After that the flag
+    stays set and .env is never read for the list again, so an admin who
+    deletes every model doesn't get the .env list back on the next boot."""
+    if conn.execute("SELECT 1 FROM app_meta WHERE key = 'chat_models_seeded'").fetchone():
+        return
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    for position, model in enumerate(settings.chat_models):
+        conn.execute(
+            "INSERT OR IGNORE INTO chat_models (model, position, enabled, created_at, updated_at) "
+            "VALUES (?, ?, 1, ?, ?)",
+            (model, position, now, now),
+        )
+    conn.execute("INSERT INTO app_meta (key, value) VALUES ('chat_models_seeded', '1')")
+    log.info("migration: seeded chat_models with %d model(s)", len(settings.chat_models))
 
 
 @contextmanager

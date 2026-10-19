@@ -1,0 +1,155 @@
+{%- set de = lang == 'de' -%}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+{#- Rendered by backend/routes/privacy.py at /privacy (en) and /de/privacy
+    (Austrian German, "Sie"). The policy text lives here, in both languages,
+    and must match what the code does: retention.py (90 days), the salted
+    visitor hash in main.py, net.py, chat.py and feedback.py (no stored IPs),
+    files.py (secure-link audit keeps the IP). #}
+<title>{% if de %}Datenschutzerklärung{% else %}Privacy policy{% endif %} · Lukas Grünzweil</title>
+<meta name="description" content="{% if de %}Welche Daten gruenzweil.cc verarbeitet, wozu, wie lange, und welche Rechte Sie haben.{% else %}What data gruenzweil.cc processes, why, for how long, and what your rights are.{% endif %}" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="{{ origin }}{{ paths[lang] }}" />
+<link rel="alternate" hreflang="en" href="{{ origin }}{{ paths.en }}" />
+<link rel="alternate" hreflang="de" href="{{ origin }}{{ paths.de }}" />
+<link rel="alternate" hreflang="x-default" href="{{ origin }}{{ paths.en }}" />
+<meta name="theme-color" content="#0d0e11" />
+<meta name="color-scheme" content="dark" />
+<meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<script>
+window.I18N = {{ js_strings | tojson }};
+document.documentElement.classList.add('js');
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">{{ t('a11y.skip') }}</a>
+
+<div class="cabinet">
+  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
+  <div class="cab-body">
+    <div class="rail rail--l" aria-hidden="true"></div>
+    <div class="units">
+
+      <header class="unit unit--nav unit--nohandle">
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        <nav class="face nav" aria-label="Breadcrumb">
+          <ol class="crumbs lcd lcd--chip">
+            <li><a href="{{ home }}">lukas@lg-rack-01</a></li>
+            <li aria-current="page">privacy</li>
+          </ol>
+          {% if de %}<a class="key key--sm crumbs-back" href="{{ paths.en }}" hreflang="en" lang="en">English</a>
+          {% else %}<a class="key key--sm crumbs-back" href="{{ paths.de }}" hreflang="de" lang="de">Deutsch</a>{% endif %}
+        </nav>
+        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+      </header>
+
+      <main id="main" class="units-main" tabindex="-1">
+        <article class="unit" aria-labelledby="privacy-title">
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+          <div class="face">
+            <div class="unit-head">
+              <h1 class="silk" id="privacy-title">{% if de %}Datenschutzerklärung{% else %}Privacy policy{% endif %}</h1>
+              <span class="model" aria-hidden="true">GDPR · DSGVO</span>
+            </div>
+            <div class="readme">
+{% if de %}
+              <p>Hier steht, welche personenbezogenen Daten diese Website verarbeitet, wozu, auf welcher Rechtsgrundlage und wie lange. Die Website ist ein privates Portfolio ohne Werbung, ohne Tracking-Cookies und ohne Weitergabe Ihrer Daten zu Werbezwecken.</p>
+
+              <h4>1. Verantwortlicher</h4>
+              <p>Lukas Grünzweil, Österreich. E-Mail: <a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a>. Für alle Fragen zum Datenschutz und zur Ausübung Ihrer Rechte schreiben Sie bitte an diese Adresse.</p>
+
+              <h4>2. Hosting und Übertragung</h4>
+              <p>Die Website läuft auf einem selbst betriebenen Server in Österreich. Anfragen erreichen ihn über Cloudflare (Cloudflare Tunnel und CDN, Cloudflare, Inc.). Cloudflare verarbeitet dabei als Auftragsverarbeiter jede Anfrage, einschließlich Ihrer IP-Adresse, um die Seite auszuliefern und vor Angriffen zu schützen. Dabei kann es zu einer Übermittlung in die USA kommen; Cloudflare ist nach dem EU-US Data Privacy Framework zertifiziert. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren, erreichbaren Website).</p>
+
+              <h4>3. Zugriffsstatistik</h4>
+              <p>Für jeden Seitenaufruf speichert der Server Pfad, Referrer (die Seite, von der Sie kamen), Browser-Kennung (User-Agent), HTTP-Status und Zeitpunkt. Ihre IP-Adresse wird dafür nicht gespeichert: Statt ihr wird ein gekürzter Hashwert gespeichert, gebildet aus IP-Adresse, User-Agent, Datum und einem zufälligen Schlüssel, der nur im Arbeitsspeicher liegt, täglich gewechselt und nie gespeichert wird. So lassen sich Besucher eines Tages zählen, aber nicht über Tage hinweg verfolgen oder auf eine IP-Adresse zurückführen. Die Statistik verwendet keine Cookies. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (Interesse daran, zu sehen, welche Seiten genutzt werden und ob etwas kaputt ist). Die Einträge werden nach 90 Tagen gelöscht.</p>
+
+              <h4>4. Schutz vor Missbrauch (Rate Limiting)</h4>
+              <p>Um Chatbot, Feedback-Formular und Schnittstellen vor Überlastung zu schützen, hält der Server Ihre IP-Adresse für wenige Minuten im Arbeitsspeicher, um Anfragen pro Minute zu zählen. Sie wird nie auf die Festplatte geschrieben. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+
+              <h4>5. Chatbot</h4>
+              <p>Wenn Sie den Chatbot nutzen, werden Ihre Nachrichten und die Antworten zusammen mit einer zufälligen Sitzungs-ID, dem User-Agent und Zeitstempeln 90 Tage lang gespeichert, um den Bot zu verbessern und Missbrauch zu erkennen. Ihre IP-Adresse wird dabei nicht gespeichert.</p>
+              <p>Um Antworten zu erzeugen, werden Ihre Nachrichten und der bisherige Gesprächsverlauf an Google (Gemini API, Google LLC bzw. Google Ireland Ltd.) gesendet. Google ist der einzige KI-Anbieter, der Chats erhält. Weil der Chatbot den kostenlosen Zugang der Gemini API nutzt, kann Google die Inhalte laut seinen Bedingungen verwenden, um eigene Produkte zu verbessern, und sie dafür auch von Menschen prüfen lassen. <strong>Teilen Sie im Chat deshalb bitte keine personenbezogenen oder vertraulichen Daten.</strong></p>
+              <p>Vor jeder Nachricht prüft Cloudflare Turnstile, ob die Anfrage von einem Menschen stammt. Dabei verarbeitet Cloudflare technische Daten Ihres Browsers und Ihre IP-Adresse. Die Sitzungs-ID wird im lokalen Speicher (localStorage) Ihres Browsers abgelegt, damit das Gespräch beim Neuladen weitergeht; „clear“ im Chatfenster löscht sie.</p>
+              <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (Interesse daran, Fragen zu meinem Werdegang beantworten zu können und den Dienst vor Missbrauch zu schützen). Die Nutzung des Chatbots ist freiwillig.</p>
+
+              <h4>6. Feedback-Formular</h4>
+              <p>Wenn Sie das Formular nutzen, werden Name und E-Mail-Adresse (beide freiwillig), Ihre Nachricht, der User-Agent und der Zeitpunkt gespeichert und mir als Benachrichtigung zugestellt. Ihre IP-Adresse wird nicht gespeichert. Auch hier prüft Cloudflare Turnstile die Anfrage. Die Einträge werden nach 90 Tagen gelöscht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (Interesse daran, Fehlerberichte zu bearbeiten und zu antworten).</p>
+
+              <h4>7. Private Download-Links</h4>
+              <p>Manche Dateien sind nur über persönliche Links erreichbar, die ich gezielt weitergebe. Bei jedem Zugriff auf einen solchen Link werden IP-Adresse, User-Agent, Zeitpunkt und Ergebnis protokolliert, um Missbrauch der Links zu erkennen. Diese Protokolle werden nach 90 Tagen gelöscht. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
+
+              <h4>8. Schriftarten und Speicher im Browser</h4>
+              <p>Die Schriftarten der Website werden von Google Fonts (Google LLC) geladen. Dabei erhält Google Ihre IP-Adresse und technische Daten Ihres Browsers. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (einheitliche Darstellung der Website). Außer der Chat-Sitzungs-ID (siehe oben) merkt sich die Website im Sitzungsspeicher (sessionStorage) nur, dass die Startanimation bereits gespielt wurde. Cookies setzt die Website selbst nicht.</p>
+
+              <h4>9. Ihre Rechte</h4>
+              <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten, auf Datenübertragbarkeit und auf Widerspruch gegen eine Verarbeitung auf Grundlage berechtigter Interessen (Art. 15–21 DSGVO). Schreiben Sie dafür an die oben genannte E-Mail-Adresse. Da Chats und Feedback ohne IP-Adresse gespeichert werden, helfen mir Zeitpunkt und Inhalt Ihrer Nachricht, sie zu finden.</p>
+              <p>Wenn Sie meinen, dass die Verarbeitung Ihrer Daten gegen Datenschutzrecht verstößt, können Sie sich bei der österreichischen Datenschutzbehörde beschweren (Barichgasse 40–42, 1030 Wien, <a href="https://www.dsb.gv.at/" target="_blank" rel="noopener">dsb.gv.at<span class="sr-only"> (öffnet in einem neuen Tab)</span></a>).</p>
+
+              <p class="silk silk--dim">Stand: {{ updated }}</p>
+{% else %}
+              <p>This page explains what personal data this website processes, why, on what legal basis and for how long. The site is a personal portfolio: no ads, no tracking cookies, and your data is never shared for advertising.</p>
+
+              <h4>1. Who is responsible</h4>
+              <p>Lukas Grünzweil, Austria. Email: <a href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil@liwest.at</a>. Write to this address with any privacy question or to exercise your rights.</p>
+
+              <h4>2. Hosting and transport</h4>
+              <p>The site runs on a self-hosted server in Austria. Requests reach it through Cloudflare (Cloudflare Tunnel and CDN, Cloudflare, Inc.). Cloudflare processes every request, including your IP address, as a processor, to deliver the site and protect it from attacks. This can involve a transfer to the USA; Cloudflare is certified under the EU-US Data Privacy Framework. Legal basis: Art. 6(1)(f) GDPR (legitimate interest in a secure, reachable website).</p>
+
+              <h4>3. Server logs and analytics</h4>
+              <p>For every page view the server stores the path, the referrer (the page you came from), your browser's user agent, the HTTP status and the time. Your IP address is not stored for this. Instead, a shortened hash is stored, made from your IP address, user agent, the date and a random salt that lives only in memory, changes every day and is never written to disk. That allows counting visitors per day, but not following anyone across days or tracing the hash back to an IP address. Analytics uses no cookies. Legal basis: Art. 6(1)(f) GDPR (interest in knowing which pages are used and whether something is broken). Entries are deleted after 90 days.</p>
+
+              <h4>4. Rate limiting</h4>
+              <p>To protect the chatbot, the feedback form and the API from overload, the server holds your IP address in memory for a few minutes to count requests per minute. It is never written to disk. Legal basis: Art. 6(1)(f) GDPR.</p>
+
+              <h4>5. Chatbot</h4>
+              <p>When you use the chatbot, your messages and the replies are stored for 90 days, together with a random session ID, your user agent and timestamps, to improve the bot and detect abuse. Your IP address is not stored.</p>
+              <p>To generate replies, your messages and the conversation so far are sent to Google (Gemini API, Google LLC / Google Ireland Ltd.). Google is the only AI provider that receives chats. Because the chatbot uses the Gemini API's free tier, Google's terms allow it to use the content to improve its products, which can include human review. <strong>Please don't share personal or confidential information in the chat.</strong></p>
+              <p>Before each message, Cloudflare Turnstile checks that the request comes from a person; Cloudflare processes technical data from your browser and your IP address for this. The session ID is kept in your browser's local storage so the conversation survives a reload; "clear" in the chat window deletes it.</p>
+              <p>Legal basis: Art. 6(1)(f) GDPR (interest in answering questions about my background and protecting the service from abuse). Using the chatbot is optional.</p>
+
+              <h4>6. Feedback form</h4>
+              <p>When you use the form, your name and email address (both optional), your message, your user agent and the time are stored and sent to me as a notification. Your IP address is not stored. Cloudflare Turnstile checks this request too. Entries are deleted after 90 days. Legal basis: Art. 6(1)(f) GDPR (interest in handling bug reports and replying).</p>
+
+              <h4>7. Private download links</h4>
+              <p>Some files are only available through personal links that I hand out. Every access to such a link logs the IP address, user agent, time and result, to detect misuse of the links. These logs are deleted after 90 days. Legal basis: Art. 6(1)(f) GDPR.</p>
+
+              <h4>8. Fonts and browser storage</h4>
+              <p>The site's fonts are loaded from Google Fonts (Google LLC), which receives your IP address and technical data from your browser. Legal basis: Art. 6(1)(f) GDPR (consistent presentation of the site). Apart from the chat session ID (see above), the site only uses session storage to remember that the start-up animation has already played. The site itself sets no cookies.</p>
+
+              <h4>9. Your rights</h4>
+              <p>You have the right to access, rectification, erasure and restriction of processing of your data, to data portability, and to object to processing based on legitimate interests (Art. 15–21 GDPR). Write to the email address above. Chats and feedback are stored without an IP address, so the time and content of your message help me find them.</p>
+              <p>If you believe the processing of your data breaks data protection law, you can complain to the Austrian Data Protection Authority (Datenschutzbehörde, Barichgasse 40–42, 1030 Vienna, <a href="https://www.dsb.gv.at/" target="_blank" rel="noopener">dsb.gv.at<span class="sr-only"> (opens in a new tab)</span></a>).</p>
+
+              <p class="silk silk--dim">Last changed: {{ updated }}</p>
+{% endif %}
+            </div>
+          </div>
+          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
+        </article>
+      </main>
+
+      {% include "_pdu.html" %}
+
+    </div>
+    <div class="rail rail--r" aria-hidden="true"></div>
+  </div>
+  <div class="cab-plinth" aria-hidden="true"></div>
+</div>
+
+<script src="/main.js" defer></script>
+<script src="/turnstile.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
+<script src="/chat.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+name: tests
+
+# Pull requests test every commit on their branch; push only covers master,
+# so a PR commit isn't tested twice (once as push, once as pull_request).
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 is the documented minimum. 3.13 is the newest version the
+        # pinned pydantic-core ships wheels for.
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      # No WeasyPrint system libs: it is imported lazily, and the tests never
+      # render a PDF.
+      - run: pip install -r requirements-dev.txt
+      - run: pytest

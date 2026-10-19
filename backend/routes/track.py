@@ -30,6 +30,7 @@ from pydantic import BaseModel, Field
 from ..config import settings
 from ..db.models import get_db
 from ..main import _visitor_hash
+from ..net import client_ip
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class TrackEvent(BaseModel):
 
 @router.post("/api/track")
 def track_event(event: TrackEvent, request: Request) -> Response:
-    ip = request.client.host if request.client else ""
+    ip = client_ip(request)
     ua = request.headers.get("user-agent", "")
     referrer = request.headers.get("referer", "")
     visitor = _visitor_hash(ip, ua)

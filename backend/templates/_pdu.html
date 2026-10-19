@@ -1,5 +1,5 @@
 {#- PDU: the footer unit with live values from /api/status (main.js polls
-    it). Shared by the main page, project pages and /services; needs `t` and,
+    it). Shared by the main page, project pages, /services, /privacy and /admin; needs `t` and,
     off the main page, `home` (the portfolio link). #}
 <footer class="unit unit--pdu" id="pdu" aria-labelledby="pdu-title">
   <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
@@ -19,7 +19,7 @@
       <p class="pdu-how">{{ t('pdu.how') }}</p>
     </div>
     <p class="pdu-foot silk silk--dim">
-      © 2026 Lukas Grünzweil ·{% if home %} <a href="{{ home }}">Portfolio</a> ·{% endif %} <a href="/notes/">{{ t('pdu.notes') }}</a> · <a href="#main">{{ t('pdu.top') }} <span aria-hidden="true">↑</span></a>
+      © 2026 Lukas Grünzweil ·{% if home %} <a href="{{ home }}">Portfolio</a> ·{% endif %} <a href="/notes/">{{ t('pdu.notes') }}</a> · <a href="{{ t('js.privacy_path') }}">{{ t('pdu.privacy') }}</a> · <a href="#main">{{ t('pdu.top') }} <span aria-hidden="true">↑</span></a>
     </p>
   </div>
   <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
