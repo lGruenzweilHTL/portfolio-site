@@ -19,6 +19,8 @@
   const LANG = document.documentElement.lang || 'en';
 
   const SESSION_KEY = 'lukas.chat.session_id';
+  // Window size and maximized state, remembered per browser.
+  const SIZE_KEY = 'lukas.chat.size';
   const ENDPOINT = '/api/chat';
   const EMAIL = 'lukas.gruenzweil@liwest.at';
   const HOST = 'lg-rack-01';
@@ -97,6 +99,7 @@
     sendBtn: null,
     open: false,
     busy: false,
+    max: false,
 
     init() {
       const tab = el('button', { type: 'button', class: 'con-tab', 'aria-label': tr('con.tab_label'), 'aria-expanded': 'false', 'aria-controls': 'console', 'aria-haspopup': 'dialog' }, [
@@ -112,15 +115,25 @@
       close.addEventListener('click', () => this.close());
       const clear = el('button', { type: 'button', class: 'con-clear', title: tr('con.clear_title'), text: 'clear' });
       clear.addEventListener('click', () => this.reset());
+      const maxBtn = el('button', { type: 'button', class: 'con-dot con-dot--green', 'aria-pressed': 'false', 'aria-label': tr('con.maximize') });
+      maxBtn.addEventListener('click', () => this.setMax(!this.max));
+      this.maxBtn = maxBtn;
+      // Phones get a full-screen console anyway (styles.css), so the dot
+      // stays as decoration there.
+      const phone = matchMedia('(max-width: 560px)');
+      const syncPhone = () => { maxBtn.disabled = phone.matches; };
+      syncPhone();
+      phone.addEventListener('change', syncPhone);
       const bar = el('div', { class: 'con-bar' }, [
         el('div', { class: 'con-dots' }, [
           close,
           el('span', { class: 'con-dot con-dot--amber', 'aria-hidden': 'true' }),
-          el('span', { class: 'con-dot con-dot--green', 'aria-hidden': 'true' }),
+          maxBtn,
         ]),
         el('h2', { class: 'con-title', id: 'console-title', text: 'ask-lukas — guest@' + HOST + ': ~' }),
         clear,
       ]);
+      bar.addEventListener('dblclick', (e) => { if (!maxBtn.disabled && !e.target.closest('button')) this.setMax(!this.max); });
 
       // Screen readers don't follow the log while tokens stream in; finished
       // replies and errors are announced once through this.live instead.
@@ -165,13 +178,19 @@
         el('a', { href: tr('privacy_path'), text: tr('con.privacy_link') }),
       ]);
 
-      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title' }, [bar, out, live, turnstileBox, form, note, status]);
+      // The panel sits in the bottom-right corner, so it grows from its
+      // top-left corner. Pointer only; the green dot is the keyboard way.
+      const grip = el('div', { class: 'con-grip', title: tr('con.resize'), 'aria-hidden': 'true' });
+      grip.addEventListener('pointerdown', (e) => this.dragResize(e));
+
+      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title' }, [grip, bar, out, live, turnstileBox, form, note, status]);
       panel.inert = true;
       panel.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { e.stopPropagation(); this.close(); }
       });
       document.body.appendChild(panel);
       this.panel = panel;
+      this.restoreSize();
 
       // /api/status names the model the next chat starts with; a chat reply
       // names the model that answered it ('model' SSE event).
@@ -245,6 +264,60 @@
       this.panel.classList.remove('open');
       const back = this.opener && this.opener.isConnected && this.opener !== document.body ? this.opener : this.tab;
       back.focus();
+    },
+
+    // Size lives in --con-w/--con-h, which styles.css clamps to the viewport
+    // and ignores on phones, where the console is always full-screen.
+    restoreSize() {
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem(SIZE_KEY) || 'null'); } catch (_) {}
+      if (!saved) return;
+      if (saved.w > 0 && saved.h > 0) this.setSize(saved.w, saved.h, false);
+      if (saved.max) this.setMax(true, false);
+    },
+    saveSize() {
+      const st = this.panel.style;
+      try {
+        localStorage.setItem(SIZE_KEY, JSON.stringify({
+          w: parseInt(st.getPropertyValue('--con-w'), 10) || 0,
+          h: parseInt(st.getPropertyValue('--con-h'), 10) || 0,
+          max: !!this.max,
+        }));
+      } catch (_) {}
+    },
+    setSize(w, h, save = true) {
+      this.panel.style.setProperty('--con-w', Math.round(w) + 'px');
+      this.panel.style.setProperty('--con-h', Math.round(h) + 'px');
+      if (save) this.saveSize();
+    },
+    setMax(on, save = true) {
+      this.max = on;
+      this.panel.classList.toggle('con--max', on);
+      this.maxBtn.setAttribute('aria-pressed', String(on));
+      this.maxBtn.setAttribute('aria-label', tr(on ? 'con.restore' : 'con.maximize'));
+      if (save) this.saveSize();
+    },
+    dragResize(e) {
+      if (e.button !== 0 || this.max) return;
+      e.preventDefault();
+      const grip = e.currentTarget;
+      grip.setPointerCapture(e.pointerId);
+      const rect = this.panel.getBoundingClientRect();
+      const x0 = e.clientX, y0 = e.clientY;
+      this.panel.classList.add('con--sizing');
+      const move = (ev) => this.setSize(rect.width + x0 - ev.clientX, rect.height + y0 - ev.clientY, false);
+      const up = () => {
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', up);
+        grip.removeEventListener('pointercancel', up);
+        this.panel.classList.remove('con--sizing');
+        // Store what the viewport clamp left over, not the raw drag.
+        const r = this.panel.getBoundingClientRect();
+        this.setSize(r.width, r.height);
+      };
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', up);
+      grip.addEventListener('pointercancel', up);
     },
 
     announce(text) {

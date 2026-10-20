@@ -240,6 +240,9 @@ js:
     tab_label: "Apri l'assistente IA: fai domande su Lukas"
     close: Chiudi la console
     clear_title: Inizia una nuova conversazione
+    maximize: Ingrandisci la console
+    restore: Ripristina la dimensione della console
+    resize: Trascina per ridimensionare la console
     output_label: Output della console
     input_label: La tua domanda
     placeholder: "fai una domanda…"

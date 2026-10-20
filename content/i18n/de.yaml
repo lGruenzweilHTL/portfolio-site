@@ -238,6 +238,9 @@ js:
     tab_label: "KI-Assistenten öffnen: Fragen über Lukas stellen"
     close: Konsole schließen
     clear_title: Neues Gespräch beginnen
+    maximize: Konsole maximieren
+    restore: Konsolengröße wiederherstellen
+    resize: Ziehen, um die Größe der Konsole zu ändern
     output_label: Konsolenausgabe
     input_label: Ihre Frage
     placeholder: "Frage stellen…"
