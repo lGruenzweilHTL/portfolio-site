@@ -245,6 +245,9 @@ js:
     tab_label: "Open the AI assistant: ask questions about Lukas"
     close: Close console
     clear_title: Start a new conversation
+    maximize: Maximize console
+    restore: Restore console size
+    resize: Drag to resize the console
     output_label: Console output
     input_label: Your question
     placeholder: "ask a question…"

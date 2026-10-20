@@ -1073,7 +1073,9 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 
 .con {
   position: fixed; right: var(--space-6); bottom: var(--space-6); z-index: 61;
-  width: min(560px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 48px));
+  /* --con-w/--con-h come from the resize grip (chat.js); the viewport wins. */
+  width: min(var(--con-w, 560px), calc(100vw - 32px)); height: min(var(--con-h, 560px), calc(100dvh - 48px));
+  min-width: min(360px, calc(100vw - 32px)); min-height: min(320px, calc(100dvh - 48px));
   display: flex; flex-direction: column; overflow: hidden;
   border-radius: 8px; border: 1px solid var(--panel-line);
   background: var(--rack-hole); box-shadow: 0 18px 50px rgb(0 0 0 / .7), 0 4px 0 #08090b;
@@ -1081,6 +1083,16 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
   opacity: 0; transform: scale(.96); transform-origin: bottom right; visibility: hidden;
   transition: opacity var(--dur-base) ease, transform var(--dur-base) var(--ease-rack), visibility 0s linear var(--dur-base);
 }
+/* inset, not 100vw, for the same scrollbar reason as on phones. */
+.con--max { left: var(--space-6); top: var(--space-6); width: auto; height: auto; }
+.con--sizing { user-select: none; }
+.con-grip {
+  position: absolute; left: 0; top: 0; z-index: 1; width: 16px; height: 16px; cursor: nwse-resize; touch-action: none;
+  background: linear-gradient(135deg, var(--text-muted) 0 1.5px, transparent 1.5px 4px, var(--text-muted) 4px 5.5px, transparent 5.5px) 3px 3px / 8px 8px no-repeat;
+  opacity: .5; transition: opacity var(--dur-fast);
+}
+.con-grip:hover, .con--sizing .con-grip { opacity: 1; }
+.con--max .con-grip { display: none; }
 .con.open { opacity: 1; transform: none; visibility: visible; transition: opacity var(--dur-base) ease, transform var(--dur-base) var(--ease-rack), visibility 0s; }
 .con-bar {
   flex: none; display: flex; align-items: center; gap: var(--space-3); padding: 8px 12px;
@@ -1091,9 +1103,12 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 .con-dot { position: relative; width: 12px; height: 12px; border-radius: 50%; border: 0; padding: 0; background: var(--led-off); }
 .con-dot--red { background: var(--led-red); cursor: pointer; }
 .con-dot--amber { background: var(--led-amber); }
-.con-dot--green { background: var(--led-green); }
+.con-dot--green { background: var(--led-green); cursor: pointer; }
 .con-dot--red::after { content: '×'; position: absolute; inset: 0; display: grid; place-items: center; font: 700 10px/1 var(--font-mono); color: rgb(0 0 0 / .7); opacity: 0; }
-.con-dot--red:hover::after, .con-dot--red:focus-visible::after { opacity: 1; }
+.con-dot--green::after { content: '+'; position: absolute; inset: 0; display: grid; place-items: center; font: 700 10px/1 var(--font-mono); color: rgb(0 0 0 / .7); opacity: 0; }
+.con-dot--green[aria-pressed="true"]::after { content: '−'; }
+.con-dot--red:hover::after, .con-dot--red:focus-visible::after,
+.con-dot--green:hover::after, .con-dot--green:focus-visible::after { opacity: 1; }
 .con-title { flex: 1; min-width: 0; margin: 0; text-align: center; font: 12px/1.3 var(--font-mono); color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .con-clear { border: 0; background: none; cursor: pointer; padding: 2px 6px; border-radius: 3px; font: 12px/1.3 var(--font-mono); color: var(--text-muted); }
 .con-clear:hover { color: var(--text-hi); background: var(--panel-line); }
@@ -1131,7 +1146,11 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
 @media (max-width: 560px) {
   .con-tab { right: var(--space-3); bottom: var(--space-3); padding: 9px 12px; }
   /* inset, not 100vw: 100vw includes a scrollbar and would overhang. */
-  .con { inset: 0; width: auto; height: auto; border-radius: 0; border: 0; }
+  .con, .con--max { inset: 0; width: auto; height: auto; min-width: 0; min-height: 0; border-radius: 0; border: 0; }
+  /* Already full-screen: nothing to maximize or resize. */
+  .con-dot--green:disabled { cursor: default; }
+  .con-dot--green:disabled::after { opacity: 0; }
+  .con-grip { display: none; }
   /* iOS zooms into inputs under 16px on focus. The whole input row goes
      to 16px so the prompt and the text share one line box, and the prompt
      shrinks to "$" so the input keeps its width. */
