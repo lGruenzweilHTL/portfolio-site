@@ -1,7 +1,6 @@
 // Main page (backend/templates/index.html): the rack. Analytics, nav ports,
-// U grid, chassis flip, feedback drawer, live status (PDU), power-on
-// self-test, entrances, and the Marshal wiring-diagram stepper. Also loaded
-// by the project pages, which share the nav and the PDU.
+// U grid, feedback drawer, live status (PDU), power-on self-test and
+// entrances. Also loaded by the project pages, which share the nav and the PDU.
 
 // Strings in the page's language: window.I18N is rendered from
 // content/i18n/<lang>.yaml (the "js" subtree). A missing key shows as itself.
@@ -170,41 +169,6 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 })();
 
-// Marshal chassis: FRONT (modules) / REAR (wiring diagram). Without JS
-// both sides are shown one after the other.
-(function () {
-  const chassis = document.getElementById('chassis');
-  if (!chassis) return;
-  const front = chassis.querySelector('.chassis-front');
-  const rear = chassis.querySelector('.chassis-rear');
-  const keys = [...document.querySelectorAll('.seg [data-view]')];
-  let view = 'front';
-  rear.hidden = true;
-
-  function swap(next) {
-    front.hidden = next !== 'front';
-    rear.hidden = next !== 'rear';
-    keys.forEach(k => k.setAttribute('aria-pressed', String(k.dataset.view === next)));
-    document.dispatchEvent(new Event('rack:relayout'));
-  }
-  keys.forEach(k => k.addEventListener('click', () => {
-    const next = k.dataset.view;
-    if (next === view) return;
-    view = next;
-    if (reducedMotion) { swap(next); return; }
-    chassis.classList.remove('flip-in');
-    chassis.classList.add('flip-out');
-    setTimeout(() => {
-      swap(next);
-      chassis.classList.remove('flip-out');
-      chassis.classList.add('flip-in');
-    }, 220);
-  }));
-  chassis.addEventListener('animationend', e => {
-    if (e.animationName === 'flip-in') chassis.classList.remove('flip-in');
-  });
-})();
-
 // KVM drawer with the feedback form. Fault LED: red while the drawer is
 // open, green after a report went through (feedback.js fires feedback:sent).
 (function () {
@@ -324,75 +288,6 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!timer) { poll(); timer = setInterval(poll, 60000); }
   }
   document.addEventListener('visibilitychange', sync);
-  sync();
-})();
-
-// Interactive architecture pipeline stepper. The diagram exists twice
-// (landscape + portrait SVG); parts are addressed by data-part so both
-// stay in sync whichever one is visible.
-(function () {
-  const arch = document.getElementById('arch');
-  const noteEl = document.getElementById('archNote');
-  const playBtn = document.getElementById('archPlay');
-  if (!arch || !noteEl || !playBtn) return;
-  const btns = [...arch.querySelectorAll('.arch-step[data-step]')];
-  const parts = id => arch.querySelectorAll('[data-part="' + id + '"]');
-
-  // step -> { nodes lit, edges lit ([id, reverse-flow]), badge lit, note }
-  const steps = {
-    1: { on: ['n-assist', 'n-core'], edges: [['e-assist', false]], note: tr('arch.note1') },
-    2: { on: ['n-core', 'n-context'], edges: [['e-context', false]], badge: 'b-context', note: tr('arch.note2') },
-    3: { on: ['n-core', 'n-model'], edges: [['e-model', false]], badge: 'b-model', note: tr('arch.note3') },
-    4: { on: ['n-core', 'n-guard'], edges: [['e-guard', false]], badge: 'b-guard', note: tr('arch.note4') },
-    5: { on: ['n-core', 'n-web'], edges: [['e-web', true]], note: tr('arch.note5') },
-    6: { on: ['n-core', 'n-tools'], edges: [['e-tools', false]], badge: 'b-tools', note: tr('arch.note6') },
-    7: { on: ['n-assist', 'n-core'], edges: [['e-assist', true]], note: tr('arch.note7') }
-  };
-
-  function clear() {
-    arch.querySelectorAll('svg .on').forEach(el => el.classList.remove('on', 'rev'));
-    btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
-  }
-  function show(n) {
-    clear();
-    const s = steps[n];
-    if (!s) return;
-    s.on.forEach(id => parts(id).forEach(el => el.classList.add('on')));
-    s.edges.forEach(([id, rev]) => parts(id).forEach(el => {
-      el.classList.add('on');
-      if (rev) el.classList.add('rev');
-    }));
-    if (s.badge) parts(s.badge).forEach(el => el.classList.add('on'));
-    const b = btns.find(b => +b.dataset.step === n);
-    if (b) { b.classList.add('active'); b.setAttribute('aria-pressed', 'true'); }
-    noteEl.innerHTML = s.note;
-  }
-
-  // Autoplay runs only while the diagram is on screen, and never after the
-  // user has taken over (a step click or Pause). The note is announced to
-  // screen readers only for manual steps, not every autoplay tick.
-  let timer = null, cur = 1, wantPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches, visible = false;
-  function tick() { cur = cur % 7 + 1; show(cur); }
-  function sync() {
-    const run = wantPlay && visible && !document.hidden;
-    if (run && !timer) timer = setInterval(tick, 1700);
-    if (!run && timer) { clearInterval(timer); timer = null; }
-    playBtn.classList.toggle('active', wantPlay);
-    playBtn.setAttribute('aria-pressed', String(wantPlay));
-    playBtn.textContent = tr(wantPlay ? 'arch.pause' : 'arch.auto');
-    noteEl.setAttribute('aria-live', wantPlay ? 'off' : 'polite');
-  }
-
-  btns.forEach(b => b.addEventListener('click', () => { wantPlay = false; sync(); cur = +b.dataset.step; show(cur); }));
-  playBtn.addEventListener('click', () => { wantPlay = !wantPlay; sync(); });
-  document.addEventListener('visibilitychange', sync);
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(entries => {
-      visible = entries[entries.length - 1].isIntersecting; sync();
-    }).observe(arch);
-  } else { visible = true; }
-
-  show(1);
   sync();
 })();
 

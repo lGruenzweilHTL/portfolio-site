@@ -236,15 +236,15 @@ def _date_range(entry: dict) -> str:
 
 
 # Main-page copy (content/i18n/en.yaml) that carries facts resume.yaml doesn't:
-# the Marshal component names, vektorgrid as its predecessor, how the
-# SlideLizard project was staffed, where Lukas lives, why he built things. Add a key here when the main page
-# gains a fact the chatbot should know.
+# what Marshal does, vektorgrid as its predecessor, how the SlideLizard
+# project was staffed, where Lukas lives, why he built things. Add a key here
+# when the main page gains a fact the chatbot should know.
 _SITE_COPY_KEYS = (
     "hero.line1",
     "hero.line2",
     "hero.line3",
     "hero.bio",
-    "mg.flow_html",
+    "mg.lead",
     "blades.vektorgrid_desc",
     "exp.sl_desc",
     "about.p1",

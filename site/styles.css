@@ -503,83 +503,25 @@ ul, ol { list-style: none; }
 .bay div > span:last-child { font-size: 13px; line-height: 1.4; }
 .bay .led { align-self: flex-start; margin-top: 4px; }
 
-/* ---------- CHASSIS: Marshal ---------- */
+/* ---------- FEATURED: Marshal ---------- */
 
-.seg { display: flex; }
-.seg .key:first-child { border-radius: var(--radius-button) 0 0 var(--radius-button); }
-.seg .key:last-child { border-radius: 0 var(--radius-button) var(--radius-button) 0; }
-.seg .key[aria-pressed="true"] { color: var(--lcd-text); }
-.chassis-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; margin-bottom: var(--space-6); }
+.feature-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; margin-bottom: var(--space-6); }
 .lead { font-size: var(--size-body-lg); line-height: 1.6; max-width: 62ch; margin-bottom: var(--space-2); }
-.chassis.flip-out { animation: flip-out 220ms ease-in both; }
-.chassis.flip-in { animation: flip-in 380ms var(--ease-latch) both; }
-.modules {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3);
+.feature-shot {
   padding: var(--space-2); border-radius: var(--radius-plate);
   background: var(--rack-hole); box-shadow: var(--depth-recess);
 }
-.module {
-  position: relative; display: flex; flex-direction: column; gap: var(--space-2);
-  padding: 16px 16px 14px; border-radius: var(--radius-plate);
-  border-top: 4px solid var(--stripe);
-  background: var(--metal), var(--face-raised); box-shadow: var(--depth-raised);
-  transition: filter var(--dur-fast);
-}
-.module:hover { filter: brightness(1.08); }
+.feature-shot img { display: block; width: 100%; height: auto; border-radius: calc(var(--radius-plate) - 2px); }
 
-/* Clickable cards (modules, blades, service cards): the title link's ::after
+/* Clickable cards (blades, service cards): the title link's ::after
    stretches over the whole card, so anything that reacts to hover is a link.
    Other links inside the card sit above it. */
 .card-link { color: inherit; text-decoration: none; }
 .card-link::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
 .card-link:focus-visible { outline: none; }
-.module:has(.card-link:focus-visible), .blade:has(.card-link:focus-visible), .service-card:has(.card-link:focus-visible) { outline: 2px solid var(--accent-key); outline-offset: 3px; }
+.blade:has(.card-link:focus-visible), .service-card:has(.card-link:focus-visible) { outline: 2px solid var(--accent-key); outline-offset: 3px; }
 .card-link:hover { text-decoration: underline; text-decoration-color: rgb(127 246 234 / .5); text-underline-offset: 4px; }
 .blade .keys a, .service-card .keys a { position: relative; z-index: 2; }
-.module-role { font: 600 var(--size-body)/1.35 var(--font-body); color: var(--text-hi); }
-.module > p:not(.silk) { flex: 1; font-size: var(--size-small); line-height: 1.55; }
-
-/* Rear view: the wiring diagram. Cables are the SVG lines. */
-.chassis-rear {
-  margin-top: var(--space-3);
-  padding: var(--space-6); border-radius: var(--radius-plate);
-  background: var(--rack-hole); box-shadow: var(--depth-recess);
-}
-.js .chassis-rear { margin-top: 0; }
-.arch-cap { margin-bottom: var(--space-4); }
-.arch-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-6); align-items: center; }
-.arch-step {
-  padding: 6px 10px; min-height: 30px; cursor: pointer;
-  font: 600 var(--size-silk)/1.2 var(--font-silk); text-transform: uppercase; letter-spacing: .05em;
-  color: var(--silk-label); background: var(--metal), var(--face-raised);
-  border: 1px solid var(--face-edge); border-radius: var(--radius-plate); box-shadow: var(--depth-button);
-}
-.arch-step:hover { filter: brightness(1.15); }
-.arch-step.active { color: var(--accent-on); background: var(--metal), var(--accent-key); }
-.arch-play { margin-left: auto; }
-.arch-svg { width: 100%; height: auto; display: block; }
-.arch-tall { display: none; }
-.d-box { fill: var(--face-raised); stroke: var(--face-edge); stroke-width: 1; transition: stroke .2s; }
-.d-box-origin { fill: var(--face-raised); stroke: var(--lang-cs); stroke-width: 2; }
-.d-box-scalar { fill: var(--face-anodized); stroke: var(--panel-line); stroke-width: 1; transition: stroke .2s; }
-.d-title { fill: var(--text-hi); font-family: var(--font-display); font-weight: 600; font-size: 14px; }
-.d-title-o { font-size: 15px; }
-.d-title-s { font-size: 13px; }
-.d-sub, .d-lbl { fill: var(--silk-dim); font-family: var(--font-mono); font-size: 10px; }
-.d-line { stroke: var(--face-highlight); stroke-width: 3.5; stroke-linecap: round; fill: none; transition: stroke .2s; }
-.d-num { fill: var(--accent-on); font-family: var(--font-mono); font-size: 10px; font-weight: 700; }
-.d-numbg { fill: var(--face-highlight); transition: fill .2s; }
-.d-lang-cs { fill: var(--lang-cs); } .d-lang-py { fill: var(--lang-py); }
-.d-lang-cpp { fill: var(--lang-cpp); } .d-lang-kt { fill: var(--lang-kt); }
-.d-lang-ts { fill: var(--lang-ts); }
-.d-box.on, .d-box-scalar.on, .d-box-origin.on { stroke: var(--lcd-text); stroke-width: 2; }
-.d-numbg.on { fill: var(--lcd-text); }
-.d-line.on { stroke: var(--lcd-text); stroke-dasharray: 6 8; animation: dashflow .7s linear infinite; }
-.d-line.on.rev { animation: dashflow-rev .7s linear infinite; }
-.arch-note { font-family: var(--font-mono); font-size: var(--size-mono); min-height: 1.6em; margin-top: var(--space-4); line-height: 1.6; }
-.arch-note b { color: var(--lcd-text); font-weight: 500; }
-.arch-flow { font-size: var(--size-small); line-height: 1.75; max-width: 72ch; padding-top: var(--space-4); }
-.arch-flow b { color: var(--text-hi); font-weight: 600; }
 
 /* ---------- ENCLOSURE: project blades ---------- */
 
@@ -818,11 +760,7 @@ a.svc-card:focus-visible { outline: 2px solid var(--accent-key); outline-offset:
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes blink3 { 0%, 33%, 66% { opacity: 1; } 16%, 50%, 83% { opacity: .1; } }
 @keyframes flicker { 0% { opacity: 1; } 25% { opacity: .2; } 50% { opacity: 1; } 75% { opacity: .4; } }
-@keyframes dashflow { to { stroke-dashoffset: -28; } }
-@keyframes dashflow-rev { to { stroke-dashoffset: 28; } }
 @keyframes roll { from { transform: translateY(-40%); opacity: 0; } }
-@keyframes flip-out { to { transform: perspective(1600px) rotateY(88deg); opacity: .4; } }
-@keyframes flip-in { from { transform: perspective(1600px) rotateY(-88deg); opacity: .4; } }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes type-on { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes post-led {
@@ -883,7 +821,6 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
      unbreakable content, which pushed small phones into side-scrolling. */
   .ctrl, .project { grid-template-columns: minmax(0, 1fr); }
   .bays { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .blades { grid-template-columns: 1fr; }
 }
 
@@ -947,7 +884,6 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
   .bays { gap: 6px; margin-top: var(--space-6); grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bay { padding: 8px 10px 8px 8px; gap: var(--space-2); }
   .bay-latch { width: 7px; height: 34px; }
-  .modules { grid-template-columns: 1fr; }
   .blade, .blade--noshot { grid-template-columns: 1fr; padding: var(--space-3); }
   .blade-shot { aspect-ratio: 2 / 1; }
   .blade-handle { display: none; }
@@ -966,12 +902,6 @@ html.post .vfd-line, html.post .vfd-kicker, html.post .vfd-pitch, html.post .quo
   .contact .keys { width: 100%; }
   .cab-plinth::before { left: 16px; }
   .cab-plinth::after { right: 16px; }
-  .arch-wide { display: none; }
-  .arch-tall { display: block; max-width: 420px; margin: 0 auto; }
-  .arch-tall .d-sub, .arch-tall .d-lbl { font-size: 11px; }
-  .arch-tall .d-title { font-size: 15px; }
-  .arch-play { margin-left: 0; }
-  .chassis-rear { padding: var(--space-4) var(--space-3); }
   .readme { padding: var(--space-4); }
   .crumbs-back { display: none; }
 }
