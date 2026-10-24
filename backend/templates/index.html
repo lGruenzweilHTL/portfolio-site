@@ -134,34 +134,41 @@ window.I18N = {{ js_strings | tojson }};
           "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 2, "item": {
+          "@type": "SoftwareSourceCode", "name": "Marshal", "url": "https://gruenzweil.cc/projects/marshal",
+          "description": {{ t('ld.marshal') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/marshal",
+          "programmingLanguage": ["C#", "TypeScript"],
+          "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 3, "item": {
           "@type": "CreativeWork", "name": "Forkcast",
           "description": {{ t('ld.forkcast') | tojson }},
           "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 3, "item": {
+        { "@type": "ListItem", "position": 4, "item": {
           "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
           "description": {{ t('ld.roboducks') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
           "programmingLanguage": ["Python", "C"],
           "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 4, "item": {
+        { "@type": "ListItem", "position": 5, "item": {
           "@type": "SoftwareSourceCode", "name": "SceneForge AI", "url": "https://gruenzweil.cc/projects/sceneforge-ai",
           "description": {{ t('ld.sceneforge') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/SceneForge-AI",
           "programmingLanguage": "C#", "runtimePlatform": "Unity Editor",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 5, "item": {
+        { "@type": "ListItem", "position": 6, "item": {
           "@type": "SoftwareSourceCode", "name": "UniConsole", "url": "https://gruenzweil.cc/projects/uniconsole",
           "description": {{ t('ld.uniconsole') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/UniConsole",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 6, "item": {
+        { "@type": "ListItem", "position": 7, "item": {
           "@type": "SoftwareSourceCode", "name": "Space Defenders", "url": "https://gruenzweil.cc/projects/space-defenders",
           "description": {{ t('ld.space_defenders') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/Space-Defenders",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 7, "item": {
+        { "@type": "ListItem", "position": 8, "item": {
           "@type": "CreativeWork", "name": "P.I.G.E.O.N. — Covert Ops",
           "description": {{ t('ld.pigeon') | tojson }},
           "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
@@ -466,6 +473,20 @@ window.I18N = {{ js_strings | tojson }};
                  in their own, smaller group. A "last push" line only shows when
                  /api/status reports a push in the last 90 days (main.js). #}
             <ul class="blades">
+              <li class="blade">
+                <span class="blade-handle" aria-hidden="true"></span>
+                <div class="blade-shot"><img src="/img/marshal.webp" width="1200" height="750" loading="lazy" decoding="async" alt="{{ t('blades.marshal_alt') }}"></div>
+                <div class="blade-info">
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/marshal">Marshal</a></h3><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
+                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="marshal">--</span></p>
+                  <p class="blade-desc">{{ t('blades.marshal_desc') }}</p>
+                  <div class="blade-foot">
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Vue</li><li class="cable">Home Assistant</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/marshal">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='Marshal') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/marshal" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Marshal') }}</span></a></span>
+                  </div>
+                </div>
+              </li>
+
               <li class="blade blade--static">
                 <span class="blade-handle" aria-hidden="true"></span>
                 <div class="blade-shot"><img src="/img/forkcast.webp" width="1200" height="668" loading="lazy" decoding="async" alt="{{ t('blades.forkcast_alt') }}"></div>

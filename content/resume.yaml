@@ -110,6 +110,21 @@ projects:
       - "Python pipeline chains STT → intent router → expert LLM → TTS; every call routes through Origin, never peer-to-peer"
       - "Risky tool calls pause for biometric approval on the phone before execution"
 
+  - name: "Marshal"
+    summary: >
+      A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts
+      mail, briefs you in the morning and remembers what matters. Harmless
+      actions just happen; risky ones wait for your yes.
+    role: "Author"
+    stack: ["C#", ".NET", "Vue", "TypeScript"]
+    repo_url: "https://github.com/lGruenzweilHTL/marshal"
+    status: "in_progress"
+    highlights:
+      - "ASP.NET harness every request goes through: agent loop, tool registry, risk engine, model router, MCP client"
+      - "Risk tiers per tool: harmless calls run, risky ones need confirmation, some (sending mail) are impossible"
+      - "Durable background tasks and follow-ups, long-term memory with hybrid retrieval on SQLite + sqlite-vec"
+      - "Integrations for Home Assistant, Moonraker, mail, FreshRSS, CalDAV, media, Proxmox and GitHub; Vue web app"
+
   - name: "SceneForge AI"
     cv: true
     summary: >

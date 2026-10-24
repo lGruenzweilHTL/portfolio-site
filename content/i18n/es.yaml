@@ -23,6 +23,7 @@ ld:
   seeks_description: "Abierto a prácticas de backend; actualmente en 4.º de 5 en la HTL Leonding y se gradúa en junio de 2028."
   projects_name: "Proyectos de Lukas Grünzweil"
   vektorgrid: "Un asistente de voz autoalojado construido como sistema distribuido: relés edge en C++ capturan la voz, un orquestador en C# ejecuta una cadena en Python de reconocimiento de voz, enrutado de intenciones, LLM y síntesis de voz, y una app en Kotlin aprueba con biometría las llamadas a herramientas arriesgadas."
+  marshal: "Un agente de IA autoalojado para Home Assistant: un núcleo en ASP.NET evalúa el riesgo de cada llamada a herramientas, ejecuta tareas en segundo plano y mantiene una memoria a largo plazo, con una app web en Vue."
   sceneforge: "Un plugin de IA para el editor de Unity que convierte la descripción de una escena en texto plano en GameObjects y componentes."
   uniconsole: "Una consola de depuración dentro del juego para Unity, gratuita y ligera: marca un método estático con [Command] y llámalo desde un terminal en la escena."
   forkcast: "Un proyecto escolar de planificación de comidas con búsqueda de recetas mediante la API de Spoonacular, un calendario de comidas y listas de la compra combinadas. Lukas escribió la mayor parte del backend en TypeScript."
@@ -138,6 +139,8 @@ blades:
   tag_mobile: Juego para móvil
   tag_game: Juego
   tag_robotics: Robótica
+  marshal_alt: "Panel de Marshal con aprobaciones pendientes para abrir la puerta principal e iniciar una impresión, junto al estado en vivo de la impresora 3D"
+  marshal_desc: "Un agente de IA autoalojado para Home Assistant. Controla la impresora 3D, ordena el correo, te da un resumen cada mañana y recuerda lo importante. Lo inofensivo ocurre sin más; lo arriesgado espera tu sí."
   sceneforge_alt: "Ventana de chat de SceneForge AI en el editor de Unity creando un jugador cápsula rojo con CharacterController a partir de un prompt"
   sceneforge_desc: "Un plugin de IA para el editor de Unity. Describe una escena en texto plano y recibe GameObjects y componentes. Elimina el montaje manual en el diseño de niveles."
   uniconsole_alt: "Terminal de UniConsole mostrando los comandos disponibles y ejecutando un comando echo"

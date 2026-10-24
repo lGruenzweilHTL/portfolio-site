@@ -21,6 +21,7 @@ ld:
   seeks_description: "Offen für ein Backend-Praktikum; aktuell im 4. von 5 Jahren an der HTL Leonding, Abschluss im Juni 2028."
   projects_name: "Projekte von Lukas Grünzweil"
   vektorgrid: "Ein selbst gehosteter Sprachassistent als verteiltes System: C++-Edge-Relays nehmen Sprache auf, ein C#-Orchestrator steuert eine Python-Pipeline aus Spracherkennung, Intent-Routing, LLM und Sprachausgabe, und eine Kotlin-App gibt riskante Tool-Aufrufe per Biometrie frei."
+  marshal: "Ein selbst gehosteter KI-Agent für Home Assistant: Ein ASP.NET-Harness prüft jeden Tool-Aufruf nach Risiko, führt Hintergrundaufgaben aus und hat ein Langzeitgedächtnis, dazu eine Vue-Web-App."
   sceneforge: "Ein KI-Plugin für den Unity Editor, das aus einer Szenenbeschreibung in Klartext GameObjects und Komponenten erzeugt."
   uniconsole: "Eine kostenlose, schlanke In-Game-Debug-Konsole für Unity: statische Methode mit [Command] markieren und über ein Terminal in der Szene aufrufen."
   forkcast: "Ein Schulprojekt zur Essensplanung mit Rezeptsuche über die Spoonacular-API, Essenskalender und zusammengeführten Einkaufslisten. Lukas hat den Großteil des TypeScript-Backends geschrieben."
@@ -136,6 +137,8 @@ blades:
   tag_mobile: Mobile-Spiel
   tag_game: Spiel
   tag_robotics: Robotik
+  marshal_alt: "Marshal-Dashboard mit offenen Freigaben zum Aufsperren der Haustür und zum Starten eines Drucks, daneben der Live-Status des 3D-Druckers"
+  marshal_desc: "Ein selbst gehosteter KI-Agent für Home Assistant. Er steuert den 3D-Drucker, sortiert Mails, gibt Ihnen ein Morgen-Briefing und merkt sich, was wichtig ist. Harmloses passiert einfach, Riskantes wartet auf Ihr Ja."
   sceneforge_alt: "SceneForge-AI-Chatfenster im Unity Editor, das aus einem Text-Prompt einen roten Kapsel-Spieler mit CharacterController erstellt"
   sceneforge_desc: "Ein KI-Plugin für den Unity Editor. Szene in Klartext beschreiben, GameObjects und Komponenten zurückbekommen. Spart die manuelle Einrichtung beim Leveldesign."
   uniconsole_alt: "UniConsole-Terminal, das die verfügbaren Befehle auflistet und einen echo-Befehl ausführt"

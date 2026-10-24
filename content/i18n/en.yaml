@@ -26,6 +26,7 @@ ld:
   seeks_description: "Open to a backend internship; currently in year 4 of 5 at HTL Leonding, graduating in June 2028."
   projects_name: "Projects by Lukas Grünzweil"
   vektorgrid: "A self-hosted voice assistant built as a distributed system: C++ edge relays capture speech, a C# orchestrator runs a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin phone app approves risky tool calls with biometrics."
+  marshal: "A self-hosted AI agent for Home Assistant: an ASP.NET harness gates every tool call by risk, runs background tasks and keeps a long-term memory, with a Vue web app on top."
   sceneforge: "An AI plugin for the Unity Editor that turns a plain-text scene description into GameObjects and components."
   uniconsole: "A free, lightweight in-game debug console for Unity: mark a static method with [Command] and call it from a terminal in the scene."
   forkcast: "A meal-planning school project with recipe search via the Spoonacular API, a meal calendar and combined shopping lists. Lukas wrote most of the TypeScript backend."
@@ -142,6 +143,8 @@ blades:
   tag_mobile: Mobile game
   tag_game: Game
   tag_robotics: Robotics
+  marshal_alt: "Marshal dashboard with pending approvals to unlock the front door and start a print, next to a live 3D printer status card"
+  marshal_desc: "A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts mail, briefs you in the morning and remembers what matters. Harmless actions just happen; risky ones wait for your yes."
   sceneforge_alt: "SceneForge AI chat window in the Unity Editor, creating a red capsule player with a CharacterController from a text prompt"
   sceneforge_desc: "An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and components back. Cuts the manual setup out of level design."
   uniconsole_alt: "UniConsole terminal listing the available commands and running an echo command"

@@ -22,6 +22,7 @@ ld:
   seeks_description: "Ouvert à un stage backend ; actuellement en 4e année sur 5 à la HTL Leonding, diplômé en juin 2028."
   projects_name: "Projets de Lukas Grünzweil"
   vektorgrid: "Un assistant vocal auto-hébergé conçu comme un système distribué : des relais edge en C++ captent la parole, un orchestrateur C# pilote une chaîne Python de reconnaissance vocale, routage d'intention, LLM et synthèse vocale, et une application Kotlin valide les appels d'outils risqués par biométrie."
+  marshal: "Un agent IA auto-hébergé pour Home Assistant : un noyau ASP.NET évalue le risque de chaque appel d'outil, exécute des tâches en arrière-plan et garde une mémoire à long terme, avec une application web Vue."
   sceneforge: "Un plugin d'IA pour l'éditeur Unity qui transforme une description de scène en texte libre en GameObjects et composants."
   uniconsole: "Une console de débogage en jeu, gratuite et légère, pour Unity : annotez une méthode statique avec [Command] et appelez-la depuis un terminal dans la scène."
   forkcast: "Un projet scolaire de planification des repas avec recherche de recettes via l'API Spoonacular, un calendrier des repas et des listes de courses combinées. Lukas a écrit l'essentiel du backend TypeScript."
@@ -137,6 +138,8 @@ blades:
   tag_mobile: Jeu mobile
   tag_game: Jeu
   tag_robotics: Robotique
+  marshal_alt: "Tableau de bord de Marshal avec des validations en attente pour déverrouiller la porte d'entrée et lancer une impression, à côté de l'état en direct de l'imprimante 3D"
+  marshal_desc: "Un agent IA auto-hébergé pour Home Assistant. Il pilote l'imprimante 3D, trie les mails, vous fait un point chaque matin et retient ce qui compte. Les actions anodines se font seules ; les risquées attendent votre accord."
   sceneforge_alt: "Fenêtre de chat de SceneForge AI dans l'éditeur Unity, créant un joueur capsule rouge avec un CharacterController à partir d'un prompt"
   sceneforge_desc: "Un plugin d'IA pour l'éditeur Unity. Décrivez une scène en texte libre, récupérez des GameObjects et des composants. Supprime la mise en place manuelle en level design."
   uniconsole_alt: "Terminal UniConsole affichant les commandes disponibles et exécutant une commande echo"
