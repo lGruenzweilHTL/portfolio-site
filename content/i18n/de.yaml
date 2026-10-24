@@ -20,7 +20,7 @@ ld:
   seeks_name: "Backend-Praktikum"
   seeks_description: "Offen für ein Backend-Praktikum; aktuell im 4. von 5 Jahren an der HTL Leonding, Abschluss im Juni 2028."
   projects_name: "Projekte von Lukas Grünzweil"
-  vektorgrid: "Ein selbst gehosteter Sprachassistent als verteiltes System: C++-Edge-Relays nehmen Sprache auf, ein C#-Orchestrator steuert eine Python-Pipeline aus Spracherkennung, Intent-Routing, LLM und Sprachausgabe, und eine Kotlin-App gibt riskante Tool-Aufrufe per Biometrie frei."
+  vektorgrid: "Der Vorgänger von Marshal: ein selbst gehosteter Sprachassistent als verteiltes System, mit C++-Edge-Relays, einem C#-Orchestrator, der eine Python-Pipeline aus Spracherkennung, Intent-Routing, LLM und Sprachausgabe steuert, und einer Kotlin-App, die riskante Tool-Aufrufe per Biometrie freigibt."
   marshal: "Ein selbst gehosteter KI-Agent für Home Assistant: Ein ASP.NET-Harness prüft jeden Tool-Aufruf nach Risiko, führt Hintergrundaufgaben aus und hat ein Langzeitgedächtnis, dazu eine Vue-Web-App."
   sceneforge: "Ein KI-Plugin für den Unity Editor, das aus einer Szenenbeschreibung in Klartext GameObjects und Komponenten erzeugt."
   uniconsole: "Eine kostenlose, schlanke In-Game-Debug-Konsole für Unity: statische Methode mit [Command] markieren und über ein Terminal in der Szene aufrufen."
@@ -66,59 +66,55 @@ hero:
   facts: Eckdaten
   bay0: "Höhere Technische Lehranstalt · 2022–2028"
   bay1: "Praktikant Softwareentwicklung · 08/2026"
-  bay2: "Sprachassistent · in aktiver Entwicklung"
+  bay2: "KI-Agent für Home Assistant · in aktiver Entwicklung"
   bay3: "3 Proxmox-Knoten · liefern diese Seite aus"
   ask_title: "Fragen Sie meinen KI-Assistenten"
   ask_lead: "Er weiß mehr, als auf dieser Seite steht: warum ich Dinge baue, wie ich arbeite und was ich suche."
   ask_placeholder: "z. B. Ab wann ist er verfügbar?"
   ask_send: "Fragen"
 
-vg:
+mg:
   featured: "Hauptprojekt"
-  status: Aktiv
-  view_label: Chassis-Ansicht
-  front: Vorne
-  rear: Hinten
-  lead: "Ein selbst gehosteter Sprachassistent als verteiltes System: Edge-Relays nehmen Sprache auf, ein zentraler Orchestrator steuert die Modell-Pipeline, und eine App am Handy gibt alles Riskante frei."
-  role: "Architekt & Hauptentwickler"
-  project_page: Projektseite
-  org: Organisation auf GitHub
-  org_sr: "(vektorgrid-Organisation, öffnet in einem neuen Tab)"
-  repo_sr: 'Repository auf GitHub, öffnet in einem neuen Tab'
-  modules_label: vektorgrid-Komponenten
-  origin_role: Orchestrator
-  origin_desc: "Alles läuft über Origin; kein Knoten spricht direkt mit einem anderen. Origin steuert die Pipeline und sammelt jedes Ergebnis ein."
-  relay_role: Wake-Word am Edge
-  relay_desc: "Erkennt das Wake-Word direkt am Gerät und streamt das Audio an Origin. Die gesprochene Antwort kommt auf demselben Weg zurück."
-  gate_role: Biometrische Freigabe
-  gate_desc: "Riskante Tool-Aufrufe warten, bis sie per Biometrie am Handy freigegeben werden. Funktioniert auch als eigenständiges Relay."
-  scalars_role: Modell-Pipeline
-  scalars_desc: "Spracherkennung, Intent-Router, Experten-LLM und Sprachausgabe, von Origin der Reihe nach aufgerufen."
-  rear_cap: "Rückansicht · Verkabelung"
-  steps_label: Die Anfrage-Pipeline Schritt für Schritt
-  step1: Aufnahme
-  step3: Routing
-  step4: Inferenz
-  step5: Freigabe
-  step7: Antwort
-  diagram_title: "vektorgrid-Architektur: Relay und Gate sind über den zentralen Orchestrator Origin verbunden, der eine sequenzielle Scalar-Pipeline aus STT, Intent-Router, Experten-LLM und TTS steuert."
-  d_audio: Audio
-  d_speech: Sprache
-  d_approval: Tool-Freigabe
-  d_orchestrator: Orchestrator
-  d_wake: Wake-Word
-  d_biometric: Biometrie
-  d_in_sequence: nacheinander
-  d_router: Intent-Router
-  d_llm: Experten-LLM
-  flow_html: >-
-    Alles läuft über <b>Origin</b>; kein Knoten spricht direkt mit einem anderen. Ein <b>Relay</b>
-    erkennt das Wake-Word und streamt das Audio an Origin, das die <b>Scalar</b>-Pipeline der Reihe
-    nach abarbeitet (STT &#8594; Intent-Router &#8594; Experten-LLM &#8594; TTS): Es ruft jeden Worker auf
-    und wartet auf sein Ergebnis, bevor der nächste drankommt. Die gesprochene Antwort geht über das
-    Relay zurück. Fordert das Modell einen riskanten Tool-Aufruf an, pausiert Origin und lässt ihn von
-    <b>Gate</b> per Biometrie freigeben. Gate läuft auch eigenständig: Es fragt Metriken von Origin ab
-    und hat ein Relay eingebaut, sodass man auch vom Handy aus mit dem System sprechen kann.
+  status: "Aktiv"
+  view_label: "Chassis-Ansicht"
+  front: "Vorne"
+  rear: "Hinten"
+  lead: "Ein selbst gehosteter KI-Agent für Home Assistant. Er steuert den 3D-Drucker, sortiert Mails, bereitet den Morgen vor und merkt sich, was wichtig ist. Harmloses passiert einfach, Riskantes wartet auf ein klares Ja."
+  role: "Autor"
+  project_page: "Projektseite"
+  repo: "Repo auf GitHub"
+  repo_sr: "(Marshal-Repository, öffnet in einem neuen Tab)"
+  src_sr: "Quellcode auf GitHub, öffnet in einem neuen Tab"
+  modules_label: "Marshal-Komponenten"
+  core_role: "Agent-Harness"
+  core_desc: "Jede Anfrage, ob gesprochen, getippt oder geplant, läuft durch dieselbe Schleife: Kontext aufbauen, Modell aufrufen, jeden Tool-Aufruf prüfen, ausführen."
+  tasks_role: "Hintergrundarbeit"
+  tasks_desc: "Dauerhafte Aufgaben, Zeitpläne und Nachfragen. Ergebnisse kommen in dem Raum an, in dem Sie gerade sind, und wecken Sie nachts nicht auf."
+  memory_role: "Langzeitgedächtnis"
+  memory_desc: "Merkt sich Vorlieben und Projekte und findet den passenden Kontext per hybrider Suche auf SQLite mit sqlite-vec. Alles bleibt sichtbar und bearbeitbar."
+  web_role: "Web-App"
+  web_desc: "Chat, Freigaben mit einem Tipp, Denkschritte und Tool-Aufrufe live, die Kosten jedes Laufs und der Gedächtnis-Graph. Für Desktop und Handy gebaut."
+  rear_cap: "Rückansicht · eine Anfrage"
+  steps_label: "Eine Anfrage Schritt für Schritt"
+  step1: "Hören"
+  step2: "Kontext"
+  step3: "Modell"
+  step4: "Prüfung"
+  step5: "Freigabe"
+  step6: "Ausführung"
+  step7: "Antwort"
+  diagram_title: "Marshal-Architektur: Home Assistant Assist und die Web-App sind mit Core verbunden, dessen Agent-Schleife Kontext, Modell, Risikoprüfung und Tools der Reihe nach durchläuft."
+  d_text: "Text"
+  d_approval: "Freigabe"
+  d_voice: "Sprache"
+  d_loop: "Agent-Schleife"
+  d_loop_cap: "AGENT-SCHLEIFE"
+  d_repeats: "wiederholt sich"
+  d_context: "Kontext"
+  d_model: "Modell"
+  d_guard: "Risikoprüfung"
+  d_tools: "Tools"
+  flow_html: "Jede Anfrage läuft über <b>Core</b>: Sprache aus <b>Assist</b>, Chat aus der <b>Web-App</b> und geplante Aufgaben. Die Agent-Schleife baut Kontext aus dem Gedächtnis auf, ruft das Modell mit den Tools auf, die in diesem Raum sichtbar sind, und schickt jeden Tool-Aufruf durch die Risikoprüfung, bevor etwas ausgeführt wird. Riskante Aufrufe werden mit ihren genauen Argumenten eingefroren, bis Sie bestätigen, und manches, etwa Mails senden, ist gar kein Tool. Spracherkennung und Sprachausgabe bleiben in Home Assistant: Beim Vorgänger <b>vektorgrid</b> habe ich diese Pipeline samt Protokollen selbst geschrieben, und einmal hat gereicht."
 
 blades:
   title: Weitere Projekte
@@ -137,8 +133,8 @@ blades:
   tag_mobile: Mobile-Spiel
   tag_game: Spiel
   tag_robotics: Robotik
-  marshal_alt: "Marshal-Dashboard mit offenen Freigaben zum Aufsperren der Haustür und zum Starten eines Drucks, daneben der Live-Status des 3D-Druckers"
-  marshal_desc: "Ein selbst gehosteter KI-Agent für Home Assistant. Er steuert den 3D-Drucker, sortiert Mails, gibt Ihnen ein Morgen-Briefing und merkt sich, was wichtig ist. Harmloses passiert einfach, Riskantes wartet auf Ihr Ja."
+  predecessor: "Vorgänger"
+  vektorgrid_desc: "Der Vorgänger von Marshal: ein Sprachassistent als verteiltes System, mit C++-Relays fürs Wake-Word, einem C#-Orchestrator, einer Python-Pipeline aus STT → LLM → TTS und einer Kotlin-App für die biometrische Freigabe. Was ich gelernt habe: die Sprach-Pipeline samt Protokollen nicht selbst schreiben. Marshal überlässt das Home Assistant."
   sceneforge_alt: "SceneForge-AI-Chatfenster im Unity Editor, das aus einem Text-Prompt einen roten Kapsel-Spieler mit CharacterController erstellt"
   sceneforge_desc: "Ein KI-Plugin für den Unity Editor. Szene in Klartext beschreiben, GameObjects und Komponenten zurückbekommen. Spart die manuelle Einrichtung beim Leveldesign."
   uniconsole_alt: "UniConsole-Terminal, das die verfügbaren Befehle auflistet und einen echo-Befehl ausführt"
@@ -229,13 +225,13 @@ js:
   arch:
     auto: "▶ Auto"
     pause: "❚❚ Pause"
-    note1: "<b>Aufnahme:</b> Das Relay erkennt das Wake-Word und streamt das Audio an Origin."
-    note2: "<b>STT:</b> Origin schickt das Audio an den STT-Worker, der Text zurückgibt."
-    note3: "<b>Routing:</b> Der Intent-Router wählt, welcher Experte antworten soll."
-    note4: "<b>Inferenz:</b> Das gewählte Experten-LLM erzeugt die Antwort."
-    note5: "<b>Freigabe:</b> Ein riskanter Tool-Aufruf wartet auf die biometrische Freigabe in Gate."
-    note6: "<b>TTS:</b> Origin schickt den Antworttext an TTS, das Audio zurückgibt."
-    note7: "<b>Antwort:</b> Origin streamt die gesprochene Antwort über das Relay zurück."
+    note1: "<b>Hören:</b> Home Assistant Assist macht aus Sprache Text und übergibt ihn an Core, zusammen mit dem Raum, aus dem er kommt."
+    note2: "<b>Kontext:</b> Core holt passende Erinnerungen, aktive Projekte und die Tools, die in diesem Raum erlaubt sind."
+    note3: "<b>Modell:</b> Der Model-Router wählt ein lokales oder ein Cloud-Modell, das antwortet oder Tool-Aufrufe anfordert."
+    note4: "<b>Prüfung:</b> Die Risiko-Engine gibt jedem Aufruf eine Stufe: sicher, bestätigen oder verboten. Keine Stufe wird je gesenkt."
+    note5: "<b>Freigabe:</b> Ein Aufruf der Stufe „bestätigen“ wird mit seinen genauen Argumenten am Server eingefroren, bis Sie Ja sagen oder auf Freigeben tippen."
+    note6: "<b>Ausführung:</b> Das Tool läuft gegen Home Assistant, den Drucker, die Mail oder eine andere Integration. Die Schleife wiederholt sich, bis das Modell fertig ist."
+    note7: "<b>Antwort:</b> Die Antwort streamt zurück an Assist, das sie auf dem Satelliten ausspricht, mit dem Sie geredet haben."
   con:
     tab: "KI fragen"
     tab_label: "KI-Assistenten öffnen: Fragen über Lukas stellen"
@@ -253,7 +249,7 @@ js:
     last_login: "Letzte Anmeldung:"
     help: "Einfach eine Frage über Lukas eintippen und Enter drücken: Projekte, Praktika, Stack, Verfügbarkeit. Die Antworten stammen aus seinen Lebenslaufdaten. Lieber ein Mensch? E-Mail an {email}."
     examples: "Beispiele:"
-    ex1: Was ist vektorgrid?
+    ex1: "Was ist Marshal?"
     ex2: Was hat er bei SlideLizard gebaut?
     ex3: Ab wann ist er verfügbar?
     new_session: Neue Sitzung.

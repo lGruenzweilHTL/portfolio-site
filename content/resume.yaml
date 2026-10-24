@@ -95,22 +95,8 @@ experience:
 # appear on the résumé PDFs — those are picked to support the backend angle, and
 # the résumé has room for two. Add the flag to a project to promote it.
 projects:
-  - name: "vektorgrid"
-    cv: true
-    summary: >
-      A self-hosted voice assistant built as a distributed system: edge relays capture
-      speech, a central orchestrator runs the model pipeline, and a phone app approves
-      anything risky.
-    role: "Architect & primary developer"
-    stack: ["C#", "C++", "Kotlin", "Python"]
-    repo_url: "https://github.com/vektorgrid-ai"
-    status: "active"   # active | shipped | in_progress | private
-    highlights:
-      - "Origin orchestrator in C#, edge relays in C++ (wake-word), biometric approval app in Kotlin"
-      - "Python pipeline chains STT → intent router → expert LLM → TTS; every call routes through Origin, never peer-to-peer"
-      - "Risky tool calls pause for biometric approval on the phone before execution"
-
   - name: "Marshal"
+    cv: true
     summary: >
       A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts
       mail, briefs you in the morning and remembers what matters. Harmless
@@ -118,12 +104,26 @@ projects:
     role: "Author"
     stack: ["C#", ".NET", "Vue", "TypeScript"]
     repo_url: "https://github.com/lGruenzweilHTL/marshal"
-    status: "in_progress"
+    status: "active"   # active | shipped | in_progress | private | superseded
     highlights:
-      - "ASP.NET harness every request goes through: agent loop, tool registry, risk engine, model router, MCP client"
-      - "Risk tiers per tool: harmless calls run, risky ones need confirmation, some (sending mail) are impossible"
-      - "Durable background tasks and follow-ups, long-term memory with hybrid retrieval on SQLite + sqlite-vec"
-      - "Integrations for Home Assistant, Moonraker, mail, FreshRSS, CalDAV, media, Proxmox and GitHub; Vue web app"
+      - "ASP.NET harness every request goes through: agent loop, tool registry, model router, MCP client"
+      - "Risk engine tiers every tool call: safe runs, confirm is frozen with its exact arguments until approved, forbidden never runs"
+      - "Durable background tasks, long-term memory with hybrid retrieval on SQLite + sqlite-vec, Vue web app"
+
+  - name: "vektorgrid"
+    summary: >
+      The predecessor of Marshal: a self-hosted voice assistant built as a
+      distributed system. Edge relays capture speech, a central orchestrator
+      runs the model pipeline, and a phone app approves anything risky.
+    role: "Architect & primary developer"
+    stack: ["C#", "C++", "Kotlin", "Python"]
+    repo_url: "https://github.com/vektorgrid-ai"
+    status: "superseded"
+    highlights:
+      - "Origin orchestrator in C#, edge relays in C++ (wake-word), biometric approval app in Kotlin"
+      - "Python pipeline chains STT → intent router → expert LLM → TTS; every call routes through Origin, never peer-to-peer"
+      - "Risky tool calls pause for biometric approval on the phone before execution"
+      - "Lesson: hand-writing the speech pipeline and the satellite protocol cost most of the time. Marshal leaves voice to Home Assistant Assist"
 
   - name: "SceneForge AI"
     cv: true
@@ -255,14 +255,16 @@ chat_only:
       preference on team size yet; I'm still finding out what suits me. I can
       work in and around Linz or fully remote, but I can't relocate. After
       graduating in 2028 I plan to start working rather than go to university.
-  - topic: "Why I built vektorgrid"
+  - topic: "Why I built vektorgrid, and why Marshal replaced it"
     body: >
-      I'm an Iron Man fan and wanted my own Jarvis. It was also a deliberate
-      chance to learn several languages in one system (C#, Python, C++,
-      Kotlin). Biggest lesson: I wouldn't write the audio processing and the
-      satellite protocol myself again. A successor is in development and not
-      public yet; the one detail I share is that it builds on Home Assistant
-      Assist with a custom integration instead.
+      I'm an Iron Man fan and wanted my own Jarvis. vektorgrid was also a
+      deliberate chance to learn several languages in one system (C#, Python,
+      C++, Kotlin). Biggest lesson: I wouldn't write the speech-to-text and
+      text-to-speech pipeline and the satellite protocol myself again. That
+      took most of the time and wasn't the interesting part. Marshal is the
+      successor: it leaves voice to Home Assistant Assist through a custom
+      integration, so all the effort goes into the agent itself: tools, risk
+      checks, memory and background tasks.
   - topic: "SceneForge AI and UniConsole, honestly"
     body: >
       Both started because I needed them for my own projects. They're small and
@@ -360,7 +362,7 @@ chat_only:
 # and experience. Keep it first-person and specific.
 elevator_pitch: >
   I'm a student in Austria. Most of my work is backend systems and AI tooling,
-  with games and occasional robotics on the side. I built vektorgrid, a
-  self-hosted voice assistant as a distributed system; SceneForge AI, a Unity
-  Editor plugin that builds scenes from text; and UniConsole, a free in-game
-  debug console for Unity. When something annoys me enough, I write code for it.
+  with games and occasional robotics on the side. I built Marshal, a
+  self-hosted AI agent for Home Assistant that asks before anything risky;
+  SceneForge AI, a Unity Editor plugin that builds scenes from text; and
+  UniConsole, a free in-game debug console for Unity. When something annoys me enough, I write code for it.

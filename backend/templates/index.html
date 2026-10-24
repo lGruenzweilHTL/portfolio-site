@@ -128,17 +128,16 @@ window.I18N = {{ js_strings | tojson }};
       "name": {{ t('ld.projects_name') | tojson }},
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "item": {
-          "@type": "SoftwareSourceCode", "name": "vektorgrid", "url": "https://gruenzweil.cc/projects/vektorgrid",
-          "description": {{ t('ld.vektorgrid') | tojson }},
-          "codeRepository": "https://github.com/vektorgrid-ai",
-          "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
-          "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 2, "item": {
           "@type": "SoftwareSourceCode", "name": "Marshal", "url": "https://gruenzweil.cc/projects/marshal",
           "description": {{ t('ld.marshal') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/marshal",
           "programmingLanguage": ["C#", "TypeScript"],
-          "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 2, "item": {
+          "@type": "SoftwareSourceCode", "name": "vektorgrid", "url": "https://gruenzweil.cc/projects/vektorgrid",
+          "description": {{ t('ld.vektorgrid') | tojson }},
+          "codeRepository": "https://github.com/vektorgrid-ai",
+          "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 3, "item": {
           "@type": "CreativeWork", "name": "Forkcast",
@@ -272,187 +271,187 @@ window.I18N = {{ js_strings | tojson }};
             <ul class="bays" aria-label="{{ t('hero.facts') }}">
               <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>HTL Leonding</strong><span>{{ t('hero.bay0') }}</span></div></li>
               <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>SlideLizard</strong><span>{{ t('hero.bay1') }}</span></div></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>vektorgrid</strong><span>{{ t('hero.bay2') }}</span></div></li>
+              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>Marshal</strong><span>{{ t('hero.bay2') }}</span></div></li>
               <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>Homelab</strong><span>{{ t('hero.bay3') }}</span></div><span class="led" data-led="status" aria-hidden="true"></span></li>
             </ul>
           </div>
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
         </section>
 
-        {# CHASSIS: vektorgrid. Front = hot-swap modules, rear = the
+        {# CHASSIS: Marshal. Front = hot-swap modules, rear = the
              interactive wiring diagram. JS hides one side and flips between
              them; without JS both are shown. #}
-        <section class="unit unit--featured rv" id="projects" aria-labelledby="vektorgrid-title">
+        <section class="unit unit--featured rv" id="projects" aria-labelledby="marshal-title">
           <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
           <div class="face">
             <div class="unit-head">
               <div class="unit-title">
-                <p class="silk silk--dim">{{ t('vg.featured') }}</p>
-                <h2 id="vektorgrid-title">vektorgrid</h2>
+                <p class="silk silk--dim">{{ t('mg.featured') }}</p>
+                <h2 id="marshal-title">Marshal</h2>
               </div>
               <div class="unit-head-r">
-                <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('vg.status') }}</p>
-                <div class="seg" role="group" aria-label="{{ t('vg.view_label') }}">
-                  <button type="button" class="key key--sm" data-view="front" aria-pressed="true" aria-controls="chassis">{{ t('vg.front') }}</button>
-                  <button type="button" class="key key--sm" data-view="rear" aria-pressed="false" aria-controls="chassis">{{ t('vg.rear') }}</button>
+                <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('mg.status') }}</p>
+                <div class="seg" role="group" aria-label="{{ t('mg.view_label') }}">
+                  <button type="button" class="key key--sm" data-view="front" aria-pressed="true" aria-controls="chassis">{{ t('mg.front') }}</button>
+                  <button type="button" class="key key--sm" data-view="rear" aria-pressed="false" aria-controls="chassis">{{ t('mg.rear') }}</button>
                 </div>
               </div>
             </div>
 
             <div class="chassis-intro">
               <div>
-                <p class="lead">{{ t('vg.lead') }}</p>
-                <p class="silk silk--dim">{{ t('vg.role') }} · C# · C++ · Kotlin · Python</p>
+                <p class="lead">{{ t('mg.lead') }}</p>
+                <p class="silk silk--dim">{{ t('mg.role') }} · C# · .NET · Vue · TypeScript</p>
               </div>
               <div class="keys">
-                <a class="key key--primary" href="/projects/vektorgrid">{{ t('vg.project_page') }}</a>
-                <a class="key" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">{{ t('vg.org') }} <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('vg.org_sr') }}</span></a>
+                <a class="key key--primary" href="/projects/marshal">{{ t('mg.project_page') }}</a>
+                <a class="key" href="https://github.com/lGruenzweilHTL/marshal" target="_blank" rel="noopener">{{ t('mg.repo') }} <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('mg.repo_sr') }}</span></a>
               </div>
             </div>
 
             <div class="chassis" id="chassis">
-              <ul class="chassis-front modules" aria-label="{{ t('vg.modules_label') }}">
+              <ul class="chassis-front modules" aria-label="{{ t('mg.modules_label') }}">
                 <li class="module" style="--stripe: var(--lang-cs)">
-                  <p class="silk">Origin</p>
-                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-origin" target="_blank" rel="noopener">{{ t('vg.origin_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
-                  <p>{{ t('vg.origin_desc') }}</p>
+                  <p class="silk">Core</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/lGruenzweilHTL/marshal/tree/HEAD/src/Marshal.Core" target="_blank" rel="noopener">{{ t('mg.core_role') }}<span class="sr-only"> ({{ t('mg.src_sr') }})</span></a></h3>
+                  <p>{{ t('mg.core_desc') }}</p>
                   <ul class="cables"><li class="cable cable--cs">C#</li></ul>
                 </li>
-                <li class="module" style="--stripe: var(--lang-cpp)">
-                  <p class="silk">Relay</p>
-                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-relay" target="_blank" rel="noopener">{{ t('vg.relay_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
-                  <p>{{ t('vg.relay_desc') }}</p>
-                  <ul class="cables"><li class="cable cable--cpp">C++</li></ul>
+                <li class="module" style="--stripe: var(--lang-cs)">
+                  <p class="silk">Tasks</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/lGruenzweilHTL/marshal/tree/HEAD/src/Marshal.Tasks" target="_blank" rel="noopener">{{ t('mg.tasks_role') }}<span class="sr-only"> ({{ t('mg.src_sr') }})</span></a></h3>
+                  <p>{{ t('mg.tasks_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--cs">C#</li></ul>
                 </li>
-                <li class="module" style="--stripe: var(--lang-kt)">
-                  <p class="silk">Gate</p>
-                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-gate" target="_blank" rel="noopener">{{ t('vg.gate_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
-                  <p>{{ t('vg.gate_desc') }}</p>
-                  <ul class="cables"><li class="cable cable--kt">Kotlin</li></ul>
+                <li class="module" style="--stripe: var(--lang-cs)">
+                  <p class="silk">Memory</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/lGruenzweilHTL/marshal/tree/HEAD/src/Marshal.Memory" target="_blank" rel="noopener">{{ t('mg.memory_role') }}<span class="sr-only"> ({{ t('mg.src_sr') }})</span></a></h3>
+                  <p>{{ t('mg.memory_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--cs">C#</li><li class="cable">SQLite</li></ul>
                 </li>
-                <li class="module" style="--stripe: var(--lang-py)">
-                  <p class="silk">Scalars</p>
-                  <h3 class="module-role"><a class="card-link" href="https://github.com/vektorgrid-ai/vektor-scalars" target="_blank" rel="noopener">{{ t('vg.scalars_role') }}<span class="sr-only"> ({{ t('vg.repo_sr') }})</span></a></h3>
-                  <p>{{ t('vg.scalars_desc') }}</p>
-                  <ul class="cables"><li class="cable cable--py">Python</li></ul>
+                <li class="module" style="--stripe: var(--lang-ts)">
+                  <p class="silk">Web</p>
+                  <h3 class="module-role"><a class="card-link" href="https://github.com/lGruenzweilHTL/marshal/tree/HEAD/web" target="_blank" rel="noopener">{{ t('mg.web_role') }}<span class="sr-only"> ({{ t('mg.src_sr') }})</span></a></h3>
+                  <p>{{ t('mg.web_desc') }}</p>
+                  <ul class="cables"><li class="cable cable--ts">TypeScript</li><li class="cable">Vue</li></ul>
                 </li>
               </ul>
 
               <div class="chassis-rear" id="chassis-rear">
             <div class="arch" id="arch">
-              <h3 class="silk arch-cap" id="arch-cap">{{ t('vg.rear_cap') }}</h3>
-              <div class="arch-steps" role="group" aria-label="{{ t('vg.steps_label') }}">
-                <button type="button" class="arch-step" data-step="1" aria-pressed="false">1 · {{ t('vg.step1') }}</button>
-                <button type="button" class="arch-step" data-step="2" aria-pressed="false">2 · STT</button>
-                <button type="button" class="arch-step" data-step="3" aria-pressed="false">3 · {{ t('vg.step3') }}</button>
-                <button type="button" class="arch-step" data-step="4" aria-pressed="false">4 · {{ t('vg.step4') }}</button>
-                <button type="button" class="arch-step" data-step="5" aria-pressed="false">5 · {{ t('vg.step5') }}</button>
-                <button type="button" class="arch-step" data-step="6" aria-pressed="false">6 · TTS</button>
-                <button type="button" class="arch-step" data-step="7" aria-pressed="false">7 · {{ t('vg.step7') }}</button>
+              <h3 class="silk arch-cap" id="arch-cap">{{ t('mg.rear_cap') }}</h3>
+              <div class="arch-steps" role="group" aria-label="{{ t('mg.steps_label') }}">
+                <button type="button" class="arch-step" data-step="1" aria-pressed="false">1 · {{ t('mg.step1') }}</button>
+                <button type="button" class="arch-step" data-step="2" aria-pressed="false">2 · {{ t('mg.step2') }}</button>
+                <button type="button" class="arch-step" data-step="3" aria-pressed="false">3 · {{ t('mg.step3') }}</button>
+                <button type="button" class="arch-step" data-step="4" aria-pressed="false">4 · {{ t('mg.step4') }}</button>
+                <button type="button" class="arch-step" data-step="5" aria-pressed="false">5 · {{ t('mg.step5') }}</button>
+                <button type="button" class="arch-step" data-step="6" aria-pressed="false">6 · {{ t('mg.step6') }}</button>
+                <button type="button" class="arch-step" data-step="7" aria-pressed="false">7 · {{ t('mg.step7') }}</button>
                 <button type="button" class="arch-step arch-play" id="archPlay" aria-pressed="false">{{ t('js.arch.auto') }}</button>
               </div>
 
               <svg class="arch-svg arch-wide" viewBox="0 0 740 340" role="img" aria-labelledby="arch-desc-title">
-                <title id="arch-desc-title">{{ t('vg.diagram_title') }}</title>
+                <title id="arch-desc-title">{{ t('mg.diagram_title') }}</title>
                 <defs>
                   <marker id="arw" markerWidth="9" markerHeight="9" refX="6.5" refY="3.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
                     <path d="M0,0 L7,3.5 L0,7 Z" style="fill:context-stroke"/>
                   </marker>
                 </defs>
 
-                {# edges: everything routes through Origin. x1/y1 is always the
+                {# edges: everything routes through Core. x1/y1 is always the
                      end that starts a forward flow. #}
-                <line data-part="e-relay" class="d-line" x1="200" y1="104" x2="286" y2="176" marker-start="url(#arw)" marker-end="url(#arw)"/>
-                <text class="d-lbl" x="242" y="160" text-anchor="end">{{ t('vg.d_audio') }} &#8644; {{ t('vg.d_speech') }}</text>
-                <line data-part="e-gate" class="d-line" x1="200" y1="290" x2="286" y2="222" marker-start="url(#arw)" marker-end="url(#arw)"/>
-                <text class="d-lbl" x="242" y="240" text-anchor="end">{{ t('vg.d_approval') }} &#8644; &#10003;/&#10007;</text>
-                <line data-part="e-stt"    class="d-line" x1="440" y1="188" x2="548" y2="66"  marker-start="url(#arw)" marker-end="url(#arw)"/>
-                <line data-part="e-router" class="d-line" x1="440" y1="196" x2="548" y2="128" marker-start="url(#arw)" marker-end="url(#arw)"/>
-                <line data-part="e-llm"    class="d-line" x1="440" y1="204" x2="548" y2="190" marker-start="url(#arw)" marker-end="url(#arw)"/>
-                <line data-part="e-tts"    class="d-line" x1="440" y1="212" x2="548" y2="252" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-assist" class="d-line" x1="200" y1="104" x2="286" y2="176" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <text class="d-lbl" x="242" y="160" text-anchor="end">{{ t('mg.d_text') }} &#8644; SSE</text>
+                <line data-part="e-web" class="d-line" x1="200" y1="290" x2="286" y2="222" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <text class="d-lbl" x="242" y="240" text-anchor="end">{{ t('mg.d_approval') }} &#8644; &#10003;/&#10007;</text>
+                <line data-part="e-context" class="d-line" x1="440" y1="188" x2="548" y2="66"  marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-model"   class="d-line" x1="440" y1="196" x2="548" y2="128" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-guard"   class="d-line" x1="440" y1="204" x2="548" y2="190" marker-start="url(#arw)" marker-end="url(#arw)"/>
+                <line data-part="e-tools"   class="d-line" x1="440" y1="212" x2="548" y2="252" marker-start="url(#arw)" marker-end="url(#arw)"/>
 
-                <rect data-part="n-origin" class="d-box-origin" x="288" y="164" width="150" height="72" rx="8"/>
-                <text class="d-title d-title-o" x="363" y="196" text-anchor="middle">Origin</text>
-                <text class="d-sub" x="363" y="216" text-anchor="middle">{{ t('vg.d_orchestrator') }} · <tspan class="d-lang-cs">C#</tspan></text>
+                <rect data-part="n-core" class="d-box-origin" x="288" y="164" width="150" height="72" rx="8"/>
+                <text class="d-title d-title-o" x="363" y="196" text-anchor="middle">Core</text>
+                <text class="d-sub" x="363" y="216" text-anchor="middle">{{ t('mg.d_loop') }} · <tspan class="d-lang-cs">C#</tspan></text>
 
-                <rect data-part="n-relay" class="d-box" x="50" y="74" width="152" height="58" rx="7"/>
-                <text class="d-title" x="126" y="98" text-anchor="middle">Relay</text>
-                <text class="d-sub" x="126" y="116" text-anchor="middle">{{ t('vg.d_wake') }} · <tspan class="d-lang-cpp">C++</tspan></text>
+                <rect data-part="n-assist" class="d-box" x="50" y="74" width="152" height="58" rx="7"/>
+                <text class="d-title" x="126" y="98" text-anchor="middle">Assist</text>
+                <text class="d-sub" x="126" y="116" text-anchor="middle">{{ t('mg.d_voice') }} · <tspan class="d-lang-py">Python</tspan></text>
 
-                <rect data-part="n-gate" class="d-box" x="50" y="262" width="152" height="58" rx="7"/>
-                <text class="d-title" x="126" y="286" text-anchor="middle">Gate</text>
-                <text class="d-sub" x="126" y="304" text-anchor="middle">{{ t('vg.d_biometric') }} · <tspan class="d-lang-kt">Kotlin</tspan></text>
+                <rect data-part="n-web" class="d-box" x="50" y="262" width="152" height="58" rx="7"/>
+                <text class="d-title" x="126" y="286" text-anchor="middle">{{ t('mg.web_role') }}</text>
+                <text class="d-sub" x="126" y="304" text-anchor="middle">{{ t('mg.d_approval') }} · <tspan class="d-lang-ts">Vue</tspan></text>
 
-                <text class="d-sub" x="628" y="30" text-anchor="middle">SCALARS · <tspan class="d-lang-py">Python</tspan> · {{ t('vg.d_in_sequence') }}</text>
+                <text class="d-sub" x="628" y="30" text-anchor="middle">{{ t('mg.d_loop_cap') }} · {{ t('mg.d_repeats') }}</text>
 
-                <rect data-part="n-stt" class="d-box-scalar" x="548" y="44"  width="160" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="628" y="71"  text-anchor="middle">STT</text>
-                <rect data-part="n-router" class="d-box-scalar" x="548" y="106" width="160" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="628" y="133" text-anchor="middle">{{ t('vg.d_router') }}</text>
-                <rect data-part="n-llm" class="d-box-scalar" x="548" y="168" width="160" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="628" y="195" text-anchor="middle">{{ t('vg.d_llm') }}</text>
-                <rect data-part="n-tts" class="d-box-scalar" x="548" y="230" width="160" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="628" y="257" text-anchor="middle">TTS</text>
+                <rect data-part="n-context" class="d-box-scalar" x="548" y="44"  width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="71"  text-anchor="middle">{{ t('mg.d_context') }}</text>
+                <rect data-part="n-model" class="d-box-scalar" x="548" y="106" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="133" text-anchor="middle">{{ t('mg.d_model') }}</text>
+                <rect data-part="n-guard" class="d-box-scalar" x="548" y="168" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="195" text-anchor="middle">{{ t('mg.d_guard') }}</text>
+                <rect data-part="n-tools" class="d-box-scalar" x="548" y="230" width="160" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="628" y="257" text-anchor="middle">{{ t('mg.d_tools') }}</text>
 
-                <g><circle data-part="b-stt"    class="d-numbg" cx="548" cy="66"  r="9"/><text class="d-num" x="548" y="69"  text-anchor="middle">1</text></g>
-                <g><circle data-part="b-router" class="d-numbg" cx="548" cy="128" r="9"/><text class="d-num" x="548" y="131" text-anchor="middle">2</text></g>
-                <g><circle data-part="b-llm"    class="d-numbg" cx="548" cy="190" r="9"/><text class="d-num" x="548" y="193" text-anchor="middle">3</text></g>
-                <g><circle data-part="b-tts"    class="d-numbg" cx="548" cy="252" r="9"/><text class="d-num" x="548" y="255" text-anchor="middle">4</text></g>
+                <g><circle data-part="b-context" class="d-numbg" cx="548" cy="66"  r="9"/><text class="d-num" x="548" y="69"  text-anchor="middle">1</text></g>
+                <g><circle data-part="b-model"   class="d-numbg" cx="548" cy="128" r="9"/><text class="d-num" x="548" y="131" text-anchor="middle">2</text></g>
+                <g><circle data-part="b-guard"   class="d-numbg" cx="548" cy="190" r="9"/><text class="d-num" x="548" y="193" text-anchor="middle">3</text></g>
+                <g><circle data-part="b-tools"   class="d-numbg" cx="548" cy="252" r="9"/><text class="d-num" x="548" y="255" text-anchor="middle">4</text></g>
               </svg>
 
-              {# Portrait layout: Relay / Origin / Gate stacked on the left, the
-                   Scalar pipeline stacked on the right. #}
+              {# Portrait layout: Assist / Core / web app stacked on the left,
+                   the agent loop stacked on the right. #}
               <svg class="arch-svg arch-tall" viewBox="0 0 340 446" role="img" aria-labelledby="arch-desc-title-m">
-                <title id="arch-desc-title-m">{{ t('vg.diagram_title') }}</title>
+                <title id="arch-desc-title-m">{{ t('mg.diagram_title') }}</title>
                 <defs>
                   <marker id="arw-m" markerWidth="9" markerHeight="9" refX="6.5" refY="3.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
                     <path d="M0,0 L7,3.5 L0,7 Z" style="fill:context-stroke"/>
                   </marker>
                 </defs>
 
-                <line data-part="e-relay" class="d-line" x1="80" y1="96" x2="80" y2="197" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
-                <text class="d-lbl" x="89" y="146">{{ t('vg.d_audio') }}</text>
-                <text class="d-lbl" x="89" y="160">&#8644; {{ t('vg.d_speech') }}</text>
-                <line data-part="e-gate" class="d-line" x1="80" y1="370" x2="80" y2="269" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
-                <text class="d-lbl" x="89" y="314">{{ t('vg.d_approval') }}</text>
+                <line data-part="e-assist" class="d-line" x1="80" y1="96" x2="80" y2="197" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <text class="d-lbl" x="89" y="146">{{ t('mg.d_text') }}</text>
+                <text class="d-lbl" x="89" y="160">&#8644; SSE</text>
+                <line data-part="e-web" class="d-line" x1="80" y1="370" x2="80" y2="269" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <text class="d-lbl" x="89" y="314">{{ t('mg.d_approval') }}</text>
                 <text class="d-lbl" x="89" y="328">&#8644; &#10003;/&#10007;</text>
-                <line data-part="e-stt"    class="d-line" x1="152" y1="219" x2="196" y2="140" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
-                <line data-part="e-router" class="d-line" x1="152" y1="228" x2="196" y2="202" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
-                <line data-part="e-llm"    class="d-line" x1="152" y1="238" x2="196" y2="264" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
-                <line data-part="e-tts"    class="d-line" x1="152" y1="247" x2="196" y2="326" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-context" class="d-line" x1="152" y1="219" x2="196" y2="140" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-model"   class="d-line" x1="152" y1="228" x2="196" y2="202" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-guard"   class="d-line" x1="152" y1="238" x2="196" y2="264" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
+                <line data-part="e-tools"   class="d-line" x1="152" y1="247" x2="196" y2="326" marker-start="url(#arw-m)" marker-end="url(#arw-m)"/>
 
-                <rect data-part="n-relay" class="d-box" x="10" y="40" width="140" height="54" rx="7"/>
-                <text class="d-title" x="80" y="63" text-anchor="middle">Relay</text>
-                <text class="d-sub" x="80" y="82" text-anchor="middle">{{ t('vg.d_wake') }} · <tspan class="d-lang-cpp">C++</tspan></text>
+                <rect data-part="n-assist" class="d-box" x="10" y="40" width="140" height="54" rx="7"/>
+                <text class="d-title" x="80" y="63" text-anchor="middle">Assist</text>
+                <text class="d-sub" x="80" y="82" text-anchor="middle">{{ t('mg.d_voice') }} · <tspan class="d-lang-py">Python</tspan></text>
 
-                <rect data-part="n-origin" class="d-box-origin" x="10" y="199" width="140" height="68" rx="8"/>
-                <text class="d-title d-title-o" x="80" y="229" text-anchor="middle">Origin</text>
-                <text class="d-sub" x="80" y="250" text-anchor="middle">{{ t('vg.d_orchestrator') }} · <tspan class="d-lang-cs">C#</tspan></text>
+                <rect data-part="n-core" class="d-box-origin" x="10" y="199" width="140" height="68" rx="8"/>
+                <text class="d-title d-title-o" x="80" y="229" text-anchor="middle">Core</text>
+                <text class="d-sub" x="80" y="250" text-anchor="middle">{{ t('mg.d_loop') }} · <tspan class="d-lang-cs">C#</tspan></text>
 
-                <rect data-part="n-gate" class="d-box" x="10" y="372" width="140" height="54" rx="7"/>
-                <text class="d-title" x="80" y="395" text-anchor="middle">Gate</text>
-                <text class="d-sub" x="80" y="414" text-anchor="middle">{{ t('vg.d_biometric') }} · <tspan class="d-lang-kt">Kotlin</tspan></text>
+                <rect data-part="n-web" class="d-box" x="10" y="372" width="140" height="54" rx="7"/>
+                <text class="d-title" x="80" y="395" text-anchor="middle">{{ t('mg.web_role') }}</text>
+                <text class="d-sub" x="80" y="414" text-anchor="middle">{{ t('mg.d_approval') }} · <tspan class="d-lang-ts">Vue</tspan></text>
 
-                <text class="d-sub" x="263" y="86" text-anchor="middle">SCALARS · <tspan class="d-lang-py">Python</tspan></text>
-                <text class="d-sub" x="263" y="102" text-anchor="middle">{{ t('vg.d_in_sequence') }}</text>
+                <text class="d-sub" x="263" y="86" text-anchor="middle">{{ t('mg.d_loop_cap') }}</text>
+                <text class="d-sub" x="263" y="102" text-anchor="middle">{{ t('mg.d_repeats') }}</text>
 
-                <rect data-part="n-stt" class="d-box-scalar" x="196" y="118" width="134" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="266" y="145" text-anchor="middle">STT</text>
-                <rect data-part="n-router" class="d-box-scalar" x="196" y="180" width="134" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="266" y="207" text-anchor="middle">{{ t('vg.d_router') }}</text>
-                <rect data-part="n-llm" class="d-box-scalar" x="196" y="242" width="134" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="266" y="269" text-anchor="middle">{{ t('vg.d_llm') }}</text>
-                <rect data-part="n-tts" class="d-box-scalar" x="196" y="304" width="134" height="44" rx="7"/>
-                <text class="d-title d-title-s" x="266" y="331" text-anchor="middle">TTS</text>
+                <rect data-part="n-context" class="d-box-scalar" x="196" y="118" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="145" text-anchor="middle">{{ t('mg.d_context') }}</text>
+                <rect data-part="n-model" class="d-box-scalar" x="196" y="180" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="207" text-anchor="middle">{{ t('mg.d_model') }}</text>
+                <rect data-part="n-guard" class="d-box-scalar" x="196" y="242" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="269" text-anchor="middle">{{ t('mg.d_guard') }}</text>
+                <rect data-part="n-tools" class="d-box-scalar" x="196" y="304" width="134" height="44" rx="7"/>
+                <text class="d-title d-title-s" x="266" y="331" text-anchor="middle">{{ t('mg.d_tools') }}</text>
 
-                <g><circle data-part="b-stt"    class="d-numbg" cx="196" cy="140" r="9"/><text class="d-num" x="196" y="143" text-anchor="middle">1</text></g>
-                <g><circle data-part="b-router" class="d-numbg" cx="196" cy="202" r="9"/><text class="d-num" x="196" y="205" text-anchor="middle">2</text></g>
-                <g><circle data-part="b-llm"    class="d-numbg" cx="196" cy="264" r="9"/><text class="d-num" x="196" y="267" text-anchor="middle">3</text></g>
-                <g><circle data-part="b-tts"    class="d-numbg" cx="196" cy="326" r="9"/><text class="d-num" x="196" y="329" text-anchor="middle">4</text></g>
+                <g><circle data-part="b-context" class="d-numbg" cx="196" cy="140" r="9"/><text class="d-num" x="196" y="143" text-anchor="middle">1</text></g>
+                <g><circle data-part="b-model"   class="d-numbg" cx="196" cy="202" r="9"/><text class="d-num" x="196" y="205" text-anchor="middle">2</text></g>
+                <g><circle data-part="b-guard"   class="d-numbg" cx="196" cy="264" r="9"/><text class="d-num" x="196" y="267" text-anchor="middle">3</text></g>
+                <g><circle data-part="b-tools"   class="d-numbg" cx="196" cy="326" r="9"/><text class="d-num" x="196" y="329" text-anchor="middle">4</text></g>
               </svg>
 
               <p class="arch-note" id="archNote"></p>
-              <p class="arch-flow">{{ t('vg.flow_html') }}</p>
+              <p class="arch-flow">{{ t('mg.flow_html') }}</p>
             </div>
               </div>
             </div>
@@ -473,16 +472,14 @@ window.I18N = {{ js_strings | tojson }};
                  in their own, smaller group. A "last push" line only shows when
                  /api/status reports a push in the last 90 days (main.js). #}
             <ul class="blades">
-              <li class="blade">
+              <li class="blade blade--noshot">
                 <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/marshal.webp" width="1200" height="750" loading="lazy" decoding="async" alt="{{ t('blades.marshal_alt') }}"></div>
                 <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/marshal">Marshal</a></h3><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
-                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="marshal">--</span></p>
-                  <p class="blade-desc">{{ t('blades.marshal_desc') }}</p>
+                  <div class="blade-top"><h3><a class="card-link" href="/projects/vektorgrid">vektorgrid</a></h3><p class="status"><span class="led" aria-hidden="true"></span>{{ t('blades.predecessor') }}</p></div>
+                  <p class="blade-desc">{{ t('blades.vektorgrid_desc') }}</p>
                   <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Vue</li><li class="cable">Home Assistant</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/marshal">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='Marshal') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/marshal" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Marshal') }}</span></a></span>
+                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable cable--cpp">C++</li><li class="cable cable--py">Python</li><li class="cable cable--kt">Kotlin</li></ul>
+                    <span class="keys"><a class="key key--sm key--primary" href="/projects/vektorgrid">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='vektorgrid') }}</span></a><a class="key key--sm" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='vektorgrid') }}</span></a></span>
                   </div>
                 </div>
               </li>

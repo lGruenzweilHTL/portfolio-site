@@ -503,7 +503,7 @@ ul, ol { list-style: none; }
 .bay div > span:last-child { font-size: 13px; line-height: 1.4; }
 .bay .led { align-self: flex-start; margin-top: 4px; }
 
-/* ---------- CHASSIS: vektorgrid ---------- */
+/* ---------- CHASSIS: Marshal ---------- */
 
 .seg { display: flex; }
 .seg .key:first-child { border-radius: var(--radius-button) 0 0 var(--radius-button); }
@@ -571,6 +571,7 @@ ul, ol { list-style: none; }
 .d-numbg { fill: var(--face-highlight); transition: fill .2s; }
 .d-lang-cs { fill: var(--lang-cs); } .d-lang-py { fill: var(--lang-py); }
 .d-lang-cpp { fill: var(--lang-cpp); } .d-lang-kt { fill: var(--lang-kt); }
+.d-lang-ts { fill: var(--lang-ts); }
 .d-box.on, .d-box-scalar.on, .d-box-origin.on { stroke: var(--lcd-text); stroke-width: 2; }
 .d-numbg.on { fill: var(--lcd-text); }
 .d-line.on { stroke: var(--lcd-text); stroke-dasharray: 6 8; animation: dashflow .7s linear infinite; }

@@ -1,6 +1,6 @@
 // Main page (backend/templates/index.html): the rack. Analytics, nav ports,
 // U grid, chassis flip, feedback drawer, live status (PDU), power-on
-// self-test, entrances, and the vektorgrid wiring-diagram stepper. Also loaded
+// self-test, entrances, and the Marshal wiring-diagram stepper. Also loaded
 // by the project pages, which share the nav and the PDU.
 
 // Strings in the page's language: window.I18N is rendered from
@@ -170,7 +170,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
 })();
 
-// vektorgrid chassis: FRONT (modules) / REAR (wiring diagram). Without JS
+// Marshal chassis: FRONT (modules) / REAR (wiring diagram). Without JS
 // both sides are shown one after the other.
 (function () {
   const chassis = document.getElementById('chassis');
@@ -340,13 +340,13 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // step -> { nodes lit, edges lit ([id, reverse-flow]), badge lit, note }
   const steps = {
-    1: { on: ['n-relay', 'n-origin'], edges: [['e-relay', false]], note: tr('arch.note1') },
-    2: { on: ['n-origin', 'n-stt'], edges: [['e-stt', false]], badge: 'b-stt', note: tr('arch.note2') },
-    3: { on: ['n-origin', 'n-router'], edges: [['e-router', false]], badge: 'b-router', note: tr('arch.note3') },
-    4: { on: ['n-origin', 'n-llm'], edges: [['e-llm', false]], badge: 'b-llm', note: tr('arch.note4') },
-    5: { on: ['n-origin', 'n-gate'], edges: [['e-gate', true]], note: tr('arch.note5') },
-    6: { on: ['n-origin', 'n-tts'], edges: [['e-tts', false]], badge: 'b-tts', note: tr('arch.note6') },
-    7: { on: ['n-relay', 'n-origin'], edges: [['e-relay', true]], note: tr('arch.note7') }
+    1: { on: ['n-assist', 'n-core'], edges: [['e-assist', false]], note: tr('arch.note1') },
+    2: { on: ['n-core', 'n-context'], edges: [['e-context', false]], badge: 'b-context', note: tr('arch.note2') },
+    3: { on: ['n-core', 'n-model'], edges: [['e-model', false]], badge: 'b-model', note: tr('arch.note3') },
+    4: { on: ['n-core', 'n-guard'], edges: [['e-guard', false]], badge: 'b-guard', note: tr('arch.note4') },
+    5: { on: ['n-core', 'n-web'], edges: [['e-web', true]], note: tr('arch.note5') },
+    6: { on: ['n-core', 'n-tools'], edges: [['e-tools', false]], badge: 'b-tools', note: tr('arch.note6') },
+    7: { on: ['n-assist', 'n-core'], edges: [['e-assist', true]], note: tr('arch.note7') }
   };
 
   function clear() {

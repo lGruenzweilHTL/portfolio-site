@@ -22,7 +22,7 @@ ld:
   seeks_name: "Tirocinio backend"
   seeks_description: "Disponibile per un tirocinio backend; attualmente al 4° anno su 5 alla HTL Leonding, diploma a giugno 2028."
   projects_name: "Progetti di Lukas Grünzweil"
-  vektorgrid: "Un assistente vocale self-hosted costruito come sistema distribuito: relay edge in C++ catturano la voce, un orchestratore C# gestisce una pipeline Python di riconoscimento vocale, instradamento degli intenti, LLM e sintesi vocale, e un'app Kotlin approva con la biometria le chiamate a strumenti rischiose."
+  vektorgrid: "Il predecessore di Marshal: un assistente vocale self-hosted costruito come sistema distribuito, con relay edge in C++, un orchestratore C# che gestisce una pipeline Python di riconoscimento vocale, instradamento degli intenti, LLM e sintesi vocale, e un'app Kotlin che approva con la biometria le chiamate a strumenti rischiose."
   marshal: "Un agente IA self-hosted per Home Assistant: un nucleo ASP.NET valuta il rischio di ogni chiamata a strumenti, esegue attività in background e mantiene una memoria a lungo termine, con una web app in Vue."
   sceneforge: "Un plugin di IA per l'editor di Unity che trasforma la descrizione testuale di una scena in GameObject e componenti."
   uniconsole: "Una console di debug in-game per Unity, gratuita e leggera: marca un metodo statico con [Command] e richiamalo da un terminale nella scena."
@@ -68,59 +68,55 @@ hero:
   facts: Dati principali
   bay0: "Istituto tecnico superiore · 2022–2028"
   bay1: "Tirocinante in ingegneria del software · 08/2026"
-  bay2: "Assistente vocale · in sviluppo attivo"
+  bay2: "Agente IA per Home Assistant · in sviluppo attivo"
   bay3: "3 nodi Proxmox · servono questa pagina"
   ask_title: "Chiedi al mio assistente IA"
   ask_lead: "Sa più di quanto c'è su questa pagina: perché costruisco le cose, come lavoro e cosa cerco."
   ask_placeholder: "es. Quando è disponibile?"
   ask_send: "Chiedi"
 
-vg:
-  featured: "Progetto principale"
-  status: Attivo
-  view_label: Vista dello chassis
-  front: Fronte
-  rear: Retro
-  lead: "Un assistente vocale self-hosted, costruito come sistema distribuito: i relay edge catturano la voce, un orchestratore centrale gestisce la pipeline dei modelli e un'app sul telefono approva tutto ciò che è rischioso."
-  role: "Architetto e sviluppatore principale"
-  project_page: Pagina del progetto
-  org: Organizzazione su GitHub
-  org_sr: "(organizzazione vektorgrid, si apre in una nuova scheda)"
-  repo_sr: 'repository su GitHub, si apre in una nuova scheda'
-  modules_label: Componenti di vektorgrid
-  origin_role: Orchestratore
-  origin_desc: "Tutto passa per Origin; nessun nodo parla direttamente con un altro. Guida la pipeline e raccoglie ogni risultato."
-  relay_role: Wake word sull'edge
-  relay_desc: "Rileva la wake word sul dispositivo e trasmette l'audio a Origin. La risposta vocale torna per la stessa strada."
-  gate_role: Approvazione biometrica
-  gate_desc: "Le chiamate a strumenti rischiose restano in attesa finché non vengono approvate con la biometria sul telefono. Funziona anche come relay autonomo."
-  scalars_role: Pipeline dei modelli
-  scalars_desc: "Riconoscimento vocale, router degli intenti, LLM esperto e sintesi vocale, chiamati in sequenza da Origin."
-  rear_cap: "Vista posteriore · cablaggio"
-  steps_label: Segui la pipeline della richiesta passo per passo
-  step1: Acquisizione
-  step3: Instradamento
-  step4: Inferenza
-  step5: Approvazione
-  step7: Risposta
-  diagram_title: "Architettura di vektorgrid: Relay e Gate sono collegati tramite l'orchestratore centrale Origin, che guida una pipeline sequenziale di Scalar: STT, router degli intenti, LLM esperto e TTS."
-  d_audio: audio
-  d_speech: voce
-  d_approval: approvazione
-  d_orchestrator: orchestratore
-  d_wake: wake word
-  d_biometric: biometria
-  d_in_sequence: in sequenza
-  d_router: Router intenti
-  d_llm: LLM esperto
-  flow_html: >-
-    Tutto passa per <b>Origin</b>; nessun nodo parla direttamente con un altro. Un <b>Relay</b>
-    rileva la wake word e trasmette l'audio a Origin, che esegue la pipeline <b>Scalar</b> in ordine
-    (STT &#8594; router degli intenti &#8594; LLM esperto &#8594; TTS), chiamando ogni worker e raccogliendone
-    il risultato prima del successivo. La risposta vocale torna attraverso il Relay. Se il modello
-    richiede una chiamata a uno strumento rischiosa, Origin si ferma e chiede a <b>Gate</b> di
-    approvarla con la biometria. Gate funziona anche da solo: interroga Origin per le metriche e ha un
-    Relay integrato, così si può parlare con il sistema dal telefono.
+mg:
+  featured: "Progetto in evidenza"
+  status: "Attivo"
+  view_label: "Vista dello chassis"
+  front: "Fronte"
+  rear: "Retro"
+  lead: "Un agente IA self-hosted per Home Assistant. Gestisce la stampante 3D, smista la posta, prepara la mattina e ricorda ciò che conta. Le azioni innocue avvengono e basta; quelle rischiose aspettano un sì chiaro."
+  role: "Autore"
+  project_page: "Pagina del progetto"
+  repo: "Repo su GitHub"
+  repo_sr: "(repository di Marshal, si apre in una nuova scheda)"
+  src_sr: "codice su GitHub, si apre in una nuova scheda"
+  modules_label: "Componenti di Marshal"
+  core_role: "Nucleo dell'agente"
+  core_desc: "Ogni richiesta, parlata, scritta o pianificata, passa per lo stesso ciclo: costruire il contesto, chiamare il modello, controllare ogni chiamata a strumenti, eseguire."
+  tasks_role: "Lavoro in background"
+  tasks_desc: "Attività persistenti, pianificazioni e promemoria. I risultati arrivano nella stanza in cui ti trovi, senza svegliarti di notte."
+  memory_role: "Memoria a lungo termine"
+  memory_desc: "Ricorda preferenze e progetti e trova il contesto giusto con una ricerca ibrida su SQLite e sqlite-vec. Tutto resta visibile e modificabile."
+  web_role: "Web app"
+  web_desc: "Chat, approvazioni con un tocco, ragionamento e passaggi degli strumenti in diretta, il costo di ogni esecuzione e il grafo della memoria. Per desktop e telefono."
+  rear_cap: "Vista posteriore · una richiesta"
+  steps_label: "Seguire una richiesta passo per passo"
+  step1: "Ascolto"
+  step2: "Contesto"
+  step3: "Modello"
+  step4: "Controllo"
+  step5: "Approvazione"
+  step6: "Esecuzione"
+  step7: "Risposta"
+  diagram_title: "Architettura di Marshal: Home Assistant Assist e la web app si collegano a Core, il cui ciclo dell'agente passa in sequenza per contesto, modello, controllo del rischio e strumenti."
+  d_text: "testo"
+  d_approval: "approvazione"
+  d_voice: "voce"
+  d_loop: "ciclo agente"
+  d_loop_cap: "CICLO DELL'AGENTE"
+  d_repeats: "si ripete"
+  d_context: "Contesto"
+  d_model: "Modello"
+  d_guard: "Controllo rischi"
+  d_tools: "Strumenti"
+  flow_html: "Ogni richiesta passa per <b>Core</b>: la voce da <b>Assist</b>, la chat dalla <b>web app</b> e le attività pianificate. Il ciclo dell'agente costruisce il contesto dalla memoria, chiama il modello con gli strumenti visibili in quella stanza e fa passare ogni chiamata a strumenti dal controllo del rischio prima di eseguire qualsiasi cosa. Le chiamate rischiose vengono congelate con gli argomenti esatti finché non confermi, e alcune cose, come inviare posta, non sono nemmeno strumenti. Riconoscimento e sintesi vocale restano in Home Assistant: in <b>vektorgrid</b>, il predecessore, avevo scritto io quella pipeline e i suoi protocolli, e una volta è bastata."
 
 blades:
   title: Altri progetti
@@ -139,8 +135,8 @@ blades:
   tag_mobile: Gioco mobile
   tag_game: Gioco
   tag_robotics: Robotica
-  marshal_alt: "Dashboard di Marshal con approvazioni in sospeso per sbloccare la porta d'ingresso e avviare una stampa, accanto allo stato live della stampante 3D"
-  marshal_desc: "Un agente IA self-hosted per Home Assistant. Gestisce la stampante 3D, smista la posta, ti aggiorna ogni mattina e ricorda ciò che conta. Le azioni innocue avvengono e basta; quelle rischiose aspettano il tuo sì."
+  predecessor: "Predecessore"
+  vektorgrid_desc: "Il predecessore di Marshal: un assistente vocale costruito come sistema distribuito, con relay C++ per la parola di attivazione, un orchestratore C#, una pipeline Python STT → LLM → TTS e un'app Kotlin per l'approvazione biometrica. Cosa ho imparato: non scrivere a mano la pipeline vocale e i suoi protocolli. Marshal la lascia a Home Assistant."
   sceneforge_alt: "Finestra di chat di SceneForge AI nell'editor di Unity che crea un giocatore a capsula rosso con un CharacterController a partire da un prompt"
   sceneforge_desc: "Un plugin di IA per l'editor di Unity. Descrivi una scena a parole e ottieni GameObject e componenti. Elimina il lavoro manuale nel level design."
   uniconsole_alt: "Terminale di UniConsole che elenca i comandi disponibili ed esegue un comando echo"
@@ -231,13 +227,13 @@ js:
   arch:
     auto: "▶ Auto"
     pause: "❚❚ Pausa"
-    note1: "<b>Acquisizione:</b> il Relay rileva la wake word e trasmette l'audio a Origin."
-    note2: "<b>STT:</b> Origin invia l'audio al worker STT, che restituisce il testo."
-    note3: "<b>Instradamento:</b> il router degli intenti sceglie quale esperto deve rispondere."
-    note4: "<b>Inferenza:</b> l'LLM esperto scelto genera la risposta."
-    note5: "<b>Approvazione:</b> una chiamata a strumento rischiosa attende l'approvazione biometrica in Gate."
-    note6: "<b>TTS:</b> Origin invia il testo della risposta al TTS, che restituisce l'audio."
-    note7: "<b>Risposta:</b> Origin trasmette la risposta vocale attraverso il Relay."
+    note1: "<b>Ascolto:</b> Home Assistant Assist trasforma la voce in testo e lo passa a Core, insieme alla stanza da cui arriva."
+    note2: "<b>Contesto:</b> Core raccoglie i ricordi pertinenti, i progetti attivi e gli strumenti consentiti in quella stanza."
+    note3: "<b>Modello:</b> il router dei modelli sceglie un modello locale o cloud, che risponde o chiede chiamate a strumenti."
+    note4: "<b>Controllo:</b> il motore del rischio assegna a ogni chiamata un livello: sicura, da confermare o vietata. Nessuna fase abbassa mai un livello."
+    note5: "<b>Approvazione:</b> una chiamata «da confermare» viene congelata sul server con gli argomenti esatti finché non dici sì o tocchi Approva."
+    note6: "<b>Esecuzione:</b> lo strumento agisce su Home Assistant, la stampante, la posta o un'altra integrazione. Il ciclo si ripete finché il modello ha finito."
+    note7: "<b>Risposta:</b> la risposta torna in streaming ad Assist, che la pronuncia sul satellite con cui hai parlato."
   con:
     tab: "Chiedi alla mia IA"
     tab_label: "Apri l'assistente IA: fai domande su Lukas"
@@ -255,7 +251,7 @@ js:
     last_login: "Ultimo accesso:"
     help: "Scrivi una domanda su Lukas e premi Invio: progetti, tirocini, stack, disponibilità. Le risposte vengono dai dati del suo CV. Preferisci una persona? Scrivi a {email}."
     examples: "esempi:"
-    ex1: Cos'è vektorgrid?
+    ex1: "Cos'è Marshal?"
     ex2: Cosa ha realizzato da SlideLizard?
     ex3: Quando è disponibile?
     new_session: Nuova sessione.

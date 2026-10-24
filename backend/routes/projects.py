@@ -38,6 +38,7 @@ _STATUS = {
     "shipped": ("green", "Shipped"),
     "in_progress": ("amber", "In progress"),
     "private": ("blue", "Private"),
+    "superseded": ("off", "Predecessor"),  # no led--off rule: the LED stays unlit
 }
 
 # Cable colour class per language, same as the main page.

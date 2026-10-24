@@ -25,7 +25,7 @@ ld:
   seeks_name: "Backend internship"
   seeks_description: "Open to a backend internship; currently in year 4 of 5 at HTL Leonding, graduating in June 2028."
   projects_name: "Projects by Lukas Grünzweil"
-  vektorgrid: "A self-hosted voice assistant built as a distributed system: C++ edge relays capture speech, a C# orchestrator runs a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin phone app approves risky tool calls with biometrics."
+  vektorgrid: "The predecessor of Marshal: a self-hosted voice assistant built as a distributed system, with C++ edge relays, a C# orchestrator running a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin app that approves risky tool calls with biometrics."
   marshal: "A self-hosted AI agent for Home Assistant: an ASP.NET harness gates every tool call by risk, runs background tasks and keeps a long-term memory, with a Vue web app on top."
   sceneforge: "An AI plugin for the Unity Editor that turns a plain-text scene description into GameObjects and components."
   uniconsole: "A free, lightweight in-game debug console for Unity: mark a static method with [Command] and call it from a terminal in the scene."
@@ -72,59 +72,55 @@ hero:
   facts: Key facts
   bay0: "Higher technical college · 2022–2028"
   bay1: "Software engineering intern · 08/2026"
-  bay2: "Voice assistant · in active development"
+  bay2: "Home Assistant AI agent · in active development"
   bay3: "3 Proxmox nodes · serves this page"
   ask_title: "Ask my AI assistant"
   ask_lead: "It knows more than this page: why I built things, how I work and what I'm looking for."
   ask_placeholder: "e.g. When is he available?"
   ask_send: "Ask"
 
-vg:
+mg:
   featured: "Featured project"
-  status: Active
-  view_label: Chassis view
-  front: Front
-  rear: Rear
-  lead: "A self-hosted voice assistant, built as a distributed system: edge relays capture speech, a central orchestrator runs the model pipeline, and a phone app approves anything risky."
-  role: "Architect & primary developer"
-  project_page: Project page
-  org: Org on GitHub
-  org_sr: "(vektorgrid organization, opens in a new tab)"
-  repo_sr: 'repository on GitHub, opens in a new tab'
-  modules_label: vektorgrid components
-  origin_role: Orchestrator
-  origin_desc: "Everything routes through Origin; no two nodes talk directly. It drives the pipeline and collects each result."
-  relay_role: Edge wake-word
-  relay_desc: "Catches the wake-word at the edge and streams audio to Origin. The spoken reply comes back the same way."
-  gate_role: Biometric approval
-  gate_desc: "Risky tool calls pause until they're approved with biometrics on the phone. Also works as a standalone relay."
-  scalars_role: Model pipeline
-  scalars_desc: "Speech-to-text, intent router, expert LLM and text-to-speech, called in sequence by Origin."
-  rear_cap: "Rear view · wiring"
-  steps_label: Step through the request pipeline
-  step1: Capture
-  step3: Route
-  step4: Inference
-  step5: Approve
-  step7: Reply
-  diagram_title: "vektorgrid architecture: Relay and Gate connect through a central Origin orchestrator, which drives a sequential Scalar pipeline of STT, intent router, expert LLM, and TTS."
-  d_audio: audio
-  d_speech: speech
-  d_approval: tool approval
-  d_orchestrator: orchestrator
-  d_wake: wake-word
-  d_biometric: biometric
-  d_in_sequence: in sequence
-  d_router: Intent router
-  d_llm: Expert LLM
-  flow_html: >-
-    Everything routes through <b>Origin</b>; no two nodes talk directly. A <b>Relay</b>
-    catches the wake-word and streams audio to Origin, which drives the <b>Scalar</b>
-    pipeline in order (STT &#8594; intent router &#8594; expert LLM &#8594; TTS), calling each
-    worker and collecting its result before the next. The spoken reply returns through the
-    Relay. If the model requests a risky tool call, Origin pauses and asks <b>Gate</b> to
-    approve it with biometrics. Gate also runs standalone: it polls Origin for metrics and has
-    a Relay built in, so you can talk to the system from your phone.
+  status: "Active"
+  view_label: "Chassis view"
+  front: "Front"
+  rear: "Rear"
+  lead: "A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts mail, prepares the morning and remembers what matters. Harmless actions just happen; risky ones wait for a clear yes."
+  role: "Author"
+  project_page: "Project page"
+  repo: "Repo on GitHub"
+  repo_sr: "(Marshal repository, opens in a new tab)"
+  src_sr: "source on GitHub, opens in a new tab"
+  modules_label: "Marshal components"
+  core_role: "Agent harness"
+  core_desc: "Every request, spoken, typed or scheduled, runs through one loop: build the context, call the model, guard each tool call, execute."
+  tasks_role: "Background work"
+  tasks_desc: "Durable tasks, schedules and follow-ups. Results reach you in the room you're in, without waking you at night."
+  memory_role: "Long-term memory"
+  memory_desc: "Remembers preferences and projects and finds the right context with hybrid search on SQLite and sqlite-vec. Everything stays visible and editable."
+  web_role: "Web app"
+  web_desc: "Chat, one-tap approvals, live reasoning and tool steps, the cost of every run, and the memory graph. Built for desktop and phone."
+  rear_cap: "Rear view · one request"
+  steps_label: "Step through one request"
+  step1: "Hear"
+  step2: "Context"
+  step3: "Model"
+  step4: "Guard"
+  step5: "Approve"
+  step6: "Execute"
+  step7: "Reply"
+  diagram_title: "Marshal architecture: Home Assistant Assist and the web app connect to Core, whose agent loop runs context, model, risk guard and tools in turn."
+  d_text: "text"
+  d_approval: "approval"
+  d_voice: "voice"
+  d_loop: "agent loop"
+  d_loop_cap: "AGENT LOOP"
+  d_repeats: "repeats"
+  d_context: "Context"
+  d_model: "Model"
+  d_guard: "Risk guard"
+  d_tools: "Tools"
+  flow_html: "Every request goes through <b>Core</b>: voice from <b>Assist</b>, chat from the <b>web app</b>, and scheduled tasks. The agent loop builds context from memory, calls the model with the tools visible in that room, and runs every tool call through the risk guard before anything executes. Risky calls are frozen with their exact arguments until you confirm, and some things, like sending mail, are not tools at all. Speech recognition and synthesis stay in Home Assistant: in <b>vektorgrid</b>, the predecessor, I wrote that pipeline and its protocols myself, and once was enough."
 
 blades:
   title: More projects
@@ -143,8 +139,8 @@ blades:
   tag_mobile: Mobile game
   tag_game: Game
   tag_robotics: Robotics
-  marshal_alt: "Marshal dashboard with pending approvals to unlock the front door and start a print, next to a live 3D printer status card"
-  marshal_desc: "A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts mail, briefs you in the morning and remembers what matters. Harmless actions just happen; risky ones wait for your yes."
+  predecessor: "Predecessor"
+  vektorgrid_desc: "Marshal's predecessor: a voice assistant built as a distributed system, with C++ wake-word relays, a C# orchestrator, a Python STT → LLM → TTS pipeline and a Kotlin app for biometric approval. What I learned: don't hand-write the speech pipeline and its protocols. Marshal leaves that to Home Assistant."
   sceneforge_alt: "SceneForge AI chat window in the Unity Editor, creating a red capsule player with a CharacterController from a text prompt"
   sceneforge_desc: "An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and components back. Cuts the manual setup out of level design."
   uniconsole_alt: "UniConsole terminal listing the available commands and running an echo command"
@@ -236,13 +232,13 @@ js:
   arch:
     auto: "▶ Auto"
     pause: "❚❚ Pause"
-    note1: "<b>Capture:</b> Relay catches the wake-word and streams audio to Origin."
-    note2: "<b>STT:</b> Origin sends the audio to the STT worker, which returns text."
-    note3: "<b>Route:</b> the intent router picks which expert should answer."
-    note4: "<b>Inference:</b> the chosen expert LLM generates the response."
-    note5: "<b>Approve:</b> a risky tool call pauses for biometric approval in Gate."
-    note6: "<b>TTS:</b> Origin sends the reply text to TTS, which returns audio."
-    note7: "<b>Reply:</b> Origin streams the spoken reply back through the Relay."
+    note1: "<b>Hear:</b> Home Assistant Assist turns speech into text and hands it to Core, together with the room it came from."
+    note2: "<b>Context:</b> Core pulls in relevant memories, active projects and the tools that room may use."
+    note3: "<b>Model:</b> the model router picks a local or cloud model, which answers or asks for tool calls."
+    note4: "<b>Guard:</b> the risk engine gives each call a tier: safe, confirm or forbidden. No stage ever lowers a tier."
+    note5: "<b>Approve:</b> a confirm-tier call is frozen on the server with its exact arguments until you say yes or tap Approve."
+    note6: "<b>Execute:</b> the tool runs against Home Assistant, the printer, mail or another integration. The loop repeats until the model is done."
+    note7: "<b>Reply:</b> the answer streams back to Assist, which speaks it on the satellite you talked to."
   con:
     tab: "Ask my AI"
     tab_label: "Open the AI assistant: ask questions about Lukas"
@@ -260,7 +256,7 @@ js:
     last_login: "Last login:"
     help: "Type a question about Lukas and press Enter: projects, internships, stack, availability. Answers come from his résumé data. Prefer a human? Email {email}."
     examples: "examples:"
-    ex1: What is vektorgrid?
+    ex1: "What is Marshal?"
     ex2: What did he build at SlideLizard?
     ex3: When is he available?
     new_session: New session.
