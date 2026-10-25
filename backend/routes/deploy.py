@@ -10,7 +10,9 @@ Security:
 
 Only `push` events for refs/heads/<DEPLOY_BRANCH> (default master) deploy.
 `ping` answers "ok · pong"; any other event or ref answers 200
-"ok · skipped (<ref>)" and does nothing.
+"ok · skipped (<ref>)" and does nothing. Both webhook content types are
+accepted: `application/json` and `application/x-www-form-urlencoded`
+(JSON in a `payload` field).
 
 Actions triggered (idempotent — safe to call repeatedly):
   1. (Production only) `git pull --ff-only` in the project dir.
@@ -34,6 +36,7 @@ import hmac
 import logging
 import subprocess
 from pathlib import Path
+from urllib.parse import parse_qs
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
@@ -83,6 +86,24 @@ def _run(cmd: list[str], cwd: str | None = None, timeout: int = 30) -> tuple[int
         return -1, "", f"exec error: {e}"
 
 
+def _push_ref(body: bytes, content_type: str) -> str:
+    """The `ref` of a push payload, or "" if the body isn't one.
+
+    GitHub sends the JSON either as the raw body or, when the hook is set
+    to the form content type, urlencoded in a `payload` field. Reading only
+    the raw body made every form-encoded push look ref-less, so each one
+    was skipped while GitHub still showed a green 200.
+    """
+    try:
+        if content_type.split(";")[0].strip().lower() == "application/x-www-form-urlencoded":
+            fields = parse_qs(body.decode("utf-8"))
+            body = (fields.get("payload") or [""])[0].encode()
+        payload = json.loads(body or b"{}")
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return ""
+    return str(payload.get("ref") or "") if isinstance(payload, dict) else ""
+
+
 @router.post("/webhook/deploy")
 async def deploy(request: Request) -> PlainTextResponse:
     if _LIMITER.limited(client_ip(request, "unknown")):
@@ -105,13 +126,7 @@ async def deploy(request: Request) -> PlainTextResponse:
     event = request.headers.get("X-GitHub-Event", "")
     if event == "ping":
         return PlainTextResponse("ok · pong\n")
-    ref = ""
-    if event == "push":
-        try:
-            payload = json.loads(body or b"{}")
-            ref = str(payload.get("ref") or "") if isinstance(payload, dict) else ""
-        except (json.JSONDecodeError, UnicodeDecodeError):
-            ref = ""
+    ref = _push_ref(body, request.headers.get("content-type", "")) if event == "push" else ""
     if event != "push" or ref != f"refs/heads/{settings.deploy_branch}":
         what = ref or event or "no event"
         log.info("Deploy webhook skipped (%s)", what)

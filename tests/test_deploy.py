@@ -7,6 +7,8 @@ import json
 
 import pytest
 
+from urllib.parse import urlencode
+
 from backend.config import settings
 from backend.routes import deploy
 
@@ -43,9 +45,13 @@ def hook(client, monkeypatch, tmp_path):
     import backend.notify
     monkeypatch.setattr(backend.notify, "notify", lambda **kw: notes.append(kw))
 
-    def post(payload: dict | None = None, event: str = "push", signature: str | None = "auto", raw: bytes | None = None):
+    def post(payload: dict | None = None, event: str = "push", signature: str | None = "auto",
+             raw: bytes | None = None, form: bool = False):
         body = raw if raw is not None else json.dumps(payload or {}).encode()
-        headers = {"X-GitHub-Event": event, "content-type": "application/json"}
+        if form and raw is None:
+            body = urlencode({"payload": body.decode()}).encode()
+        content_type = "application/x-www-form-urlencoded" if form else "application/json"
+        headers = {"X-GitHub-Event": event, "content-type": content_type}
         if signature == "auto":
             headers["X-Hub-Signature-256"] = sign(body)
         elif signature is not None:
@@ -127,5 +133,24 @@ def test_failed_pull_reports_and_skips_restart(hook):
 def test_garbage_body_with_valid_signature_is_skipped(hook):
     resp = hook(raw=b"not json")
     assert resp.status_code == 200
+    assert "skipped" in resp.text
+    assert hook.calls == []
+
+
+def test_form_encoded_push_to_master_deploys(hook):
+    resp = hook({"ref": "refs/heads/master"}, form=True)
+    assert resp.status_code == 200
+    assert hook.calls == [["git", "pull", "--ff-only"]]
+    assert "git: pulled" in resp.text
+
+
+def test_form_encoded_other_ref_is_skipped(hook):
+    resp = hook({"ref": "refs/heads/feat/x"}, form=True)
+    assert resp.text == "ok · skipped (refs/heads/feat/x)\n"
+    assert hook.calls == []
+
+
+def test_form_encoded_without_payload_is_skipped(hook):
+    resp = hook(raw=b"other=1", form=True)
     assert "skipped" in resp.text
     assert hook.calls == []

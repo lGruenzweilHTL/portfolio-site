@@ -430,7 +430,9 @@ GitHub webhook → `POST /webhook/deploy` with header
 `X-Hub-Signature-256: sha256=<hmac-of-body>`. Only a `push` to
 `refs/heads/<DEPLOY_BRANCH>` (default `master`) deploys: a `ping` answers
 `ok · pong`, and any other event or branch answers `ok · skipped (<ref>)`
-without pulling, rendering, restarting or notifying. On a valid push:
+without pulling, rendering, restarting or notifying. The hook's content
+type can be `application/json` (what production uses) or
+`application/x-www-form-urlencoded`; both are parsed. On a valid push:
 
 1. `git pull --ff-only` in the project root
 2. Reload `/content` in-process
