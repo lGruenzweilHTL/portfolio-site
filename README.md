@@ -156,6 +156,7 @@ error text. Visitors never see provider text.
 | `/projects/<slug>` | GET | Project page for every GitHub-hosted project in `resume.yaml`: facts, JSON-LD (SoftwareSourceCode + BreadcrumbList) and the repo README, fetched from the GitHub API and sanitised through an allowlist (`backend/projects.py`). `/projects` redirects to `/#projects`. |
 | `/sitemap.xml` | GET | Generated: the main page in every language (with `xhtml:link` hreflang alternates), project pages, résumés, `llms.txt`, and every study note on disk. |
 | `/services/` | GET | Same service directory with a trailing slash |
+| `/services/bookmarks.html` | GET | The service directory as a Netscape bookmark file (Chrome: Bookmarks manager → Import). One folder per category. A snapshot, not a live feed: re-import after the catalog changes. Covered by the same Cloudflare Access path as `/services`. |
 | `/notes/` | GET | Static study cheatsheets, served as files |
 | `/notes/<slug>` | GET | Clean URL for a cheatsheet — serves the matching `.html` file |
 | `/notes/_listing`, `/notes/<sub>/_listing` | GET | JSON index of a notes directory, consumed by `cheatsheet.js` |
