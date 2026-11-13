@@ -143,7 +143,7 @@ about:
   title: Über mich
   p1: "Ich bin Lukas, Schüler an der HTL Leonding. Die meiste Zeit stecke ich in Servercode und Spiele, und ab und zu in einen Raspberry Pi, der für einen Wettbewerb auf einen LEGO-Roboter geschraubt ist."
   p2_html: "Die meisten meiner Projekte sind entstanden, weil mich etwas genervt hat. <strong>SceneForge AI</strong> habe ich gebaut, weil es mühsam ist, Szenen von Hand aufzubauen, und das serielle Protokoll hinter <strong>RoboDucks</strong>, weil es keinen sauberen Weg gab, einen LEGO SPIKE von einem Raspberry Pi aus zu steuern."
-  homelab: "Drei Proxmox-Knoten (umfunktionierte Desktop-PCs, ein vierter ist unterwegs) mit Nextcloud, Vaultwarden, Jellyfin samt *arr-Stack, einem Minecraft-Server, Pi-hole und dieser Website, alles auch von außerhalb meines Netzwerks erreichbar."
+  homelab: "Vier Proxmox-Knoten (umfunktionierte Desktop-PCs) mit Immich, Gitea, Vaultwarden, Jellyfin samt *arr-Stack, einem Minecraft-Server, Pi-hole und dieser Website, alles auch von außerhalb meines Netzwerks erreichbar."
   homelab_link: Live-Werte in der PDU
   ender_html: 'Ich drucke funktionale Teile für meine Hardwareprojekte in 3D und rüste laufend einen Ender 3 Pro auf. Er läuft mit Klipper auf einem Raspberry Pi und ist inzwischen so umgebaut, dass ich ihn den <a href="https://de.wikipedia.org/wiki/Schiff_des_Theseus" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Schiff des Theseus auf Wikipedia, öffnet in einem neuen Tab)</span></a> nenne.'
   moto_title: Motorräder

@@ -232,8 +232,8 @@ skills:
 beyond_code:
   - topic: "Homelab"
     body: >
-      Three Proxmox nodes (repurposed desktops, with a fourth on the way) hosting
-      Nextcloud, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server,
+      Four Proxmox nodes (repurposed desktops) hosting
+      Immich, Gitea, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server,
       Pi-hole, and this site, all reachable from outside my network.
   - topic: "3D printing"
     body: >
@@ -292,7 +292,8 @@ chat_only:
     body: >
       I saw a video about Home Assistant, thought it looked cool and put it on
       a Raspberry Pi. Soon after I moved it to an old PC from our basement, and
-      about a year later I grew it to three Proxmox nodes.
+      about a year later I grew it to three Proxmox nodes. A fourth followed
+      later.
   - topic: "What the homelab taught me"
     body: >
       Pretty much all of my hands-on Linux, Docker, networking, monitoring and
@@ -307,11 +308,9 @@ chat_only:
       with ZFS.
   - topic: "What's next for the homelab"
     body: >
-      I've bought most of the hardware for a fourth node and am only waiting on
-      the CPU and motherboard, so it's coming very soon. It will probably
-      replace one of the existing nodes and is mostly there to balance services
-      better. Some day, much further out, I'd like a dedicated AI node with an
-      RTX 3090.
+      The fourth node is running now and is mostly there to balance services
+      across the nodes. Some day, much further out, I'd like a dedicated AI
+      node with an RTX 3090.
   - topic: "What I automate with Home Assistant"
     body: >
       Not many of my devices support automation, but I automate everything the
@@ -320,7 +319,7 @@ chat_only:
       plugs, and the robot lawn mower.
   - topic: "Who uses the homelab"
     body: >
-      My family relies on the Pi-hole and Nextcloud, and some friends use
+      My family relies on the Pi-hole, and some friends use
       Jellyfin and the Minecraft server.
   - topic: "The Ender of Theseus, in detail"
     body: >

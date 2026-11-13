@@ -145,7 +145,7 @@ about:
   title: Chi sono
   p1: "Sono Lukas, studente alla HTL Leonding. Passo la maggior parte del tempo tra codice server e giochi e, ogni tanto, su un Raspberry Pi avvitato a un robot LEGO per una competizione."
   p2_html: "La maggior parte dei miei progetti è nata perché qualcosa mi dava fastidio. Ho creato <strong>SceneForge AI</strong> perché allestire le scene a mano è noioso, e il protocollo seriale dietro <strong>RoboDucks</strong> perché non c'era un modo pulito per comandare un LEGO SPIKE da un Raspberry Pi."
-  homelab: "Tre nodi Proxmox (desktop riutilizzati, con un quarto in arrivo) che ospitano Nextcloud, Vaultwarden, Jellyfin con lo stack *arr, un server Minecraft, Pi-hole e questo sito, tutti raggiungibili dall'esterno della mia rete."
+  homelab: "Quattro nodi Proxmox (desktop riutilizzati) che ospitano Immich, Gitea, Vaultwarden, Jellyfin con lo stack *arr, un server Minecraft, Pi-hole e questo sito, tutti raggiungibili dall'esterno della mia rete."
   homelab_link: Dati in tempo reale nella PDU
   ender_html: 'Stampo in 3D parti funzionali per i miei progetti hardware e continuo a potenziare una Ender 3 Pro. Funziona con Klipper su un Raspberry Pi ed è stata modificata così tanto che la chiamo la <a href="https://it.wikipedia.org/wiki/Paradosso_della_nave_di_Teseo" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (paradosso della nave di Teseo su Wikipedia, si apre in una nuova scheda)</span></a>.'
   moto_title: Moto
