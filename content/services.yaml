@@ -18,13 +18,23 @@ categories:
       - label: Authentik
         url: https://auth.gruenzweil.cc
 
-  - id: cloud-communication
-    name: Cloud and communication
-    description: Nextcloud for files, ntfy for push notifications, FreshRSS for feeds.
+  - id: development
+    name: Development
+    description: Gitea for my Git repositories.
     visibility: public
     urls:
-      - label: Nextcloud
-        url: https://cloud.gruenzweil.cc
+      - label: Gitea
+        url: https://gitea.gruenzweil.cc
+
+  - id: files-communication
+    name: Files and communication
+    description: Syncthing for files, Immich for photos, ntfy for push notifications, FreshRSS for feeds.
+    visibility: public
+    urls:
+      - label: Syncthing
+        url: https://files.gruenzweil.cc
+      - label: Immich
+        url: https://immich.gruenzweil.cc
       - label: Ntfy
         url: https://ntfy.gruenzweil.cc
     services:
@@ -46,44 +56,73 @@ categories:
 
   - id: home-family
     name: Home and family
-    description: Home Assistant, plus apps the family uses.
+    description: Home Assistant, Homebox for the household inventory, Mealie for recipes, plus apps the family uses.
     visibility: public
     urls:
       - label: Home Assistant
         url: https://hass.gruenzweil.cc
+      - label: Homebox
+        url: https://homebox.gruenzweil.cc
+      - label: Mealie
+        url: https://mealie.gruenzweil.cc
       - label: Sprachlaute
         url: https://sprachlaute.gruenzweil.cc
 
   - id: media
     name: Media
-    description: Jellyfin, and the *arr stack that keeps it stocked.
+    description: Jellyfin, Seerr for requests, and the *arr stack that keeps it stocked.
     visibility: public
     services:
       - id: jellyfin
         name: Jellyfin
-        description: Reachable from outside the house.
+        description: Reachable from outside the house, and directly on the home network.
         visibility: public
         urls:
           - label: Open Jellyfin
             url: https://media.gruenzweil.cc
+          - label: Home network
+            url: https://media.internal.gruenzweil.cc
+            visibility: internal
+
+      - id: seerr
+        name: Seerr
+        description: Where friends and family request films and shows.
+        visibility: public
+        urls:
+          - label: Open Seerr
+            url: https://seerr.gruenzweil.cc
 
       - id: media-automation
         name: Automation and downloads
-        description: Sonarr, Radarr and the two download clients behind them.
+        description: Sonarr, Radarr, Prowlarr and Bazarr, Downtify for music, and the two download clients behind them.
         visibility: internal
         urls:
           - label: Sonarr
-            url: https://sonarr.internal.gruenzweil.cc
+            url: https://sonarr.media.internal.gruenzweil.cc
           - label: Radarr
-            url: https://radarr.internal.gruenzweil.cc
+            url: https://radarr.media.internal.gruenzweil.cc
+          - label: Prowlarr
+            url: https://prowlarr.media.internal.gruenzweil.cc
+          - label: Bazarr
+            url: https://bazarr.media.internal.gruenzweil.cc
+          - label: Downtify
+            url: https://downtify.media.internal.gruenzweil.cc
           - label: qBittorrent
-            url: https://qbittorrent.internal.gruenzweil.cc
+            url: https://qbittorrent.media.internal.gruenzweil.cc
           - label: SABnzbd
-            url: https://sabnzbd.internal.gruenzweil.cc
+            url: https://sabnzbd.media.internal.gruenzweil.cc
+
+      - id: media-portainer
+        name: Portainer
+        description: Manages the containers of the media stack.
+        visibility: internal
+        urls:
+          - label: Open Portainer
+            url: https://portainer.media.internal.gruenzweil.cc
 
   - id: network-infrastructure
     name: Network and infrastructure
-    description: Two Pi-holes, the reverse proxy and the three Proxmox nodes.
+    description: Two Pi-holes, the reverse proxy and the four Proxmox nodes.
     visibility: internal
     urls:
       - label: Pi-hole 1
@@ -98,6 +137,8 @@ categories:
         url: https://pve2.internal.gruenzweil.cc
       - label: Proxmox 3
         url: https://pve3.internal.gruenzweil.cc
+      - label: Proxmox 4
+        url: https://pve4.internal.gruenzweil.cc
 
   - id: security
     name: Security

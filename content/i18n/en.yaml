@@ -149,7 +149,7 @@ about:
   title: About
   p1: "I'm Lukas, a student at HTL Leonding. Most of my time goes into server code and games, and every so often into a Raspberry Pi bolted to a LEGO robot for a competition."
   p2_html: "Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong> because setting up scenes by hand is tedious, and the serial protocol behind <strong>RoboDucks</strong> because there was no clean way to drive a LEGO SPIKE from a Raspberry Pi."
-  homelab: "Three Proxmox nodes (repurposed desktops, with a fourth on the way) hosting Nextcloud, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site, all reachable from outside my network."
+  homelab: "Four Proxmox nodes (repurposed desktops) hosting Immich, Gitea, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site, all reachable from outside my network."
   homelab_link: Live numbers in the PDU
   ender_html: 'I 3D print functional parts for my hardware projects and keep upgrading an Ender 3 Pro. It runs Klipper off a Raspberry Pi and has been modded enough that I call it the <a href="https://en.wikipedia.org/wiki/Ship_of_Theseus" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Ship of Theseus on Wikipedia, opens in a new tab)</span></a>.'
   moto_title: Motorbikes

@@ -34,7 +34,7 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 
 ## Beyond code
 
-- Runs a homelab of three Proxmox nodes hosting Nextcloud, Vaultwarden, Jellyfin, a Minecraft server, Pi-hole and this website.
+- Runs a homelab of four Proxmox nodes hosting Immich, Gitea, Vaultwarden, Jellyfin, a Minecraft server, Pi-hole and this website.
 - 3D prints functional parts and keeps upgrading a heavily modded Ender 3 Pro running Klipper.
 - Rides motorbikes (an Aprilia Tuono 125).
 

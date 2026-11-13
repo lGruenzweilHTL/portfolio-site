@@ -12,7 +12,7 @@ Response:
     "rev": "a1b2c3d",               # short SHA of the deployed working tree
     "rev_time": "2026-09-30T08:12:00+00:00",
     "edge": "VIE",                  # Cloudflare colo that served this request
-    "nodes": 3,                     # settings.homelab_nodes
+    "nodes": 4,                     # settings.homelab_nodes
     "model": "gemma-4-26b-a4b-it",  # model the next chat starts with (skips models in cooldown)
     "provider": "OpenRouter",       # derived from OPENROUTER_BASE_URL
     "projects": {"sceneforge-ai": "2026-09-18T10:04:11Z", ...}  # GitHub pushed_at

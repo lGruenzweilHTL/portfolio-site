@@ -102,7 +102,7 @@ class Settings(BaseSettings):
     # --- Live rack status (GET /api/status) ---
     # Number of homelab nodes shown on the PDU readout. Static on purpose:
     # the page never queries Proxmox, so no internal hosts leak.
-    homelab_nodes: int = 3
+    homelab_nodes: int = 4
     # How long the per-project "last push" dates from the GitHub API stay
     # cached. Unauthenticated GitHub allows 60 requests/hour per IP.
     github_cache_seconds: int = 3600
