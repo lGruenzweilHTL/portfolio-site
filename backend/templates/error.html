@@ -3,101 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ code }} {{ title }} — Lukas Grünzweil</title>
+<title>{{ code }} {{ title }} · Lukas Grünzweil</title>
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#0d0e11">
+<meta name="theme-color" content="#1b1f22">
+<meta name="color-scheme" content="dark">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<!-- An error is an empty slot in the rack: the same unit anatomy as the main
-     page (site/styles.css), inlined so this page never depends on it. -->
+{# Self-contained on purpose: an error page must not depend on the stylesheet,
+   the textures, chalk.js or anything else that might be what failed. Same
+   board as site/styles.css (token values copied): slate ground, chalk ink,
+   one yellow accent. The fonts are a bonus; the system stack stands in when
+   they can't load, and the one chalk stroke is inline SVG. #}
 <style>
+  @font-face { font-family: "Tafel Sans"; src: url("/fonts/tafel-sans-latin.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: "Kalam"; font-weight: 700; src: url("/fonts/kalam-latin-700.woff2") format("woff2"); font-display: swap; }
+  :root { --slate: #1b1f22; --slate-deep: #121416; --chalk: #eceae4; --chalk-dim: #b3b7b9; --chalk-line: rgb(236 234 228 / .45); --acc: #f1d26a;
+    --hand: "Kalam", "Segoe Print", "Bradley Hand", cursive; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --rack-powder: #0d0e11; --rack-hole: #030304; --face-anodized: #2a2d33; --face-raised: #33373f;
-    --face-edge: #15171b; --panel-line: #262930; --text-hi: #f1f2f4; --text-body: #c8ccd3;
-    --silk-label: #d9dce1; --silk-dim: #9096a1; --accent-key: #62e3d6; --accent-on: #17110a;
-    --led-red: #ff5c5c; --lcd-bg: #03181b; --lcd-text: #7ff6ea;
-    --metal: linear-gradient(180deg, rgb(255 255 255 / .10), rgb(255 255 255 / .02) 50%, rgb(0 0 0 / .30));
-    --bevel: inset 0 2px 0 rgb(255 255 255 / .22), inset 2px 0 0 rgb(255 255 255 / .08), inset 0 -3px 0 rgb(0 0 0 / .6), inset -2px 0 0 rgb(0 0 0 / .45), inset 0 0 0 1px rgb(0 0 0 / .85);
-    --recess: inset 0 3px 8px rgb(0 0 0 / .75), inset 0 1px 0 rgb(0 0 0 / .9), 0 1px 0 rgb(255 255 255 / .06);
-    --button: 0 3px 0 #050607, 0 6px 10px rgb(0 0 0 / .45), inset 0 1px 0 rgb(255 255 255 / .25);
-  }
   body {
-    min-height: 100vh; display: grid; place-items: center; padding: 24px;
-    background: radial-gradient(ellipse 80% 50% at 50% 0%, rgb(42 46 54 / .5), transparent 70%), var(--rack-powder);
-    color: var(--text-body); font: 16px/1.6 'IBM Plex Sans', system-ui, sans-serif;
+    min-height: 100vh; min-height: 100svh; display: grid; align-content: center;
+    padding: 48px clamp(16px, 8vw, 120px); overflow-x: hidden;
+    background: radial-gradient(ellipse 60% 45% at 18% 30%, rgb(236 234 228 / .045), transparent 70%), var(--slate) url("/tex/slate.webp") 0 0 / 256px;
+    color: var(--chalk); font: 17px/1.6 "Tafel Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  .unit {
-    width: min(760px, 100%); display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px;
-    box-shadow: 0 5px 0 var(--rack-hole), 0 22px 34px rgb(0 0 0 / .7);
-  }
-  .ear {
-    background:
-      radial-gradient(circle at 50% 22px, #c9cdd3 0 1.2px, #8a9099 1.8px 4px, #3b3f47 4.6px 5px, transparent 5.5px),
-      radial-gradient(8px 13px at 50% 22px, var(--rack-hole) 0 92%, transparent 100%),
-      radial-gradient(circle at 50% calc(100% - 22px), #c9cdd3 0 1.2px, #8a9099 1.8px 4px, #3b3f47 4.6px 5px, transparent 5.5px),
-      radial-gradient(8px 13px at 50% calc(100% - 22px), var(--rack-hole) 0 92%, transparent 100%),
-      linear-gradient(90deg, rgb(255 255 255 / .1), rgb(0 0 0 / .1) 78%, rgb(0 0 0 / .45) 90%, rgb(0 0 0 / .2)),
-      var(--face-anodized);
-    box-shadow: var(--bevel);
-  }
-  .face { padding: 14px 32px 28px; background: var(--metal), var(--face-anodized); box-shadow: var(--bevel); min-width: 0; }
-  .silk { font: 600 11px/1.3 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif; text-transform: uppercase; letter-spacing: .12em; color: var(--silk-label); }
-  .dim { color: var(--silk-dim); }
-  .head { display: flex; align-items: center; gap: 12px; padding-bottom: 10px; margin-bottom: 24px; border-bottom: 1px solid var(--panel-line); }
-  .led { width: 10px; height: 10px; border-radius: 50%; background: var(--led-red); box-shadow: 0 0 10px 1px rgb(255 92 92 / .8); margin-left: auto; }
-  .slot { display: flex; gap: 28px; align-items: center; }
-  .vents {
-    flex: none; width: 150px; height: 104px; border-radius: 3px; padding: 10px;
-    background: repeating-linear-gradient(90deg, var(--face-edge) 0 10px, transparent 10px 16px) content-box, var(--rack-hole);
-    box-shadow: var(--recess);
-  }
-  .code { display: inline-block; margin-bottom: 10px; padding: 2px 8px; border-radius: 2px; background: var(--lcd-bg); color: var(--lcd-text); font: 20px 'Share Tech Mono', monospace; box-shadow: inset 0 0 14px rgb(0 0 0 / .85); text-shadow: 0 0 6px rgb(127 246 234 / .55); }
-  h1 { font: 700 26px/1.2 'Bricolage Grotesque', system-ui, sans-serif; color: var(--text-hi); margin-bottom: 8px; }
-  p { margin-bottom: 20px; }
-  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
-  a.key {
-    display: inline-flex; align-items: center; padding: 10px 18px; border-radius: 4px; text-decoration: none;
-    font: 600 13px/1.2 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif; text-transform: uppercase; letter-spacing: .08em;
-    color: var(--silk-label); background: var(--metal), var(--face-raised); border: 1px solid var(--face-edge); box-shadow: var(--button);
-  }
-  a.key.primary { color: var(--accent-on); background: var(--metal), var(--accent-key); }
-  a.key:hover { filter: brightness(1.12); }
-  a:focus-visible { outline: 2px solid var(--accent-key); outline-offset: 3px; }
-  .path { margin-top: 20px; font: 12px 'Share Tech Mono', monospace; color: var(--silk-dim); word-break: break-all; }
-  @media (max-width: 560px) {
-    .unit { grid-template-columns: 14px minmax(0, 1fr) 14px; }
-    .ear { background: var(--face-anodized); }
-    .face { padding: 12px 16px 20px; }
-    .vents { display: none; }
-  }
+  main { max-width: 36rem; }
+  .code { display: block; font: 700 clamp(5.5rem, 22vw, 10rem)/1 var(--hand); letter-spacing: .02em;
+    filter: url(#chalk-lg); font-variant-numeric: tabular-nums; }
+  .stroke { display: block; width: min(15rem, 70%); height: 16px; margin: -10px 0 20px -6px; color: var(--chalk); overflow: visible; }
+  h1 { font: 700 clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem)/1.2 var(--hand); margin-bottom: 8px; }
+  p { margin-bottom: 28px; color: var(--chalk-dim); max-width: 34em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 14px 16px; }
+  a { color: inherit; }
+  .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; font-weight: 600; text-decoration: none; color: var(--chalk);
+    border: 2px solid var(--chalk-line); border-radius: 4px 2px 5px 3px / 3px 5px 2px 4px; }
+  .btn:hover { border-color: var(--chalk); }
+  .btn--solid { background: var(--chalk); color: var(--slate-deep); border-color: var(--chalk); }
+  .btn--solid:hover { background: #fff; border-color: #fff; }
+  a:focus-visible { outline: 2px dashed var(--acc); outline-offset: 4px; }
+  .path { margin: 32px 0 0; font: .875rem/1.5 ui-monospace, "SF Mono", "DejaVu Sans Mono", monospace; overflow-wrap: anywhere; }
+  .path span { color: var(--acc); }
 </style>
 </head>
 <body>
-<main class="unit">
-  <i class="ear" aria-hidden="true"></i>
-  <div class="face">
-    <div class="head" aria-hidden="true">
-      <span class="silk">U-{{ code }}</span><span class="silk dim">Not populated</span><span class="led"></span>
-    </div>
-    <div class="slot">
-      <div class="vents" aria-hidden="true"></div>
-      <div>
-        <span class="code">{{ code }}</span>
-        <h1>{{ title }}</h1>
-        <p>{{ message }}{% if code == 404 %} Nothing is mounted in this slot.{% endif %}</p>
-        <div class="actions">
-          <a class="key primary" href="/">Back to the rack</a>
-          <a class="key" href="/notes/">Notes</a>
-          <a class="key" href="/files/">Files</a>
-        </div>
-        {% if path %}<div class="path">{{ path }}</div>{% endif %}
-      </div>
-    </div>
+{#- The display chalk filter from _icons.html, inline: the big number in chalk. #}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="chalk-lg" x="-4%" y="-25%" width="108%" height="150%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="warp"/>
+    <feDisplacementMap in="SourceGraphic" in2="warp" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.7 0.32" numOctaves="2" seed="8" result="fine"/>
+    <feGaussianBlur in="wob" stdDeviation="1.5" result="soft"/>
+    <feComposite in="soft" in2="fine" operator="arithmetic" k1="0" k2="1" k3="1.1" k4="-0.55" result="m"/>
+    <feComponentTransfer in="m" result="mask"><feFuncA type="linear" slope="3.2" intercept="-1.25"/></feComponentTransfer>
+    <feComposite in="wob" in2="mask" operator="in" result="ch"/>
+    <feGaussianBlur in="ch" stdDeviation="4" result="dust"/>
+    <feComponentTransfer in="dust" result="dust2"><feFuncA type="linear" slope=".16"/></feComponentTransfer>
+    <feMerge><feMergeNode in="dust2"/><feMergeNode in="ch"/></feMerge>
+  </filter>
+</svg>
+<main>
+  <span class="code">{{ code }}</span>
+  <svg class="stroke" viewBox="0 0 240 16" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M2 10C30 8 52 11 84 9S130 7 160 9 210 5 238 6" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="46 3 30 2 58 4 22 2 70" opacity=".85"/><path d="M14 13C60 11 120 12 176 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="18 6 30 9 12 7" opacity=".4"/></svg>
+  <h1>{{ title }}</h1>
+  <p>{{ message }}</p>
+  <div class="actions">
+    <a class="btn btn--solid" href="/">Back to the portfolio</a>
+    <a class="btn" href="/notes/">Notes</a>
+    <a class="btn" href="/files/">Files</a>
   </div>
-  <i class="ear" aria-hidden="true"></i>
+  {% if path %}<p class="path"><span aria-hidden="true">&gt;&nbsp;</span>{{ path }}</p>{% endif %}
 </main>
 </body>
 </html>
