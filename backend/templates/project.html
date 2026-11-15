@@ -4,14 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 {#- Rendered by backend/routes/projects.py from content/resume.yaml plus the
-    repo README (backend/projects.py). Same rack anatomy as the main page
-    (templates/index.html). English only. #}
+    repo README (backend/projects.py). Same stylesheet, header and footer as
+    the main page (templates/index.html). English only. #}
 <title>{{ proj.name }} · Lukas Grünzweil</title>
 <meta name="description" content="{{ description }}" />
 <meta name="author" content="Lukas Grünzweil" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
 <link rel="canonical" href="{{ origin }}/projects/{{ slug }}" />
-<meta name="theme-color" content="#0d0e11" />
+<meta name="theme-color" content="#1b1f22" />
 <meta name="color-scheme" content="dark" />
 <meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
 <meta property="og:type" content="article" />
@@ -30,10 +30,10 @@
 <link rel="me" href="https://github.com/lGruenzweilHTL" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/kalam-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/tafel-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/project.css">
 <script>
 window.I18N = {{ js_strings | tojson }};
 document.documentElement.classList.add('js');
@@ -42,114 +42,110 @@ document.documentElement.classList.add('js');
 {{ json_ld | safe }}
 </script>
 </head>
-<body>
-
+<body id="top">
+{% include "_icons.html" %}
 <a class="skip-link" href="#main">Skip to content</a>
+{% include "_header.html" %}
 
-<div class="cabinet">
-  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
-  <div class="cab-body">
-    <div class="rail rail--l" aria-hidden="true"></div>
-    <div class="units">
-
-      <header class="unit unit--nav unit--nohandle">
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        <nav class="face nav" aria-label="Breadcrumb">
-          <ol class="crumbs lcd lcd--chip">
-            <li><a href="/">lukas@lg-rack-01</a></li>
-            <li><a href="/#projects">projects</a></li>
-            <li aria-current="page">{{ slug }}</li>
-          </ol>
-          <a class="key key--sm crumbs-back" href="/#projects"><span aria-hidden="true">←</span> Back to the rack</a>
+<main id="main" tabindex="-1">
+  {#- The facts (role, status, stack, code, last push): beside the screenshot's
+      README when there is a screenshot, otherwise in the head's side column,
+      like the main projects beside the name on the main page. #}
+  {% macro facts() %}
+        <h2 class="hand-title chalk-text chalk-text--md" id="facts-title">At a glance</h2>
+        <dl class="deflist">
+          {% if proj.role %}<dt>Role</dt><dd>{{ proj.role }}</dd>{% endif %}
+          <dt>Status</dt><dd>{% if proj.status == 'shipped' %}<span class="mark-done" data-chalk="tick">{{ status_label }}</span>{% else %}{{ status_label }}{% endif %}</dd>
+          {% if stack %}<dt>Stack</dt><dd><ul class="stack">{% for name, _ in stack %}<li>{{ name }}</li>{% endfor %}</ul></dd>{% endif %}
+          <dt>Code</dt><dd><a href="{{ src.html_url }}" target="_blank" rel="noopener">{{ src.owner }}{% if src.repo %}/<wbr>{{ src.repo }}{% endif %}<span class="sr-only"> on GitHub (opens in a new tab)</span></a></dd>
+          {% if src.repo %}
+          {#- Filled from /api/status by main.js; the row stays out until it has a value. #}
+          <div class="proj-push" id="push-row" hidden><dt>Last push</dt><dd data-push="{{ slug }}"></dd></div>
+          {% endif %}
+        </dl>
+  {% endmacro %}
+  <article aria-labelledby="project-name">
+    <header class="wrap proj-head smear smear--l {% if shot %}proj-head--shot{% else %}proj-head--side{% endif %}">
+      <div class="proj-intro">
+        <nav class="crumb" aria-label="Breadcrumb">
+          <a href="/#projects">Projects</a><span aria-hidden="true"> / </span><span aria-current="page">{{ proj.name }}</span>
         </nav>
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-      </header>
-
-      <main id="main" class="units-main" tabindex="-1">
-        <article class="unit" aria-labelledby="project-name">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <p class="silk">Project</p>
-              <span class="model" aria-hidden="true">{{ src.owner }}/{{ src.repo or '' }}</span>
-              <p class="unit-head-r status"><span class="led led--{{ led }}" aria-hidden="true"></span>{{ status_label }}</p>
-            </div>
-
-            <div class="project">
-              <div class="ctrl-display">
-                <div class="vfd-bezel">
-                  <div class="vfd">
-                    <h1 class="vfd-name" id="project-name">{{ proj.name }}</h1>
-                    {% if proj.role %}<p class="vfd-line">{{ proj.role }}</p>{% endif %}
-                    <p class="vfd-line">{{ proj.stack | join(' · ') }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="panel-ctl">
-                <p class="lead">{{ description }}</p>
-                <p class="blade-meta"><span class="silk silk--dim">Last push</span> <span class="lcd lcd--chip" data-push="{{ slug }}">--</span></p>
-                <ul class="cables" aria-label="Tech">
-                  {% for name, cls in stack %}<li class="cable{% if cls %} cable--{{ cls }}{% endif %}">{{ name }}</li>{% endfor %}
-                </ul>
-                <div class="keys">
-                  <a class="key key--primary" href="{{ src.html_url }}" target="_blank" rel="noopener">{% if src.repo %}Repo{% else %}Organization{% endif %} on GitHub <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
-                </div>
-              </div>
-            </div>
-
-            {% if proj.highlights %}
-            <ul class="highlights">
-              {% for h in proj.highlights %}<li>{{ h }}</li>{% endfor %}
-            </ul>
-            {% endif %}
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </article>
-
-        <section class="unit" aria-labelledby="readme-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 class="silk" id="readme-title">README</h2>
-              <span class="model" aria-hidden="true">github.com/{{ src.owner }}{% if src.repo %}/{{ src.repo }}{% endif %}</span>
-            </div>
-            {% if readme %}
-            <div class="readme">{{ readme | safe }}</div>
-            {% else %}
-            <p class="readme-missing">The README can't be loaded right now. <a href="{{ src.html_url }}" target="_blank" rel="noopener">Read it on GitHub<span class="sr-only"> (opens in a new tab)</span></a>.</p>
-            {% endif %}
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {% if others %}
-        <nav class="unit" aria-labelledby="more-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 class="silk" id="more-title">More projects</h2>
-            </div>
-            <ul class="keys">
-              {% for s, name in others %}<li><a class="key" href="/projects/{{ s }}">{{ name }}</a></li>{% endfor %}
-              <li><a class="key" href="/#more-projects">All projects</a></li>
-            </ul>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </nav>
+        <h1 class="proj-title chalk-text chalk-text--lg" id="project-name"><span data-chalk="underline">{{ proj.name }}</span></h1>
+        <p class="lead">{{ description }}</p>
+        <div class="actions">
+          <a class="btn btn--solid" href="{{ src.html_url }}" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#ph-github-logo"/></svg>{% if src.repo %}Repository{% else %}Organization{% endif %} on GitHub<span class="sr-only"> (opens in a new tab)</span></a>
+          <a class="btn" href="/#projects">All projects</a>
+        </div>
+        {% if successor %}
+        <p class="note proj-note">Its successor: <a href="/projects/{{ successor[0] }}">{{ successor[1] }}</a></p>
         {% endif %}
-      </main>
+      </div>
+      {% if shot %}
+      {#- The project's screenshot in chalk, a link to the real one (kit:
+          figure.shot; main.js shows the colours on hover and opens it large). #}
+      <figure class="shot shot--tilt proj-shot" data-chalk="frame" style="--ar: {{ '%.3f' | format(shot.w / shot.h) }}; --w: {{ shot.w }}px">
+        <a class="shot-link" href="/img/{{ shot.img }}.webp">
+          <span class="shot-pic"><img class="shot-chalk" src="/img/{{ shot.img }}.chalk.webp" width="{{ shot.w }}" height="{{ shot.h }}" decoding="async" alt="{{ t(shot.alt) }}"></span>
+          <span class="shot-hint">{{ t('shot.hint') }}</span>
+        </a>
+      </figure>
+      {% else %}
+      <section class="proj-facts proj-side" data-chalk="divider" aria-labelledby="facts-title">
+        {{ facts() }}
+      </section>
+      {% endif %}
+    </header>
 
-      {% include "_pdu.html" %}
+    <div class="wrap proj-body{% if not shot and not proj.highlights %} proj-body--solo{% endif %}">
+      {% if shot or proj.highlights %}
+      <aside class="proj-facts" aria-labelledby="{% if shot %}facts-title{% else %}highlights-title{% endif %}">
+        {% if shot %}{{ facts() }}{% endif %}
+        {% if proj.highlights %}
+        <h2 class="hand-title chalk-text chalk-text--md" id="highlights-title">Highlights</h2>
+        <ul class="ticks proj-ticks" data-chalk="ticks">
+          {% for h in proj.highlights %}<li>{{ h }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </aside>
+      {% endif %}
 
+      <section class="proj-readme" aria-labelledby="readme-title">
+        <h2 class="hand-title chalk-text chalk-text--md" id="readme-title"><span data-chalk="underline">README</span></h2>
+        <p class="readme-src">From <a href="{{ src.html_url }}" target="_blank" rel="noopener">{{ src.html_url | replace('https://github.com/', '') }}<span class="sr-only"> on GitHub (opens in a new tab)</span></a> on GitHub</p>
+        {% if readme %}
+        <div class="readme">{{ readme | safe }}</div>
+        {% else %}
+        <p class="readme-missing">The README can't be loaded right now. <a href="{{ src.html_url }}" target="_blank" rel="noopener">Read it on GitHub<span class="sr-only"> (opens in a new tab)</span></a>.</p>
+        {% endif %}
+      </section>
     </div>
-    <div class="rail rail--r" aria-hidden="true"></div>
-  </div>
-  <div class="cab-plinth" aria-hidden="true"></div>
-</div>
 
+    {% if others %}
+    <div class="wrap"><hr class="rule proj-end" data-chalk="rule"></div>
+    <nav class="wrap proj-more" aria-labelledby="more-title">
+      <h2 class="hand-title chalk-text chalk-text--md" id="more-title">More projects</h2>
+      <ul class="proj-more-list">
+        {% for s, name in others %}<li><a class="chalk-text" href="/projects/{{ s }}">{{ name }}</a></li>{% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
+  </article>
+</main>
+
+{% include "_footer.html" %}
+
+{% if src.repo %}
+<script>
+document.addEventListener('site:status', function (e) {
+  var p = e.detail && e.detail.projects, row = document.getElementById('push-row');
+  if (row) row.hidden = !(p && p[{{ slug | tojson }}]);
+});
+</script>
+{% endif %}
 <script src="/main.js" defer></script>
 <script src="/turnstile.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
 <script src="/chat.js" defer></script>
+<script type="module" src="/chalk.js"></script>
 </body>
 </html>

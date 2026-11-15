@@ -7,7 +7,10 @@ projects whose repo_url points at GitHub get a page.
 READMEs are fetched from the GitHub API as rendered HTML, then rebuilt through
 an allowlist (see _ReadmeSanitizer) before they reach the page: headings are
 shifted under the page's own, relative links and images point back at GitHub,
-and anything outside the allowlist is dropped. They are cached in memory for
+and anything outside the allowlist is dropped. A few elements get the site's
+kit classes on the way (tables, rules, framed images and badges), so the page
+can style them without guessing (templates/project.html, site/project.css),
+and the output is always balanced. They are cached in memory for
 settings.github_cache_seconds; a cold cache fetches synchronously (so crawlers
 get the content), a stale one refreshes in the background.
 """
@@ -113,7 +116,25 @@ _ATTRS = {
     "ol": {"start"},
     "details": {"open"},
 }
+# HTML's implied end tags, as far as a README needs them: a new <li> closes
+# the open <li> of the same list, and so on; any block closes an open <p>.
+_SIBLINGS = {"li": ("li", {"ul", "ol"}), "tr": ("tr", {"table", "thead", "tbody"}),
+             "td": ("td", {"tr"}), "th": ("th", {"tr"})}
+_CLOSES_P = {"p", "div", "ul", "ol", "table", "pre", "blockquote", "hr", "details",
+             "h1", "h2", "h3", "h4", "h5", "h6"}
 _HEADING_SHIFT = 2  # page h1 = project name, h2 = "README" unit; README h1 -> h3
+
+
+def _is_badge(src: str) -> bool:
+    """A shields.io-style badge, also behind GitHub's camo proxy (which hex-encodes the original URL)."""
+    url = urlparse(src)
+    if url.hostname == "camo.githubusercontent.com":
+        try:
+            src = bytes.fromhex(url.path.rsplit("/", 1)[-1]).decode("utf-8", "replace")
+        except ValueError:
+            return False
+    host = urlparse(src).hostname or ""
+    return host.endswith(("shields.io", "badgen.net")) or "/badge" in src
 
 
 class _ReadmeSanitizer(HTMLParser):
@@ -123,6 +144,12 @@ class _ReadmeSanitizer(HTMLParser):
         self.out: list[str] = []
         self._skip_tag: str | None = None
         self._skip_depth = 0
+        # Open elements as (source tag, what closes them in the output). Only
+        # end tags of open elements are written, and close() shuts whatever
+        # is left, so the README can never close one of the page's own
+        # elements or leave a wrapper (table-wrap, rd-alert) open. Unwrapped
+        # <div>s are on it too, with nothing to write.
+        self._open: list[tuple[str, str]] = []
 
     @staticmethod
     def _heading(tag: str) -> str:
@@ -160,12 +187,32 @@ class _ReadmeSanitizer(HTMLParser):
             return
         if tag in _DROP_VOID:
             return
+        self._imply_end(tag)
+        # GitHub alerts (> [!NOTE], > [!TIP], ...): keep them as a quote with
+        # a title, instead of unwrapping them into loose paragraphs.
+        if tag == "div":
+            if "markdown-alert" in a.get("class", "").split():
+                self.out.append('<blockquote class="rd-alert">')
+                self._open.append(("div", "</blockquote>"))
+            else:
+                self._open.append(("div", ""))
+            return
+        if tag == "p" and "markdown-alert-title" in a.get("class", "").split():
+            self.out.append('<p class="rd-alert-title">')
+            self._open.append(("p", "</p>"))
+            return
         if tag in _DROP:
             self._skip_tag, self._skip_depth = tag, 1
             return
         if tag not in _ALLOWED:
             return  # unwrap: keep the children, lose the element
         parts = [self._heading(tag)]
+        if tag == "table":
+            # scrolls sideways inside its wrapper on a phone, never the page
+            self.out.append('<div class="table-wrap">')
+            parts.append('class="table"')
+        elif tag == "hr":
+            parts.append('class="rule" data-chalk="rule"')
         for key in _ATTRS.get(tag, ()):
             if key not in a:
                 continue
@@ -177,9 +224,41 @@ class _ReadmeSanitizer(HTMLParser):
             parts.append(f'{key}="{html.escape(val, quote=True)}"')
         if tag == "a" and a.get("href", "").startswith(("http://", "https://")):
             parts.append('target="_blank" rel="noopener"')
+        framed = False
         if tag == "img":
             parts.append('loading="lazy" decoding="async"')
+            if _is_badge(a.get("src", "")):
+                parts.append('class="rd-badge"')
+            else:
+                # a picture pinned to the board: a chalk frame around it
+                framed = True
+                self.out.append('<span class="rd-pic" data-chalk="frame">')
         self.out.append("<" + " ".join(parts) + ">")
+        if framed:
+            self.out.append("</span>")
+        if tag not in _VOID:
+            closer = f"</{self._heading(tag)}>" + ("</div>" if tag == "table" else "")
+            self._open.append((tag, closer))
+
+    def _imply_end(self, tag: str) -> None:
+        if tag in _CLOSES_P and self._open and self._open[-1][0] == "p":
+            self.out.append(self._open.pop()[1])
+        if tag == "td" or tag == "th":
+            sibling = {"td", "th"}
+        elif tag in _SIBLINGS:
+            sibling = {_SIBLINGS[tag][0]}
+        else:
+            return
+        scope = _SIBLINGS[tag][1]
+        for i in range(len(self._open) - 1, -1, -1):
+            name = self._open[i][0]
+            if name in scope:
+                return
+            if name in sibling:
+                for _, closer in reversed(self._open[i:]):
+                    self.out.append(closer)
+                del self._open[i:]
+                return
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         self.handle_starttag(tag, attrs)
@@ -193,8 +272,20 @@ class _ReadmeSanitizer(HTMLParser):
                 if self._skip_depth == 0:
                     self._skip_tag = None
             return
-        if tag in _ALLOWED and tag not in _VOID:
-            self.out.append(f"</{self._heading(tag)}>")
+        # Close up to the innermost open element of this name; an end tag
+        # with nothing open to match is dropped.
+        for i in range(len(self._open) - 1, -1, -1):
+            if self._open[i][0] == tag:
+                for _, closer in reversed(self._open[i:]):
+                    self.out.append(closer)
+                del self._open[i:]
+                return
+
+    def close(self) -> None:
+        super().close()
+        for _, closer in reversed(self._open):
+            self.out.append(closer)
+        self._open.clear()
 
     def handle_data(self, data: str) -> None:
         if not self._skip_tag:
