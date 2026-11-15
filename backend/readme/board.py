@@ -160,7 +160,7 @@ class Board:
             cid = self.uid("w")
             self.defs.append(
                 f'<clipPath id="{cid}"><rect class="wipe" x="{left - size * .3:.1f}" y="{y - size * 1.25:.1f}" '
-                f'width="{width + size * .6:.1f}" height="{size * 1.7:.1f}" '
+                f'width="{width + size * 1.5:.1f}" height="{size * 1.7:.1f}" '
                 f'style="animation-delay:{at:.2f}s;animation-duration:{d:.2f}s"/></clipPath>'
             )
             text_el = f'<g clip-path="url(#{cid})">{text_el}</g>'

@@ -187,6 +187,13 @@ def _ago(when: datetime, now: datetime) -> str:
     return f"{days // 30} months ago"
 
 
+# A margin note in yellow chalk instead of the GitHub description, for repos that earned one.
+QUIPS = {
+    "naollm": "the most fun way to watch a robot walk into a wall",
+    "lego-spike-serial": "a real protocol for hardware that never talks back",
+}
+
+
 def recent(d: ReadmeData, now: datetime | None = None) -> str:
     now = now or datetime.now(timezone.utc)
     items = d.recent[:4]
@@ -197,7 +204,11 @@ def recent(d: ReadmeData, now: datetime | None = None) -> str:
         b.strokes(chalk.tick(30, y - 10, b.seed(), size=0.7, w=2, tl=b.tl))
         b.hand(54, y, fit(HAND, 700, 21, repo.name, 220), 21, kind="sm")
         b.sans(HALF - 30, y - 1, _ago(repo.pushed, now), 13, fill=MUTE, anchor="end")
-        if repo.description:
+        quip = QUIPS.get(repo.name.lower())
+        if quip:
+            b.hand(55, y + 21, fit(HAND, 400, 15, quip, HALF - 70), 15, weight=400, kind="acc")
+            y += 48
+        elif repo.description:
             b.sans(55, y + 20, fit(SANS, 400, 13.5, repo.description, HALF - 86), 13.5, fill=DIM)
             y += 48
         else:

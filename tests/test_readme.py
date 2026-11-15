@@ -139,3 +139,8 @@ def test_route_serves_what_was_drawn(client):
     assert r.headers["cache-control"] == "public, no-cache"
     assert client.get("/readme/nope.svg").status_code == 404
     assert client.get("/readme/..%2Fresume.svg").status_code == 404
+
+
+def test_a_repo_with_a_quip_shows_it_instead_of_its_description(db):
+    svg = cards.recent(data.parse(_user()))
+    assert "walk into a wall" in svg and "Robot meets LLM" not in svg
