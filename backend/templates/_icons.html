@@ -1,0 +1,52 @@
+{#- Shared SVG defs, included once per page right after <body>: the chalk
+    filters that styles.css references (url(#chalk-lg) and friends), and the
+    icons. Icons are Phosphor Regular (MIT); styles.css draws them in chalk.
+    Use <svg class="icon" aria-hidden="true"><use href="#ph-NAME"/></svg>, and
+    prefer a word to an icon: the Tafel pages are mostly text-only. The svg is
+    sized to nothing instead of `hidden`: Firefox drops filters that live in
+    an undisplayed svg. #}
+<svg class="defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  {#- Display chalk (big headings): wobbled outline, solid body, edges broken into dust. #}
+  <filter id="chalk-lg" x="-4%" y="-25%" width="108%" height="150%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="4" result="warp"/>
+    <feDisplacementMap in="SourceGraphic" in2="warp" scale="2.4" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.7 0.32" numOctaves="2" seed="8" result="fine"/>
+    <feGaussianBlur in="wob" stdDeviation="1.5" result="soft"/>
+    <feComposite in="soft" in2="fine" operator="arithmetic" k1="0" k2="1" k3="1.1" k4="-0.55" result="m"/>
+    <feComponentTransfer in="m" result="mask"><feFuncA type="linear" slope="3.2" intercept="-1.25"/></feComponentTransfer>
+    <feComposite in="wob" in2="mask" operator="in" result="ch"/>
+    <feGaussianBlur in="ch" stdDeviation="4" result="dust"/>
+    <feComponentTransfer in="dust" result="dust2"><feFuncA type="linear" slope=".16"/></feComponentTransfer>
+    <feMerge><feMergeNode in="dust2"/><feMergeNode in="ch"/></feMerge>
+  </filter>
+  {#- Medium chalk (sub-headings, labels): the same, finer. #}
+  <filter id="chalk-md" x="-4%" y="-25%" width="108%" height="150%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="4" result="warp"/>
+    <feDisplacementMap in="SourceGraphic" in2="warp" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.8 0.4" numOctaves="2" seed="8" result="fine"/>
+    <feGaussianBlur in="wob" stdDeviation="1" result="soft"/>
+    <feComposite in="soft" in2="fine" operator="arithmetic" k1="0" k2="1" k3="1" k4="-0.5" result="m"/>
+    <feComponentTransfer in="m" result="mask"><feFuncA type="linear" slope="3.4" intercept="-1.2"/></feComponentTransfer>
+    <feComposite in="wob" in2="mask" operator="in"/>
+  </filter>
+  {#- Small chalk: only a slight wobble. #}
+  <filter id="wob-sm" x="-4%" y="-30%" width="108%" height="160%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  {#- Arrowheads for diagram lines (data-arrow) without JS; chalk.js draws its own. #}
+  <marker id="ah-ink" viewBox="0 0 16 16" refX="13" refY="8" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M2 2 13 8 2 14" fill="none" stroke="#eceae4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <marker id="ah-acc" viewBox="0 0 16 16" refX="13" refY="8" markerWidth="16" markerHeight="16" markerUnits="userSpaceOnUse" orient="auto"><path d="M2 2 13 8 2 14" fill="none" stroke="#f1d26a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  <symbol id="ph-download-simple" viewBox="0 0 256 256"><path fill="currentColor" d="M224 144v64a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8v-64a8 8 0 0 1 16 0v56h160v-56a8 8 0 0 1 16 0m-101.66 5.66a8 8 0 0 0 11.32 0l40-40a8 8 0 0 0-11.32-11.32L136 124.69V32a8 8 0 0 0-16 0v92.69L93.66 98.34a8 8 0 0 0-11.32 11.32Z"/></symbol>
+  <symbol id="ph-github-logo" viewBox="0 0 256 256"><path fill="currentColor" d="M208.31 75.68A59.78 59.78 0 0 0 202.93 28a8 8 0 0 0-6.93-4a59.75 59.75 0 0 0-48 24h-24a59.75 59.75 0 0 0-48-24a8 8 0 0 0-6.93 4a59.78 59.78 0 0 0-5.38 47.68A58.14 58.14 0 0 0 56 104v8a56.06 56.06 0 0 0 48.44 55.47A39.8 39.8 0 0 0 96 192v8H72a24 24 0 0 1-24-24a40 40 0 0 0-40-40a8 8 0 0 0 0 16a24 24 0 0 1 24 24a40 40 0 0 0 40 40h24v16a8 8 0 0 0 16 0v-40a24 24 0 0 1 48 0v40a8 8 0 0 0 16 0v-40a39.8 39.8 0 0 0-8.44-24.53A56.06 56.06 0 0 0 216 112v-8a58.14 58.14 0 0 0-7.69-28.32M200 112a40 40 0 0 1-40 40h-48a40 40 0 0 1-40-40v-8a41.74 41.74 0 0 1 6.9-22.48a8 8 0 0 0 1.1-7.69a43.8 43.8 0 0 1 .79-33.58a43.88 43.88 0 0 1 32.32 20.06a8 8 0 0 0 6.71 3.69h32.35a8 8 0 0 0 6.74-3.69a43.87 43.87 0 0 1 32.32-20.06a43.8 43.8 0 0 1 .77 33.58a8.09 8.09 0 0 0 1 7.65a41.7 41.7 0 0 1 7 22.52Z"/></symbol>
+  <symbol id="ph-envelope-simple" viewBox="0 0 256 256"><path fill="currentColor" d="M224 48H32a8 8 0 0 0-8 8v136a16 16 0 0 0 16 16h176a16 16 0 0 0 16-16V56a8 8 0 0 0-8-8m-20.57 16L128 133.15L52.57 64ZM216 192H40V74.19l82.59 75.71a8 8 0 0 0 10.82 0L216 74.19z"/></symbol>
+  <symbol id="ph-copy" viewBox="0 0 256 256"><path fill="currentColor" d="M216 32H88a8 8 0 0 0-8 8v40H40a8 8 0 0 0-8 8v128a8 8 0 0 0 8 8h128a8 8 0 0 0 8-8v-40h40a8 8 0 0 0 8-8V40a8 8 0 0 0-8-8m-56 176H48V96h112Zm48-48h-32V88a8 8 0 0 0-8-8H96V48h112Z"/></symbol>
+  <symbol id="ph-check" viewBox="0 0 256 256"><path fill="currentColor" d="m229.66 77.66l-128 128a8 8 0 0 1-11.32 0l-56-56a8 8 0 0 1 11.32-11.32L96 188.69L218.34 66.34a8 8 0 0 1 11.32 11.32"/></symbol>
+  <symbol id="ph-chat-circle-text" viewBox="0 0 256 256"><path fill="currentColor" d="M168 112a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m-8 24H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16m72-8a104 104 0 0 1-152.88 91.82l-34.05 11.35a16 16 0 0 1-20.24-20.24l11.35-34.05A104 104 0 1 1 232 128m-16 0a88 88 0 1 0-164.19 44.06a8 8 0 0 1 .66 6.54L40 216l37.4-12.47a7.9 7.9 0 0 1 2.53-.42a8 8 0 0 1 4 1.08A88 88 0 0 0 216 128"/></symbol>
+  <symbol id="ph-arrow-up-right" viewBox="0 0 256 256"><path fill="currentColor" d="M200 64v104a8 8 0 0 1-16 0V83.31L69.66 197.66a8 8 0 0 1-11.32-11.32L172.69 72H88a8 8 0 0 1 0-16h104a8 8 0 0 1 8 8"/></symbol>
+  <symbol id="ph-list" viewBox="0 0 256 256"><path fill="currentColor" d="M224 128a8 8 0 0 1-8 8H40a8 8 0 0 1 0-16h176a8 8 0 0 1 8 8M40 72h176a8 8 0 0 0 0-16H40a8 8 0 0 0 0 16m176 112H40a8 8 0 0 0 0 16h176a8 8 0 0 0 0-16"/></symbol>
+  <symbol id="ph-x" viewBox="0 0 256 256"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128L50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></symbol>
+  <symbol id="ph-bug" viewBox="0 0 256 256"><path fill="currentColor" d="M144 92a12 12 0 1 1 12 12a12 12 0 0 1-12-12m-44-12a12 12 0 1 0 12 12a12 12 0 0 0-12-12m116 64a87.8 87.8 0 0 1-3 23l22.24 9.72A8 8 0 0 1 232 192a7.9 7.9 0 0 1-3.2-.67L207.38 182a88 88 0 0 1-158.76 0l-21.42 9.33a7.9 7.9 0 0 1-3.2.67a8 8 0 0 1-3.2-15.33L43 167a87.8 87.8 0 0 1-3-23v-8H16a8 8 0 0 1 0-16h24v-8a87.8 87.8 0 0 1 3-23l-22.2-9.67a8 8 0 1 1 6.4-14.66L48.62 74a88 88 0 0 1 158.76 0l21.42-9.36a8 8 0 0 1 6.4 14.66L213 89.05a87.8 87.8 0 0 1 3 23v8h24a8 8 0 0 1 0 16h-24ZM56 120h144v-8a72 72 0 0 0-144 0Zm64 95.54V136H56v8a72.08 72.08 0 0 0 64 71.54M200 144v-8h-64v79.54A72.08 72.08 0 0 0 200 144"/></symbol>
+  <symbol id="ph-arrow-down" viewBox="0 0 256 256"><path fill="currentColor" d="m205.66 149.66l-72 72a8 8 0 0 1-11.32 0l-72-72a8 8 0 0 1 11.32-11.32L120 196.69V40a8 8 0 0 1 16 0v156.69l58.34-58.35a8 8 0 0 1 11.32 11.32"/></symbol>
+  <symbol id="ph-translate" viewBox="0 0 256 256"><path fill="currentColor" d="m247.15 212.42l-56-112a8 8 0 0 0-14.31 0l-21.71 43.43A88 88 0 0 1 108 126.93A103.65 103.65 0 0 0 135.69 64H160a8 8 0 0 0 0-16h-56V32a8 8 0 0 0-16 0v16H32a8 8 0 0 0 0 16h87.63A87.76 87.76 0 0 1 96 116.35a87.7 87.7 0 0 1-19-31a8 8 0 1 0-15.08 5.34A103.6 103.6 0 0 0 84 127a87.55 87.55 0 0 1-52 17a8 8 0 0 0 0 16a103.46 103.46 0 0 0 64-22.08a104.2 104.2 0 0 0 51.44 21.31l-26.6 53.19a8 8 0 0 0 14.31 7.16L148.94 192h70.11l13.79 27.58A8 8 0 0 0 240 224a8 8 0 0 0 7.15-11.58M156.94 176L184 121.89L211.05 176Z"/></symbol>
+</svg>

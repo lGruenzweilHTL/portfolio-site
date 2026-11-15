@@ -21,14 +21,17 @@ the only ingress; the tunnel's `config.yml` just repointed from
 
 ```
 /site                      Static assets + notes (served under /, /notes/)
-  styles.css               Rack design system (tokens mirror the Figma variables) + console styles
-  main.js                  Nav ports, U grid, chassis flip, feedback drawer, live status polling, racking units on scroll
-  chat.js                  Chatbot as a terminal ("ask-lukas") opened from a console tab, the hero ask field or the Contact key
+  styles.css               "Tafel" design (chalk on slate): the kit first, then the main page; console styles
+  chalk.js                 Draws the chalk: underlines, boxes, frames, arrows, notes and pins, the diagrams (see "The chalk look")
+  main.js                  Header, menu, copy button, live status polling, screenshot reveal + lightbox
+  tex/                     Slate texture, chalk grain masks and eraser smears
+  fonts/                   Tafel Sans (a trimmed Mona Sans) and Kalam (self-hosted, OFL)
+  chat.js                  Chatbot as a terminal ("ask-lukas") opened from the hero and Contact keys, or a console tab on other pages
   turnstile.js             On-demand Turnstile tokens (separate chat + feedback widgets)
   notes/                   Study cheatsheets (moved from /study)
   files/                   Public downloads — listed by routes/files.py, not the static mount
   files/secure/            Protected downloads (token-gated, no listing)
-  img/, favicon.svg         Project screenshots (WebP), favicon
+  img/, favicon.svg         Project screenshots (WebP) with their chalk renditions (*.chalk.webp), favicon
   robots.txt                Crawler rules (the sitemap is generated, see routes/projects.py)
   llms.txt                  Plain-text fact sheet for LLMs (GEO); keep in sync with the main page
   og.png, apple-touch-icon.png  Link-preview image (1200x630) and home-screen icon
@@ -45,7 +48,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   turnstile.py             siteverify helper with dev bypass + per-widget action check
   resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
   i18n.py                  Translation catalogs for the main page (content/i18n/*.yaml)
-  templates/index.html     Main portfolio page: one server rack, each section a rack unit
+  templates/index.html     Main portfolio page: hero, the projects, experience, about and contact
   routes/                  One file per route group, including /services
   db/models.py             SQLite schema + connection helpers
   templates/               resume.html (designed) + resume_ats.html (ATS), assets/,
@@ -55,7 +58,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   chatbot_personality.yaml Persona + system prompt template
   services.yaml            Public/home-network service catalog
 /deploy                    systemd units + tmpfiles.d drop-in for the deploy webhook
-/scripts                   One-off dev tooling (devicon subsetting, résumé preview render)
+/scripts                   Dev tooling: résumé preview render, chalk renditions of the screenshots
 /static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
 /tests                     pytest suite (no network: provider mocked with respx)
 /.github/workflows         CI: pytest on PRs and pushes to master (Python 3.10 + 3.13)
@@ -63,6 +66,28 @@ the only ingress; the tunnel's `config.yml` just repointed from
 requirements.txt           Pinned Python dependencies
 requirements-dev.txt       requirements.txt + pytest, pytest-asyncio, respx
 ```
+
+## The chalk look
+
+Every page is a slate board written on in chalk. The page is plain HTML and
+CSS and reads fine without JS; `site/chalk.js` (an ES module, no dependencies)
+then draws the chalk over it from data attributes, and redraws when a drawn
+box changes size.
+
+- **Text.** `.chalk-text` (with `--md`, `--lg`) is Kalam with a grain mask
+  from `site/tex/`; running text stays Tafel Sans (Mona Sans, trimmed). `.chalk-acc` is the yellow.
+- **Strokes.** `data-chalk="underline|box|frame|rule|grid|divider|ticks|route|arrow"`
+  draws that shape around or under the element. `.btn` and `.field` inputs
+  are drawn without an attribute. Notes (`.note`) point at their target
+  with an arrow; pins (`.pin`) ring a spot on a picture.
+- **Diagrams.** An `svg.drawing` is authored as plain geometry; chalk.js
+  roughens it and fits `text[data-max]` labels (wrapping with `data-wrap`),
+  so translations don't collide.
+- **Screenshots.** Pages show a chalk rendition (`img/*.chalk.webp`) and swap
+  in the real screenshot on hover or focus; a click opens it in a dialog.
+  Re-run `python scripts/bake_chalk_shots.py` after replacing a screenshot.
+- Hidden starting states are gated on `html.js`, and reduced motion shows the
+  finished drawing.
 
 ## System dependencies
 
@@ -171,8 +196,8 @@ error text. Visitors never see provider text.
 | `/api/chat` | POST | SSE stream from the chat provider (Gemini API or OpenRouter). Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
-| `/api/status` | GET | Coarse live values for the rack UI: host uptime, deployed short SHA, Cloudflare edge colo (from `CF-Ray`), `HOMELAB_NODES`, chatbot model, per-project GitHub `pushed_at` (fetched in the background, cached `GITHUB_CACHE_SECONDS`). `no-store`. |
-| `/privacy`, `/de/privacy` | GET | Privacy policy, English and Austrian German (`templates/privacy.html`). Linked from the PDU footer on every page. |
+| `/api/status` | GET | Coarse live values for the footer and the site section: host uptime, deployed short SHA, Cloudflare edge colo (from `CF-Ray`), `HOMELAB_NODES`, chatbot model, per-project GitHub `pushed_at` (fetched in the background, cached `GITHUB_CACHE_SECONDS`). `no-store`. |
+| `/privacy`, `/de/privacy` | GET | Privacy policy, English and Austrian German (`templates/privacy.html`). Linked from the footer on every page. |
 | `/webhook/deploy` | POST | GitHub HMAC. 10/min/IP. Pulls + restarts on pushes to `DEPLOY_BRANCH` only. |
 | `/admin` | GET | Cloudflare Access gated. Combined dashboard. |
 | `/admin/secure-links` | POST | Create a secure download link (returns full URL) |

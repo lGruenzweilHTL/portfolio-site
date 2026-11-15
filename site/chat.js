@@ -1,12 +1,14 @@
 /* Chatbot UI: a plain terminal ("ask-lukas") opened from a console tab in the
    bottom-right corner, from the hero's ask field ([data-ask-form], which
-   sends its question right away) or from any [data-ask] key.
+   sends its question right away) or from any [data-ask] key. A page with its
+   own [data-ask] keys (the main page: hero and Contact) keeps the tab hidden,
+   so it never covers the text on small screens.
    - Per-session UUID in localStorage; "clear" starts a new conversation
    - Calls POST /api/chat and parses the SSE stream
    - Renders failures as red "error:" lines with the email link
 
-   Styles live in styles.css ("Console" section); this file only builds the
-   markup. Copy comes from window.I18N (content/i18n/<lang>.yaml, "js.con"
+   Styles live in styles.css ("Assistant console"); this file only builds
+   the markup, chalk.js draws its frame. Copy comes from window.I18N (content/i18n/<lang>.yaml, "js.con"
    and "js.reason"), so the console speaks the page language. */
 (function () {
   'use strict';
@@ -23,7 +25,7 @@
   const SIZE_KEY = 'lukas.chat.size';
   const ENDPOINT = '/api/chat';
   const EMAIL = 'lukas.gruenzweil@liwest.at';
-  const HOST = 'lg-rack-01';
+  const HOST = 'gruenzweil';
 
   // User-facing copy for each failure reason. The backend sends its own copy
   // in some cases (model-level fallbacks); we use that when present. This
@@ -102,12 +104,13 @@
     max: false,
 
     init() {
-      const tab = el('button', { type: 'button', class: 'con-tab', 'aria-label': tr('con.tab_label'), 'aria-expanded': 'false', 'aria-controls': 'console', 'aria-haspopup': 'dialog' }, [
+      const tab = el('button', { type: 'button', class: 'con-tab', 'data-chalk': 'box', 'aria-label': tr('con.tab_label'), 'aria-expanded': 'false', 'aria-controls': 'console', 'aria-haspopup': 'dialog' }, [
         el('span', { class: 'con-tab-p', 'aria-hidden': 'true', text: '>_' }),
         el('span', { text: tr('con.tab') }),
         cursor(),
       ]);
       tab.addEventListener('click', () => this.toggle('tab'));
+      tab.hidden = !!document.querySelector('[data-ask]');
       document.body.appendChild(tab);
       this.tab = tab;
 
@@ -159,7 +162,7 @@
         input.style.height = 'auto';
         input.style.height = input.scrollHeight + 'px';
       });
-      const sendBtn = el('button', { type: 'submit', class: 'key key--sm con-send', text: tr('con.send') });
+      const sendBtn = el('button', { type: 'submit', class: 'btn btn--sm con-send', text: tr('con.send') });
       this.sendBtn = sendBtn;
       const form = el('form', { class: 'con-in' }, [
         el('span', { class: 'con-prompt', 'aria-hidden': 'true' }, prompt()),
@@ -183,7 +186,8 @@
       const grip = el('div', { class: 'con-grip', title: tr('con.resize'), 'aria-hidden': 'true' });
       grip.addEventListener('pointerdown', (e) => this.dragResize(e));
 
-      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title' }, [grip, bar, out, live, turnstileBox, form, note, status]);
+      // chalk.js draws its frame (data-chalk) and redraws it when it resizes.
+      const panel = el('div', { class: 'con', id: 'console', role: 'dialog', 'aria-labelledby': 'console-title', 'data-chalk': 'box', 'data-chalk-watch': '' }, [grip, bar, out, live, turnstileBox, form, note, status]);
       panel.inert = true;
       panel.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') { e.stopPropagation(); this.close(); }
@@ -196,8 +200,8 @@
       // names the model that answered it ('model' SSE event).
       const setModel = (s) => { if (s && s.model) modelLabel.textContent = s.model + (s.provider ? ' · ' + s.provider : ''); };
       this.setModel = setModel;
-      setModel(window.__rackStatus);
-      document.addEventListener('rack:status', (e) => setModel(e.detail));
+      setModel(window.__siteStatus);
+      document.addEventListener('site:status', (e) => setModel(e.detail));
 
       this.greet(true);
 
@@ -263,7 +267,7 @@
       this.panel.inert = true;
       this.panel.classList.remove('open');
       const back = this.opener && this.opener.isConnected && this.opener !== document.body ? this.opener : this.tab;
-      back.focus();
+      if (!back.hidden) back.focus();
     },
 
     // Size lives in --con-w/--con-h, which styles.css clamps to the viewport

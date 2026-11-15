@@ -13,7 +13,7 @@
 {# One page per language; x-default is the English page. #}
 {% for l in langs %}<link rel="alternate" hreflang="{{ l.hreflang }}" href="{{ origin }}{{ l.path }}" />
 {% endfor %}<link rel="alternate" hreflang="x-default" href="{{ origin }}/" />
-<meta name="theme-color" content="#0d0e11" />
+<meta name="theme-color" content="#1b1f22" />
 <meta name="color-scheme" content="dark" />
 {# Rewritten per response by TurnstileSitekeyMiddleware; read by turnstile.js. #}
 <meta name="turnstile-sitekey" content="__TURNSTILE_SITEKEY__" />
@@ -44,22 +44,20 @@
 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+{# Fonts, self-hosted (site/fonts, SIL OFL): no requests to font CDNs. The
+     first screen uses Kalam 700 (the name), Kalam 400 (the margin note) and
+     Tafel Sans. #}
+<link rel="preload" href="/fonts/kalam-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/tafel-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/kalam-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
-{# Entry animations hide content only once JS is known to run, so the page
-     stays fully readable without it. "post" plays the power-on self-test once
-     per browser session (main.js removes it); skipped for reduced motion.
-     window.I18N carries the page scripts' strings in this page's language. #}
+{# html.js: scripts run, so chalk.js will draw (styles.css gates its hidden
+     states on it; the page is complete without it). window.I18N carries the
+     page scripts' strings in this page's language. #}
 <script>
 window.I18N = {{ js_strings | tojson }};
-(function (h) {
-  h.classList.add('js');
-  try {
-    if (!sessionStorage.getItem('rack.post') && !matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('post');
-  } catch (_) {}
-})(document.documentElement);
+window.I18N_LOCALE = {{ lang.date_locale | tojson }};
+document.documentElement.classList.add('js');
 </script>
 
 {# Structured data: who this is, and what they built. Keep in sync with the
@@ -86,7 +84,7 @@ window.I18N = {{ js_strings | tojson }};
       "description": {{ t('head.description') | tojson }},
       "isPartOf": { "@id": "https://gruenzweil.cc/#website" },
       "mainEntity": { "@id": "https://gruenzweil.cc/#person" },
-      "dateModified": "2026-09-30T00:00:00+02:00",
+      "dateModified": "2026-11-14T00:00:00+01:00",
       "inLanguage": "{{ lang.hreflang }}"
     },
     {
@@ -140,37 +138,43 @@ window.I18N = {{ js_strings | tojson }};
           "programmingLanguage": ["C#", "C++", "Kotlin", "Python"],
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 3, "item": {
+          "@type": "SoftwareSourceCode", "name": "gruenzweil.cc", "url": "https://gruenzweil.cc/",
+          "description": {{ t('ld.site') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/portfolio-site",
+          "programmingLanguage": ["Python", "JavaScript"],
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
+        { "@type": "ListItem", "position": 4, "item": {
           "@type": "CreativeWork", "name": "Forkcast",
           "description": {{ t('ld.forkcast') | tojson }},
           "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 4, "item": {
+        { "@type": "ListItem", "position": 5, "item": {
           "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
           "description": {{ t('ld.roboducks') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
           "programmingLanguage": ["Python", "C"],
           "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 5, "item": {
+        { "@type": "ListItem", "position": 6, "item": {
           "@type": "SoftwareSourceCode", "name": "SceneForge AI", "url": "https://gruenzweil.cc/projects/sceneforge-ai",
           "description": {{ t('ld.sceneforge') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/SceneForge-AI",
           "programmingLanguage": "C#", "runtimePlatform": "Unity Editor",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 6, "item": {
+        { "@type": "ListItem", "position": 7, "item": {
           "@type": "SoftwareSourceCode", "name": "UniConsole", "url": "https://gruenzweil.cc/projects/uniconsole",
           "description": {{ t('ld.uniconsole') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/UniConsole",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 7, "item": {
+        { "@type": "ListItem", "position": 8, "item": {
           "@type": "SoftwareSourceCode", "name": "Space Defenders", "url": "https://gruenzweil.cc/projects/space-defenders",
           "description": {{ t('ld.space_defenders') | tojson }},
           "codeRepository": "https://github.com/lGruenzweilHTL/Space-Defenders",
           "programmingLanguage": "C#", "runtimePlatform": "Unity",
           "author": { "@id": "https://gruenzweil.cc/#person" } } },
-        { "@type": "ListItem", "position": 8, "item": {
+        { "@type": "ListItem", "position": 9, "item": {
           "@type": "CreativeWork", "name": "P.I.G.E.O.N. — Covert Ops",
           "description": {{ t('ld.pigeon') | tojson }},
-          "creativeWorkStatus": {{ t('blades.in_progress') | tojson }},
+          "creativeWorkStatus": {{ t('ld.pigeon_status') | tojson }},
           "author": { "@id": "https://gruenzweil.cc/#person" } } }
       ]
     }
@@ -178,420 +182,454 @@ window.I18N = {{ js_strings | tojson }};
 }
 </script>
 </head>
-<body>
-
+<body id="top">
+{% include "_icons.html" %}
 <a class="skip-link" href="#main">{{ t('a11y.skip') }}</a>
 
-{# The page is one rack cabinet; every section is a rack-mounted unit.
-     Decoration (ears, rails, LEDs, model numbers) is aria-hidden; the copy
-     inside each .face is plain, readable HTML. #}
-<div class="cabinet" id="cabinet">
-  <div class="cab-roof" aria-hidden="true"><span>{{ t('roof') }}</span></div>
-  <div class="cab-body">
-    <div class="rail rail--l" aria-hidden="true"></div>
-    <div class="units" id="units">
+{#- The main page, drawn as a chalkboard ("Tafel"): plain HTML and SVG that
+    chalk.js turns into chalk strokes (see the KIT part of styles.css). The
+    hero holds what a visitor needs first (who, what, school and graduation,
+    résumé, email, GitHub) next to the three main projects. Every visible
+    string, including the words inside drawings, comes from the catalogs. #}
+{% include "_header.html" %}
 
-      {# PATCH-01: primary nav. Ports light up for the section in view. #}
-      <header class="unit unit--nav unit--nohandle" id="nav">
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        <nav class="face nav" aria-label="{{ t('nav.label') }}">
-          <a class="nav-host" href="#hero" aria-label="{{ t('nav.host_label') }}">
-            <span class="lcd lcd--chip" aria-hidden="true">lukas@lg-rack-01</span>
-          </a>
-          <button type="button" class="key key--sm nav-toggle" aria-expanded="false" aria-controls="ports">{{ t('nav.ports') }}</button>
-          <ul class="ports" id="ports">
-            <li><a class="port" href="#projects"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.projects') }}</span></a></li>
-            <li><a class="port" href="#experience"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.experience') }}</span></a></li>
-            <li><a class="port" href="#about"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.about') }}</span></a></li>
-            <li><a class="port" href="#contact"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.contact') }}</span></a></li>
-            <li><a class="port" href="/resume.pdf" target="_blank" rel="noopener"><span class="jack" aria-hidden="true"></span><span class="port-label">{{ t('nav.resume') }}</span><span class="sr-only"> {{ t('hero.classic_sr') }}</span></a></li>
-          </ul>
-          {# Language switch: plain links, so crawlers find every version. #}
-          <details class="lang">
-            <summary class="key key--sm"><span class="sr-only">{{ t('nav.lang_label') }}: {{ lang.name }}</span><span aria-hidden="true">{{ lang.code | upper }}</span></summary>
-            <ul class="lang-list">
-              {% for l in langs %}<li><a href="{{ l.path }}" hreflang="{{ l.hreflang }}" lang="{{ l.hreflang }}"{% if l.code == lang.code %} aria-current="page"{% endif %}><span class="lcd" aria-hidden="true">{{ l.code | upper }}</span>{{ l.name }}</a></li>
-              {% endfor %}
-            </ul>
-          </details>
-        </nav>
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-      </header>
-
-      <main id="main" class="units-main" tabindex="-1">
-
-        {# CTRL: hero. The front display carries who and what in plain type;
-             the controls next to it are the three things a visitor came for:
-             email, résumé, code. Drive bays hold the key facts. #}
-        <section class="unit" id="hero" aria-labelledby="hero-name">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('hero.available') }}</p>
-            </div>
-
-            <div class="ctrl">
-              <div class="ctrl-display">
-                <div class="vfd-bezel">
-                  <div class="vfd">
-                    <p class="vfd-kicker">{{ t('hero.line1') }}</p>
-                    <h1 class="vfd-name" id="hero-name">Lukas Grünzweil</h1>
-                    <p class="vfd-pitch">{{ t('hero.line2') }}. {{ t('hero.line3') }}.</p>
-                  </div>
-                </div>
-                <figure class="quote">
-                  <blockquote>{{ t('hero.quote') }}</blockquote>
-                  <figcaption class="quote-by">{{ t('hero.quote_by_html') }}</figcaption>
-                </figure>
-              </div>
-
-              <div class="panel-ctl">
-                <p class="hero-bio">{{ t('hero.bio') }}</p>
-                <div class="keys hero-keys">
-                  <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
-                  <a class="key" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.download') }}<span class="sr-only"> {{ t('hero.classic_sr') }}</span></a>
-                  <a class="key" href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('hero.github_sr') }}</span></a>
-                </div>
-                <p class="resume-alt"><a href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.plain') }}<span class="sr-only"> {{ t('hero.ats_sr') }}</span></a></p>
-                {#- Inline entry to the AI console (chat.js). Hidden until chat.js
-                     unhides it, since without JS there is no console to open. #}
-                <form class="hero-ask" data-ask-form hidden>
-                  <label class="hero-ask-title" for="hero-ask-q">{{ t('hero.ask_title') }}</label>
-                  <p class="hero-ask-lead" id="hero-ask-lead">{{ t('hero.ask_lead') }}</p>
-                  <div class="hero-ask-row">
-                    <span class="hero-ask-p" aria-hidden="true">&gt;_</span>
-                    <input class="hero-ask-input" id="hero-ask-q" name="q" type="text" autocomplete="off" spellcheck="false" placeholder="{{ t('hero.ask_placeholder') }}" aria-describedby="hero-ask-lead">
-                    <button type="submit" class="key key--sm key--primary">{{ t('hero.ask_send') }}</button>
-                  </div>
-                </form>
-                {% if t('hero.translation_note') %}<p class="translation-note silk silk--dim">{{ t('hero.translation_note') }}</p>{% endif %}
-              </div>
-            </div>
-
-            <ul class="bays" aria-label="{{ t('hero.facts') }}">
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>HTL Leonding</strong><span>{{ t('hero.bay0') }}</span></div></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>SlideLizard</strong><span>{{ t('hero.bay1') }}</span></div></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>Marshal</strong><span>{{ t('hero.bay2') }}</span></div></li>
-              <li class="bay"><span class="bay-latch" aria-hidden="true"></span><div><strong>Homelab</strong><span>{{ t('hero.bay3') }}</span></div><span class="led" data-led="status" aria-hidden="true"></span></li>
-            </ul>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {# FEATURED: Marshal. Intro and links, then the dashboard screenshot. #}
-        <section class="unit unit--featured rv" id="projects" aria-labelledby="marshal-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <div class="unit-title">
-                <p class="silk silk--dim">{{ t('mg.featured') }}</p>
-                <h2 id="marshal-title">Marshal</h2>
-              </div>
-              <p class="unit-head-r status"><span class="led led--green" aria-hidden="true"></span>{{ t('mg.status') }}</p>
-            </div>
-
-            <div class="feature-intro">
-              <div>
-                <p class="lead">{{ t('mg.lead') }}</p>
-                <p class="silk silk--dim">{{ t('mg.role') }} · C# · .NET · Vue · TypeScript</p>
-              </div>
-              <div class="keys">
-                <a class="key key--primary" href="/projects/marshal">{{ t('mg.project_page') }}</a>
-                <a class="key" href="https://lgruenzweilhtl.github.io/marshal/" target="_blank" rel="noopener">{{ t('mg.docs') }} <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('mg.docs_sr') }}</span></a>
-                <a class="key" href="https://github.com/lGruenzweilHTL/marshal" target="_blank" rel="noopener">{{ t('mg.repo') }} <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('mg.repo_sr') }}</span></a>
-              </div>
-            </div>
-
-            <div class="feature-shot"><img src="/img/marshal.webp" width="1600" height="1000" loading="lazy" decoding="async" alt="{{ t('mg.shot_alt') }}"></div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {# ENCLOSURE: other projects as blades. [data-push] chips are filled
-             from /api/status (GitHub pushed_at); "--" until then. #}
-        <section class="unit rv" id="more-projects" aria-labelledby="blades-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="blades-title">{{ t('blades.title') }}</h2>
-            </div>
-
-            {# Work first: what's closest to backend work leads. Games follow
-                 in their own, smaller group. A "last push" line only shows when
-                 /api/status reports a push in the last 90 days (main.js). #}
-            <ul class="blades">
-              <li class="blade blade--noshot">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/vektorgrid">vektorgrid</a></h3><p class="status"><span class="led" aria-hidden="true"></span>{{ t('blades.predecessor') }}</p></div>
-                  <p class="blade-desc">{{ t('blades.vektorgrid_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable cable--cpp">C++</li><li class="cable cable--py">Python</li><li class="cable cable--kt">Kotlin</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/vektorgrid">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='vektorgrid') }}</span></a><a class="key key--sm" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='vektorgrid') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade blade--static">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/forkcast.webp" width="1200" height="668" loading="lazy" decoding="async" alt="{{ t('blades.forkcast_alt') }}"></div>
-                <div class="blade-info">
-                  <div class="blade-top"><h3>Forkcast</h3><p class="status"><span class="led led--blue" aria-hidden="true"></span>{{ t('blades.private') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.forkcast_meta') }}</span></p>
-                  <p class="blade-desc">{{ t('blades.forkcast_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--ts">TypeScript</li><li class="cable">Vue</li><li class="cable">REST API</li></ul>
-                    <span class="blade-note">{{ t('blades.private_repo') }}</span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade blade--noshot">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/roboducks-rescuemaze">RoboDucks — RescueMaze</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta"><span class="silk silk--dim">{{ t('blades.roboducks_meta') }}</span></p>
-                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="roboducks-rescuemaze">--</span></p>
-                  <p class="blade-desc">{{ t('blades.roboducks_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--py">Python</li><li class="cable cable--c">C</li><li class="cable">{{ t('blades.tag_robotics') }}</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/roboducks-rescuemaze">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='RoboDucks') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='RoboDucks') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/sceneforge.webp" width="1200" height="458" loading="lazy" decoding="async" alt="{{ t('blades.sceneforge_alt') }}"></div>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/sceneforge-ai">SceneForge AI</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="sceneforge-ai">--</span></p>
-                  <p class="blade-desc">{{ t('blades.sceneforge_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_editor') }}</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/sceneforge-ai">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='SceneForge AI') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='SceneForge AI') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-shot"><img src="/img/uniconsole.webp" width="553" height="451" loading="lazy" decoding="async" alt="{{ t('blades.uniconsole_alt') }}"></div>
-                <div class="blade-info">
-                  <div class="blade-top"><h3><a class="card-link" href="/projects/uniconsole">UniConsole</a></h3><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-meta" data-push-row hidden><span class="silk silk--dim">{{ t('blades.last_push') }}</span> <span class="lcd lcd--chip" data-push="uniconsole">--</span></p>
-                  <p class="blade-desc">{{ t('blades.uniconsole_desc_html') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_devtools') }}</li></ul>
-                    <span class="keys"><a class="key key--sm key--primary" href="/projects/uniconsole">{{ t('blades.details') }}<span class="sr-only"> {{ t('blades.details_sr', name='UniConsole') }}</span></a><a class="key key--sm" href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='UniConsole') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-            </ul>
-
-            <h3 class="silk silk--dim blades-sub" id="games-title">{{ t('blades.fun_title') }}</h3>
-            <ul class="blades blades--compact" aria-labelledby="games-title">
-              <li class="blade blade--noshot">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-info">
-                  <div class="blade-top"><h4><a class="card-link" href="/projects/space-defenders">Space Defenders</a></h4><p class="status"><span class="led led--green" aria-hidden="true"></span>{{ t('blades.shipped') }}</p></div>
-                  <p class="blade-desc">{{ t('blades.space_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_mobile') }}</li></ul>
-                    <span class="keys"><a class="key key--sm" href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">Repo <span aria-hidden="true">↗</span><span class="sr-only"> {{ t('blades.repo_sr', name='Space Defenders') }}</span></a></span>
-                  </div>
-                </div>
-              </li>
-
-              <li class="blade blade--noshot blade--static">
-                <span class="blade-handle" aria-hidden="true"></span>
-                <div class="blade-info">
-                  <div class="blade-top"><h4>P.I.G.E.O.N. — Covert Ops</h4><p class="status"><span class="led led--amber" aria-hidden="true"></span>{{ t('blades.in_progress') }}</p></div>
-                  <p class="blade-desc">{{ t('blades.pigeon_desc') }}</p>
-                  <div class="blade-foot">
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable cable--cs">C#</li><li class="cable">Unity</li><li class="cable">{{ t('blades.tag_game') }}</li></ul>
-                    {#- TODO: swap for a Repo key once the repo is public #}
-                    <span class="blade-note">{{ t('blades.not_public') }}</span>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <div class="unit unit--blank unit--nohandle" aria-hidden="true"><i class="ear"><b class="screw"></b><b class="screw"></b></i><div class="face vents"></div><i class="ear"><b class="screw"></b><b class="screw"></b></i></div>
-
-        {# LOG: experience. <details> rows, most recent open. #}
-        <section class="unit rv" id="experience" aria-labelledby="experience-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="experience-title">{{ t('exp.title') }}</h2>
-            </div>
-            <ol class="log">
-              <li>
-                <details class="log-row" open>
-                  <summary data-open="{{ t('exp.open') }}" data-close="{{ t('exp.close') }}">
-                    <time class="lcd" datetime="2026-08">2026-08</time>
-                    <h3 class="log-org">SlideLizard Software GmbH</h3>
-                    <span class="log-role">{{ t('exp.sl_role') }}</span>
-                    <span class="log-place silk silk--dim">{{ t('exp.sl_place') }}</span>
-                  </summary>
-                  <div class="log-body">
-                    <p>{{ t('exp.sl_desc') }}</p>
-                    <ul class="cables" aria-label="{{ t('common.tech') }}">
-                      <li class="cable">Angular</li><li class="cable cable--ts">TypeScript</li><li class="cable">Azure Speech</li><li class="cable">Azure OpenAI</li><li class="cable">Dataverse</li><li class="cable">OpenRouter</li>
-                    </ul>
-                  </div>
-                </details>
-              </li>
-              <li>
-                <details class="log-row">
-                  <summary data-open="{{ t('exp.open') }}" data-close="{{ t('exp.close') }}">
-                    <time class="lcd" datetime="2025-07">2025-07</time>
-                    <h3 class="log-org">{{ t('exp.caritas_org') }}</h3>
-                    <span class="log-role">{{ t('exp.caritas_role') }}</span>
-                    <span class="log-place silk silk--dim">{{ t('exp.caritas_place') }}</span>
-                  </summary>
-                  <div class="log-body">
-                    <p>{{ t('exp.caritas_desc') }}</p>
-                    <ul class="cables" aria-label="{{ t('common.tech') }}"><li class="cable">{{ t('exp.tag_admin') }}</li><li class="cable">{{ t('exp.tag_it') }}</li><li class="cable">{{ t('exp.tag_billing') }}</li></ul>
-                  </div>
-                </details>
-              </li>
-            </ol>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {# PATCH-02: stack. Same cable colours as the blades and modules. #}
-        <section class="unit rv" id="stack" aria-labelledby="stack-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="stack-title">Stack</h2>
-            </div>
-            <div class="patch">
-              <h3 class="silk silk--dim" id="stack-lang">{{ t('stack.languages') }}</h3>
-              <ul class="cables" aria-labelledby="stack-lang">
-                <li class="cable cable--cs">C#</li><li class="cable cable--py">Python</li><li class="cable cable--ts">TypeScript</li><li class="cable cable--c">C</li><li class="cable cable--cpp">C++</li><li class="cable cable--kt">Kotlin</li><li class="cable cable--java">Java</li><li class="cable cable--html">HTML/CSS</li>
-              </ul>
-              <h3 class="silk silk--dim" id="stack-tools">{{ t('stack.tools') }}</h3>
-              <ul class="cables" aria-labelledby="stack-tools">
-                <li class="cable">Unity</li><li class="cable">Docker</li><li class="cable">Docker Compose</li><li class="cable">Kubernetes</li><li class="cable">Azure</li><li class="cable">Proxmox</li>
-              </ul>
-              <h3 class="silk silk--dim" id="stack-spoken">{{ t('stack.spoken') }}</h3>
-              <ul class="chips" aria-labelledby="stack-spoken"><li>{{ t('stack.german') }}</li><li>{{ t('stack.english') }}</li></ul>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {# SHELF: about + beyond code. #}
-        <section class="unit rv" id="about" aria-labelledby="about-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="about-title">{{ t('about.title') }}</h2>
-            </div>
-            <div class="about">
-              <p>{{ t('about.p1') }}</p>
-              <p>{{ t('about.p2_html') }}</p>
-            </div>
-            <div class="shelf">
-              <ul class="shelf-items">
-                <li class="shelf-item">
-                  <h3 class="silk">Homelab</h3>
-                  <p>{{ t('about.homelab') }}</p>
-                  <a class="shelf-link" href="#pdu">{{ t('about.homelab_link') }} <span aria-hidden="true">↓</span></a>
-                </li>
-                <li class="shelf-item">
-                  <h3 class="silk">Ender of Theseus</h3>
-                  <p>{{ t('about.ender_html') }}</p>
-                </li>
-                <li class="shelf-item">
-                  <h3 class="silk">{{ t('about.moto_title') }}</h3>
-                  <p>{{ t('about.moto') }}</p>
-                </li>
-              </ul>
-              <div class="shelf-lip" aria-hidden="true"></div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {# KVM: contact. The feedback form lives in a drawer that pulls out on
-             rails; without JS it is simply open. #}
-        <section class="unit rv" id="contact" aria-labelledby="contact-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="contact-title">{{ t('contact.title') }}</h2>
-              <p class="unit-head-r status" id="fault-status"><span class="led" aria-hidden="true"></span><span class="fault-label">{{ t('js.fault.idle') }}</span></p>
-            </div>
-            <div class="contact">
-              <div>
-                <p class="contact-lead">{{ t('contact.lead') }}</p>
-                <p>{{ t('contact.body') }}</p>
-              </div>
-              <div class="keys">
-                <a class="key key--primary" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
-                <button type="button" class="key" data-ask hidden>{{ t('contact.ask') }}</button>
-                <button type="button" class="key drawer-toggle" aria-expanded="false" aria-controls="drawer">{{ t('contact.report') }}</button>
-              </div>
-            </div>
-
-            {# Site feedback (POSTs to /api/feedback, gated by Turnstile). Kept quiet on
-                 purpose: it's for typos and bugs, email is for everything else. #}
-            <div class="drawer" id="drawer">
-              {#- Mouse shortcut for the Report key above, which stays the accessible control. #}
-              <button type="button" class="drawer-handle" tabindex="-1" aria-hidden="true"></button>
-              <div class="drawer-inner">
-                <div class="drawer-tray">
-                  <h3 class="silk" id="feedback-title">{{ t('contact.report') }}</h3>
-                  <p class="feedback-sub" id="feedback-sub">{{ t('contact.feedback_sub') }}</p>
-                  <form id="feedback-form" class="feedback-form" aria-labelledby="feedback-title" aria-describedby="feedback-sub" novalidate>
-                    <div class="feedback-row">
-                      <label class="field">
-                        <span class="silk silk--dim">{{ t('contact.name_label') }}</span>
-                        <input type="text" name="name" maxlength="120" autocomplete="name" />
-                      </label>
-                      <label class="field">
-                        <span class="silk silk--dim">{{ t('contact.email_label') }}</span>
-                        <input type="email" name="email" maxlength="254" autocomplete="email" />
-                      </label>
-                    </div>
-                    <label class="field">
-                      <span class="silk silk--dim">{{ t('contact.message_label') }} <span aria-hidden="true">*</span></span>
-                      <textarea name="message" required maxlength="4000" rows="4" placeholder="{{ t('contact.placeholder') }}" aria-describedby="feedback-status"></textarea>
-                    </label>
-                    <div class="feedback-actions">
-                      {# Turnstile mount point: stays empty until a send needs an interactive challenge #}
-                      <div class="feedback-turnstile" id="feedback-turnstile"></div>
-                      <p class="feedback-status" id="feedback-status" role="status" aria-live="polite"></p>
-                      <button type="submit" class="key key--primary" id="feedback-submit">{{ t('contact.send') }}</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-      </main>
-
-      {# PDU: footer with live values from /api/status. #}
-      {% include "_pdu.html" %}
-
+<main id="main" tabindex="-1">
+<section class="hero smear smear--r smear--3" aria-labelledby="hero-name">
+  <div class="wrap hero-grid">
+    <div class="hero-text" data-chalk-host>
+      <h1 class="hero-name chalk-text chalk-text--lg" id="hero-name"><span data-chalk="underline" data-w="4.2" data-last>Lukas Grünzweil</span></h1>
+      <p class="hero-role">{{ t('hero.role') }}</p>
+      <p class="hero-school">{{ t('hero.school') }}</p>
+      <p class="hero-bio">{{ t('hero.bio') }}</p>
+      <div class="actions">
+        <a class="btn btn--solid" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.resume') }}<span class="sr-only"> ({{ t('hero.resume_sr') }})</span></a>
+        <a class="btn" href="mailto:lukas.gruenzweil@liwest.at">{{ t('common.email_me') }}</a>
+        <a class="btn" id="hero-github" href="https://github.com/lGruenzweilHTL" target="_blank" rel="noopener">GitHub<span class="sr-only"> ({{ t('common.new_tab') }})</span></a>
+      </div>
+      {#- Quieter ways in: the plain résumé and the assistant (chat.js shows
+           the button; without JS there is no console). #}
+      <p class="hero-links">
+        <a href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.plain') }}<span class="sr-only"> ({{ t('common.new_tab') }})</span></a>
+        <button type="button" class="link-btn" data-ask="hero" hidden>{{ t('hero.ask') }}</button>
+      </p>
+      {% if t('hero.translation_note') %}<p class="translation-note">{{ t('hero.translation_note') }}</p>{% endif %}
+      {#- A margin note pointing at the buttons; chalk.js places it where there
+           is room and leaves it out where there isn't. #}
+      <p class="note note--hero chalk-acc" data-chalk="arrow" data-place="after" data-to="#hero-github">{{ t('hero.note') }}</p>
     </div>
-    <div class="rail rail--r" aria-hidden="true"></div>
+    <div class="hero-side" data-chalk="divider">
+      <p class="side-title chalk-text chalk-text--md" id="main-projects">{{ t('hero.projects') }}</p>
+      <ol class="agenda" aria-labelledby="main-projects">
+        <li><a href="#projects"><b class="chalk-text chalk-text--md">Marshal</b><span>{{ t('hero.p_marshal') }}</span></a></li>
+        <li><a href="#site"><b class="chalk-text chalk-text--md">{{ t('site.title') }}</b><span>{{ t('hero.p_site') }}</span></a></li>
+        <li><a href="#vektorgrid"><b class="chalk-text chalk-text--md">vektorgrid</b><span>{{ t('hero.p_vektorgrid') }}</span></a></li>
+      </ol>
+    </div>
   </div>
-  <div class="cab-plinth" aria-hidden="true"></div>
-</div>
+</section>
+
+{#- The three main projects get a section each, the rest share "Also built". #}
+<section class="band band--marshal smear smear--l" id="projects" aria-labelledby="marshal-title">
+  <div class="wrap">
+    <div class="split marshal-split">
+      <div class="split-text">
+        <h2 class="section-title chalk-text chalk-text--lg" id="marshal-title"><span data-chalk="underline">Marshal</span></h2>
+        <p class="lead">{{ t('mg.lead') }}</p>
+        <ul class="ticks" data-chalk="ticks">
+          <li>{{ t('mg.h1') }}</li>
+          <li>{{ t('mg.h2') }}</li>
+          <li>{{ t('mg.h3') }}</li>
+        </ul>
+        <p class="role">{{ t('mg.role') }}</p>
+        <ul class="stack"><li>C#</li><li>ASP.NET Core</li><li>SQLite</li><li>Vue</li><li>TypeScript</li></ul>
+        <div class="actions">
+          <a class="btn btn--solid" href="/projects/marshal">{{ t('mg.project_page') }}</a>
+          <a class="btn" href="https://lgruenzweilhtl.github.io/marshal/" target="_blank" rel="noopener">{{ t('mg.docs') }}<span class="sr-only"> ({{ t('mg.docs_sr') }})</span></a>
+          <a class="btn" href="https://github.com/lGruenzweilHTL/marshal" target="_blank" rel="noopener">{{ t('mg.repo') }}<span class="sr-only"> ({{ t('mg.repo_sr') }})</span></a>
+        </div>
+      </div>
+      {#- The dashboard in chalk, a link to the real screenshot. The note and
+           its ring point at the held printer.start_print card's Approve. #}
+      <figure class="shot shot--tilt shot--marshal" data-chalk="frame" data-chalk-host>
+        <a class="shot-link" href="/img/marshal.webp">
+          <span class="shot-pic"><img class="shot-chalk" src="/img/marshal.chalk.webp" width="1000" height="625" loading="lazy" decoding="async" alt="{{ t('mg.shot_alt') }}"><span class="pin" id="pin-approve" data-ring="6.2%x4%" style="--x: 60.7%; --y: 71.4%"></span></span>
+          <span class="shot-hint">{{ t('shot.hint') }}</span>
+        </a>
+        <p class="note note--shot chalk-acc" aria-hidden="true" data-chalk="arrow" data-to="#pin-approve">{{ t('mg.note') }}</p>
+      </figure>
+    </div>
+
+    {#- Marshal's risk gate, the one idea that makes it different, as a board
+         diagram: wide on desktop, tall on phones. Labels fit themselves to
+         their place in every language (data-max, chalk.js). #}
+    <figure class="gate" aria-labelledby="gate-cap">
+      <figcaption class="gate-cap" id="gate-cap"><span class="chalk-text chalk-text--md">{{ t('gate.title') }}</span> {{ t('gate.caption_html') }}</figcaption>
+      <svg class="drawing gate-wide" viewBox="0 30 1200 470" role="img" aria-label="{{ t('gate.aria') }}">
+        <g class="ink">
+          <rect x="30" y="222" width="190" height="76"/>
+          <text x="125" y="271" class="t-l" text-anchor="middle" data-max="170" data-maxh="66" data-wrap>{{ t('gate.call') }}</text>
+          <line x1="232" y1="260" x2="308" y2="260" data-arrow/>
+          <polyline points="400,172 488,260 400,348 312,260 400,172"/>
+          <text x="400" y="270" class="t-m" text-anchor="middle" data-max="140" data-maxh="64" data-wrap>{{ t('gate.tier') }}</text>
+          <text x="400" y="150" class="t-s dim" text-anchor="middle" data-max="250">{{ t('gate.every') }}</text>
+          <path d="M492 250 C 528 170, 540 78, 610 72 L 664 72" data-arrow/>
+          <text x="634" y="56" class="t-m" text-anchor="middle" data-max="130">{{ t('gate.safe') }}</text>
+          <text x="682" y="84" class="t-l" data-max="200">{{ t('gate.now') }}</text>
+          <polyline points="894,70 906,86 934,48" data-tick/>
+        </g>
+        <g class="acc">
+          <line x1="496" y1="260" x2="664" y2="260" data-arrow/>
+          <text x="578" y="246" class="t-m" text-anchor="middle" data-max="150">{{ t('gate.confirm') }}</text>
+          <text x="682" y="196" class="t-s dim" data-max="300">{{ t('gate.example') }}</text>
+          <rect x="682" y="212" width="270" height="96"/>
+          <text x="817" y="253" class="t-l" text-anchor="middle" data-max="240">{{ t('gate.held') }}</text>
+          <text x="817" y="289" class="t-s" text-anchor="middle" data-max="250">{{ t('gate.frozen') }}</text>
+        </g>
+        <g class="ink">
+          <circle cx="726" cy="360" r="24"/>
+          <polyline points="726,345 726,360 738,367"/>
+        </g>
+        <g class="acc">
+          <line x1="726" y1="314" x2="726" y2="332"/>
+          <text x="860" y="369" class="t-m" text-anchor="middle" data-max="140">{{ t('gate.ttl') }}</text>
+          <ellipse cx="860" cy="360" rx="84" ry="30"/>
+        </g>
+        <g class="ink">
+          <line x1="966" y1="260" x2="1036" y2="260" data-arrow/>
+          <text x="1004" y="240" class="t-s" text-anchor="middle" data-max="74">{{ t('gate.say_yes') }}</text>
+          <text x="1048" y="272" class="t-l" data-max="104">{{ t('gate.runs') }}</text>
+          <polyline points="1168,258 1180,274 1206,238" data-tick/>
+          <path d="M492 270 C 528 350, 540 442, 610 448 L 664 448" data-arrow/>
+          <text x="664" y="490" class="t-m" text-anchor="end" data-max="150">{{ t('gate.forbidden') }}</text>
+          <text x="682" y="460" class="t-l" data-max="186" data-wrap>{{ t('gate.never') }}</text>
+          <line x1="878" y1="430" x2="910" y2="466"/>
+          <line x1="910" y1="430" x2="878" y2="466"/>
+        </g>
+      </svg>
+      <svg class="drawing gate-tall" viewBox="0 0 400 930" role="img" aria-label="{{ t('gate.aria') }}">
+        <g class="ink">
+          <rect x="110" y="20" width="180" height="64"/>
+          <text x="200" y="61" class="t-l" text-anchor="middle" data-max="166" data-maxh="56" data-wrap>{{ t('gate.call') }}</text>
+          <line x1="200" y1="92" x2="200" y2="146" data-arrow/>
+          <polyline points="200,152 272,224 200,296 128,224 200,152"/>
+          <text x="200" y="232" class="t-m" text-anchor="middle" data-max="104" data-maxh="50" data-wrap>{{ t('gate.tier') }}</text>
+          <path d="M200 302 C 200 340, 40 330, 40 380 L 40 842"/>
+          <line x1="40" y1="392" x2="86" y2="392" data-arrow/>
+          <text x="100" y="400" class="t-m b" data-max="290">{{ t('gate.safe') }}</text>
+          <text x="100" y="436" class="t-m" data-max="176">{{ t('gate.now') }}</text>
+          <polyline points="284,424 294,438 316,406" data-tick/>
+        </g>
+        <g class="acc">
+          <line x1="40" y1="512" x2="86" y2="512" data-arrow/>
+          <text x="100" y="520" class="t-m b" data-max="290">{{ t('gate.confirm') }}</text>
+          <text x="100" y="552" class="t-s dim" data-max="290">{{ t('gate.example') }}</text>
+          <rect x="100" y="568" width="276" height="92"/>
+          <text x="238" y="606" class="t-m" text-anchor="middle" data-max="250">{{ t('gate.held') }}</text>
+          <text x="238" y="640" class="t-s" text-anchor="middle" data-max="256">{{ t('gate.frozen') }}</text>
+        </g>
+        <g class="ink">
+          <circle cx="120" cy="706" r="19"/>
+          <polyline points="120,693 120,706 130,712"/>
+        </g>
+        <g class="acc">
+          <text x="244" y="715" class="t-m" text-anchor="middle" data-max="136">{{ t('gate.ttl') }}</text>
+          <ellipse cx="244" cy="706" rx="80" ry="27"/>
+        </g>
+        <g class="ink">
+          <text x="100" y="778" class="t-m" data-max="124">{{ t('gate.say_yes') }}</text>
+          <line x1="228" y1="770" x2="256" y2="770" data-arrow/>
+          <text x="270" y="778" class="t-m" data-max="84">{{ t('gate.runs') }}</text>
+          <polyline points="362,766 372,780 394,748" data-tick/>
+          <line x1="40" y1="842" x2="86" y2="842" data-arrow/>
+          <text x="100" y="850" class="t-m b" data-max="290">{{ t('gate.forbidden') }}</text>
+          <text x="100" y="896" class="t-m" data-max="152" data-maxh="52" data-wrap>{{ t('gate.never') }}</text>
+          <line x1="268" y1="872" x2="294" y2="900"/>
+          <line x1="294" y1="872" x2="268" y2="900"/>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="band band--site smear smear--r smear--2" id="site" aria-labelledby="site-title">
+  <div class="wrap split split--route">
+    <div class="split-text">
+      <h2 class="section-title chalk-text chalk-text--lg" id="site-title"><span data-chalk="underline">{{ t('site.title') }}</span></h2>
+      <p class="lead">{{ t('site.lead') }}</p>
+      <p class="role">{{ t('site.role') }}</p>
+      <ul class="stack"><li>Python</li><li>FastAPI</li><li>SQLite</li><li>Proxmox</li><li>Cloudflare Tunnel</li></ul>
+      <div class="actions">
+        <a class="btn" href="https://github.com/lGruenzweilHTL/portfolio-site" target="_blank" rel="noopener">{{ t('site.repo') }}<span class="sr-only"> ({{ t('site.repo_sr') }})</span></a>
+      </div>
+    </div>
+    {#- The path a request to this page takes, with live values from
+         /api/status (main.js); a value that doesn't arrive stays out. #}
+    <figure class="route">
+      <figcaption class="route-cap chalk-text chalk-text--md">{{ t('site.path_label') }}</figcaption>
+      <ol class="hops" data-chalk="route">
+        <li class="hop"><span class="stop" aria-hidden="true"></span><strong>{{ t('site.you') }}</strong><span>{{ t('site.you_note') }}</span></li>
+        <li class="hop"><span class="stop" aria-hidden="true"></span><strong>{{ t('site.edge') }}</strong><span data-show="edge" hidden>{{ t('site.edge_note') }} <b data-status="edge"></b></span></li>
+        <li class="hop"><span class="stop" aria-hidden="true"></span><strong>{{ t('site.tunnel') }}</strong><span>{{ t('site.tunnel_note') }}</span></li>
+        <li class="hop"><span class="stop" aria-hidden="true"></span><strong>{{ t('site.node') }}</strong><span data-show="nodes" hidden><b data-status="nodes"></b> {{ t('site.node_note') }}</span></li>
+        <li class="hop"><span class="stop" aria-hidden="true"></span><strong>{{ t('site.app') }}</strong><span data-show="uptime" hidden>{{ t('site.app_note') }} <b data-status="uptime"></b></span></li>
+      </ol>
+    </figure>
+  </div>
+</section>
+
+<section class="band band--vektor smear smear--l smear--3" id="vektorgrid" aria-labelledby="vektor-title">
+  <div class="wrap split split--vektor">
+    <div class="split-text">
+      <h2 class="section-title chalk-text chalk-text--lg" id="vektor-title"><span data-chalk="underline">vektorgrid</span></h2>
+      <p class="lead">{{ t('vk.lead') }}</p>
+      <ul class="ticks" data-chalk="ticks">
+        <li>{{ t('vk.h1') }}</li>
+        <li>{{ t('vk.h2') }}</li>
+        <li>{{ t('vk.h3') }}</li>
+      </ul>
+      <p class="role">{{ t('more.vektorgrid_role') }}</p>
+      <ul class="stack"><li>C#</li><li>C++</li><li>Python</li><li>Kotlin</li></ul>
+      <div class="actions">
+        <a class="btn btn--solid" href="/projects/vektorgrid">{{ t('mg.project_page') }}</a>
+        <a class="btn" href="https://github.com/vektorgrid-ai" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='vektorgrid') }})</span></a>
+      </div>
+    </div>
+    <aside class="learned panel panel--tilt" data-chalk="box" aria-labelledby="vektor-learned">
+      <h3 class="learned-title chalk-acc" id="vektor-learned">{{ t('vk.learned_title') }}</h3>
+      <p>{{ t('vk.learned') }}</p>
+    </aside>
+  </div>
+</section>
+
+<section class="band band--more smear smear--r" aria-labelledby="more-title">
+  <div class="wrap">
+    <h2 class="section-title chalk-text chalk-text--lg" id="more-title"><span data-chalk="underline">{{ t('more.title') }}</span></h2>
+    {#- The four with a screenshot first, each with its chalk thumbnail (a
+         link to the real one); RoboDucks and P.I.G.E.O.N. have none and
+         share the last row. No drawn stand-ins. #}
+    <ul class="also" data-chalk="grid">
+      <li>
+        <figure class="shot shot--tilt-l" data-chalk="frame" style="--ar: 2.620">
+          <a class="shot-link" href="/img/sceneforge.webp"><span class="shot-pic"><img class="shot-chalk" src="/img/sceneforge.chalk.webp" width="786" height="300" loading="lazy" decoding="async" alt="{{ t('more.sceneforge_alt') }}"></span></a>
+        </figure>
+        <h3 class="chalk-text chalk-text--md"><a href="/projects/sceneforge-ai">SceneForge AI</a></h3>
+        <p class="meta"><span class="mark-done" data-chalk="tick">{{ t('more.shipped') }}</span><span>{{ t('more.sceneforge_role') }}</span></p>
+        <p>{{ t('more.sceneforge_desc') }}</p>
+        <ul class="stack"><li>C#</li><li>Unity</li></ul>
+        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/SceneForge-AI" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='SceneForge AI') }})</span></a></p>
+      </li>
+      <li>
+        <figure class="shot shot--tilt" data-chalk="frame" style="--ar: 1.227">
+          <a class="shot-link" href="/img/uniconsole.webp"><span class="shot-pic"><img class="shot-chalk" src="/img/uniconsole.chalk.webp" width="368" height="300" loading="lazy" decoding="async" alt="{{ t('more.uniconsole_alt') }}"></span></a>
+        </figure>
+        <h3 class="chalk-text chalk-text--md"><a href="/projects/uniconsole">UniConsole</a></h3>
+        <p class="meta"><span class="mark-done" data-chalk="tick">{{ t('more.shipped') }}</span><span>{{ t('more.uniconsole_role') }}</span></p>
+        <p>{{ t('more.uniconsole_desc_html') }}</p>
+        <ul class="stack"><li>C#</li><li>Unity</li></ul>
+        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/UniConsole" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='UniConsole') }})</span></a></p>
+      </li>
+      <li>
+        <figure class="shot shot--tilt" data-chalk="frame" style="--ar: 1.797">
+          <a class="shot-link" href="/img/forkcast.webp"><span class="shot-pic"><img class="shot-chalk" src="/img/forkcast.chalk.webp" width="539" height="300" loading="lazy" decoding="async" alt="{{ t('more.forkcast_alt') }}"></span></a>
+        </figure>
+        <h3 class="chalk-text chalk-text--md">Forkcast</h3>
+        <p class="meta"><span>{{ t('more.private') }}</span><span>{{ t('more.forkcast_role') }}</span></p>
+        <p>{{ t('more.forkcast_desc') }}</p>
+        <ul class="stack"><li>TypeScript</li><li>Vue</li><li>REST API</li></ul>
+        <p class="also-links">{{ t('more.private_repo') }}</p>
+      </li>
+      <li>
+        <figure class="shot shot--tilt-l" data-chalk="frame" style="--ar: 1.790">
+          <a class="shot-link" href="/img/space-defenders.webp"><span class="shot-pic"><img class="shot-chalk" src="/img/space-defenders.chalk.webp" width="537" height="300" loading="lazy" decoding="async" alt="{{ t('more.space_alt') }}"></span></a>
+        </figure>
+        <h3 class="chalk-text chalk-text--md"><a href="/projects/space-defenders">Space Defenders</a></h3>
+        <p class="meta"><span class="mark-done" data-chalk="tick">{{ t('more.shipped') }}</span><span>{{ t('more.space_role') }}</span></p>
+        <p>{{ t('more.space_desc') }}</p>
+        <ul class="stack"><li>C#</li><li>Unity</li></ul>
+        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='Space Defenders') }})</span></a></p>
+      </li>
+      <li>
+        <h3 class="chalk-text chalk-text--md"><a href="/projects/roboducks-rescuemaze">RoboDucks: RescueMaze</a></h3>
+        <p class="meta"><span class="mark-done" data-chalk="tick">{{ t('more.shipped') }}</span><span>{{ t('more.roboducks_role') }}</span></p>
+        <p>{{ t('more.roboducks_desc') }}</p>
+        <ul class="stack"><li>Python</li><li>C</li></ul>
+        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='RoboDucks') }})</span></a></p>
+      </li>
+      <li>
+        <h3 class="chalk-text chalk-text--md">P.I.G.E.O.N.: Covert Ops</h3>
+        <p class="meta"><span>{{ t('more.in_progress') }}</span><span>{{ t('more.pigeon_role') }}</span></p>
+        <p>{{ t('more.pigeon_desc') }}</p>
+        <ul class="stack"><li>C#</li><li>Unity</li></ul>
+        {#- TODO: a repository link once the repo is public #}
+        <p class="also-links">{{ t('more.not_public') }}</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band band--exp smear smear--l smear--2" id="experience" aria-labelledby="experience-title">
+  <div class="wrap">
+    <h2 class="section-title chalk-text chalk-text--lg" id="experience-title"><span data-chalk="underline">{{ t('exp.title') }}</span></h2>
+    <div class="exp-cols">
+      <div class="exp-work">
+        <h3 class="col-title chalk-text chalk-text--md">{{ t('exp.work') }}</h3>
+        <article class="job">
+          <h4>SlideLizard Software GmbH</h4>
+          <p class="meta"><span>{{ t('exp.sl_role') }}</span><span>{{ t('exp.sl_place') }}</span></p>
+          <p>{{ t('exp.sl_desc') }}</p>
+          <ul class="stack"><li>Angular</li><li>TypeScript</li><li>Azure Speech</li><li>Azure OpenAI</li><li>Dataverse</li><li>OpenRouter</li></ul>
+          <figure class="quote">
+            <blockquote class="chalk-text chalk-text--md"><span data-chalk="underline" data-acc>{{ t('exp.quote') }}</span></blockquote>
+            <figcaption>{{ t('exp.quote_by') }}</figcaption>
+          </figure>
+        </article>
+        <article class="job">
+          <h4>{{ t('exp.caritas_org') }}</h4>
+          <p class="meta"><span>{{ t('exp.caritas_role') }}</span><span>{{ t('exp.caritas_place') }}</span></p>
+          <p>{{ t('exp.caritas_desc') }}</p>
+        </article>
+      </div>
+      <div class="exp-side" data-chalk="divider">
+        <h3 class="col-title chalk-text chalk-text--md">{{ t('exp.education') }}</h3>
+        <article class="job">
+          <h4>HTL Leonding</h4>
+          <p class="meta"><span>{{ t('exp.htl_place') }}</span></p>
+          <p>{{ t('exp.htl_desc') }}</p>
+        </article>
+        <h3 class="col-title chalk-text chalk-text--md">{{ t('stack.title') }}</h3>
+        <dl class="stack-list">
+          <div><dt>{{ t('stack.languages') }}</dt><dd><ul class="stack"><li>C#</li><li>Python</li><li>TypeScript</li><li>C</li><li>C++</li><li>Kotlin</li><li>Java</li><li>HTML/CSS</li></ul></dd></div>
+          <div><dt>{{ t('stack.tools') }}</dt><dd><ul class="stack"><li>ASP.NET Core</li><li>FastAPI</li><li>SQLite</li><li>Docker</li><li>Docker Compose</li><li>Proxmox</li><li>Azure</li><li>Unity</li></ul></dd></div>
+          <div><dt>{{ t('stack.spoken') }}</dt><dd><ul class="stack"><li>{{ t('stack.german') }}</li><li>{{ t('stack.english') }}</li></ul></dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band--about smear smear--r smear--3" id="about" aria-labelledby="about-title">
+  <div class="wrap">
+    <div class="split split--about">
+      <div class="split-text">
+        <h2 class="section-title chalk-text chalk-text--lg" id="about-title"><span data-chalk="underline">{{ t('about.title') }}</span></h2>
+        <p class="lead">{{ t('about.p1') }}</p>
+        <p>{{ t('about.p2_html') }}</p>
+        <p>{{ t('about.p3') }}</p>
+      </div>
+      {#- The Ender 3 Pro, sketched, with the three things "next on the list"
+           as margin notes. The notes are HTML, so translations wrap; each
+           sits at the height of its pin. #}
+      <figure class="sketch" data-chalk-host>
+        <div class="sketch-art">
+          <svg class="drawing" viewBox="56 14 372 482" role="img" aria-label="{{ t('about.sketch_alt') }}">
+            <g class="ink">
+              <circle cx="240" cy="52" r="34"/>
+              <circle cx="240" cy="52" r="9"/>
+              <line x1="240" y1="86" x2="240" y2="104"/>
+              <line x1="100" y1="108" x2="380" y2="108" style="stroke-width:6"/>
+              <line x1="117" y1="108" x2="117" y2="430" style="stroke-width:6"/>
+              <line x1="363" y1="108" x2="363" y2="430" style="stroke-width:6"/>
+              <line x1="140" y1="118" x2="140" y2="410" style="stroke-width:2.4"/>
+              <rect x="128" y="410" width="24" height="18"/>
+              <line x1="100" y1="258" x2="380" y2="258" style="stroke-width:6"/>
+              <rect x="214" y="234" width="56" height="48"/>
+              <polyline points="232,282 242,298 252,282"/>
+              <polyline points="150,380 330,380 350,394 130,394 150,380"/>
+              <line x1="240" y1="396" x2="240" y2="428"/>
+              <rect x="70" y="430" width="340" height="52"/>
+              <rect x="292" y="442" width="62" height="30"/>
+              <circle cx="380" cy="457" r="7"/>
+              <rect x="374" y="292" width="30" height="106"/>
+            </g>
+            <g class="acc">
+              <line x1="334" y1="140" x2="334" y2="162"/>
+              <line x1="334" y1="178" x2="334" y2="200"/>
+              <line x1="334" y1="216" x2="334" y2="238"/>
+              <line x1="334" y1="254" x2="334" y2="276"/>
+              <line x1="334" y1="292" x2="334" y2="314"/>
+              <line x1="334" y1="330" x2="334" y2="352"/>
+              <line x1="334" y1="368" x2="334" y2="390"/>
+              <line x1="334" y1="406" x2="334" y2="428"/>
+            </g>
+          </svg>
+          <span class="pin" id="pin-z" style="--x: 76%; --y: 38.6%"></span>
+          <span class="pin" id="pin-power" style="--x: 93.5%; --y: 68.7%"></span>
+          <span class="pin" id="pin-board" style="--x: 80.1%; --y: 91.9%"></span>
+        </div>
+        <div class="sketch-notes">
+          <p class="note sketch-head" id="next-title">{{ t('about.next') }}</p>
+          <ul aria-labelledby="next-title">
+            <li class="note" style="--y: 38.6%" data-chalk="arrow" data-to="#pin-z">{{ t('about.n_z') }}</li>
+            <li class="note" style="--y: 68.7%" data-chalk="arrow" data-to="#pin-power">{{ t('about.n_power') }}</li>
+            <li class="note" style="--y: 91.9%" data-chalk="arrow" data-to="#pin-board">{{ t('about.n_board') }}</li>
+          </ul>
+        </div>
+      </figure>
+    </div>
+    <dl class="about-things">
+      <div>
+        <dt class="chalk-text chalk-text--md" data-chalk="rule">{{ t('about.homelab') }}</dt>
+        <dd>{{ t('about.homelab_desc') }}</dd>
+      </div>
+      <div>
+        <dt class="chalk-text chalk-text--md" data-chalk="rule">{{ t('about.ender') }}</dt>
+        <dd>{{ t('about.ender_desc_html') }}</dd>
+      </div>
+      <div>
+        <dt class="chalk-text chalk-text--md" data-chalk="rule">{{ t('about.moto') }}</dt>
+        <dd>{{ t('about.moto_desc') }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="band band--contact smear smear--l" id="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <h2 class="section-title chalk-text chalk-text--lg" id="contact-title"><span data-chalk="underline">{{ t('contact.title') }}</span></h2>
+    <div class="contact-grid">
+      <div class="contact-main">
+        <p class="contact-lead">{{ t('contact.lead') }}</p>
+        <p class="contact-mail">
+          <a class="mail chalk-text chalk-text--lg" href="mailto:lukas.gruenzweil@liwest.at">lukas.gruenzweil<wbr>@liwest.at</a>
+          <button type="button" class="btn btn--sm copy" data-copy="lukas.gruenzweil@liwest.at" hidden><span class="copy-label">{{ t('contact.copy') }}</span></button>
+          <span class="copy-status" role="status" aria-live="polite"></span>
+        </p>
+        <p class="contact-body">{{ t('contact.body') }}</p>
+        <div class="actions">
+          <a class="btn btn--solid" href="/resume.pdf" target="_blank" rel="noopener">{{ t('hero.resume') }}<span class="sr-only"> ({{ t('hero.resume_sr') }})</span></a>
+          <a class="btn" href="/resume-ats.pdf" target="_blank" rel="noopener">{{ t('hero.plain') }}<span class="sr-only"> ({{ t('common.new_tab') }})</span></a>
+          <button type="button" class="btn" data-ask hidden>{{ t('contact.ask') }}</button>
+        </div>
+      </div>
+
+      {#- Site feedback (POSTs to /api/feedback, gated by Turnstile): for typos
+           and bugs, email is for the rest. Open beside the contact column on
+           wide screens; main.js folds it where it would sit below. #}
+      <details class="report" open>
+        <summary><span id="feedback-title">{{ t('contact.report') }}</span></summary>
+        <p class="feedback-sub" id="feedback-sub">{{ t('contact.feedback_sub') }}</p>
+        <form id="feedback-form" class="feedback-form" aria-labelledby="feedback-title" aria-describedby="feedback-sub" novalidate>
+          <div class="feedback-row">
+            <label class="field"><span>{{ t('contact.name_label') }}</span><input type="text" name="name" maxlength="120" autocomplete="name"></label>
+            <label class="field"><span>{{ t('contact.email_label') }}</span><input type="email" name="email" maxlength="254" autocomplete="email"></label>
+          </div>
+          <label class="field"><span>{{ t('contact.message_label') }} <span aria-hidden="true">*</span></span><textarea name="message" required maxlength="4000" rows="4" placeholder="{{ t('contact.placeholder') }}" aria-describedby="feedback-status"></textarea></label>
+          <div class="feedback-actions">
+            {# Turnstile mount point: stays empty until a send needs an interactive challenge #}
+            <div class="feedback-turnstile" id="feedback-turnstile"></div>
+            <p class="feedback-status" id="feedback-status" role="status" aria-live="polite"></p>
+            <button type="submit" class="btn btn--solid" id="feedback-submit">{{ t('contact.send') }}</button>
+          </div>
+        </form>
+      </details>
+    </div>
+  </div>
+</section>
+</main>
+
+{% include "_footer.html" %}
 
 <script src="/main.js" defer></script>
-
 {# Cloudflare Turnstile: separate on-demand widgets for the chatbot and the
      feedback form, see turnstile.js. It must load synchronously before the
      async API script so the onload hook exists when that script fires. If the
@@ -601,5 +639,7 @@ window.I18N = {{ js_strings | tojson }};
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__turnstileOnload" async defer></script>
 <script src="/chat.js" defer></script>
 <script src="/feedback.js" defer></script>
+{# chalk.js draws after the others have built their markup (the console). #}
+<script type="module" src="/chalk.js"></script>
 </body>
 </html>
