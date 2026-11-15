@@ -13,6 +13,11 @@ weasyprint==63.1      # PDF generation (see system deps in README)
 #   apt install libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libcairo2
 # On the homelab (Alpine): apk add pango harfbuzz cairo
 
+# Font subsetting for the profile README images (backend/readme/fonts.py).
+# WeasyPrint already pulls it in; a range, not a pin, because the newest
+# release needs Python 3.11 and CI also runs 3.10.
+fonttools[woff]>=4.38
+
 # HTTP client (OpenRouter, Turnstile siteverify)
 httpx==0.27.2
 

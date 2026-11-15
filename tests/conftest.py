@@ -39,6 +39,8 @@ def test_settings(monkeypatch, tmp_path):
         "chat_request_timeout_seconds": 5.0,
         "chat_total_timeout_seconds": 60.0,
         "data_retention_days": 90,
+        "github_token": "",
+        "static_generated_dir": str(tmp_path / "generated"),
     }
     for key, value in values.items():
         monkeypatch.setattr(settings, key, value)
