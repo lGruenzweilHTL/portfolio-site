@@ -249,7 +249,7 @@ def admin(request: Request) -> HTMLResponse:
     template = env.get_template("admin.html")
     en = catalogs()[DEFAULT_LANG]
     html = template.render(
-        # The shared PDU partial and main.js need these (English only).
+        # The shared header, footer and main.js need these (English only).
         t=en.t,
         js_strings=en.js(),
         home="/",
