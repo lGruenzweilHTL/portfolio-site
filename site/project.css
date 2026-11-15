@@ -1,0 +1,167 @@
+/* Project pages (/projects/<slug>, backend/templates/project.html).
+   Loaded after styles.css; uses only the kit's tokens and classes (KIT in
+   styles.css). The page is one board: the project's name in chalk, its
+   screenshot pinned beside it, the facts on the left edge and the README
+   as calm prose. README HTML is arbitrary (backend/projects.py sanitises it
+   and adds .table-wrap/.table, hr.rule, .rd-pic and .rd-badge), so every
+   rule under .readme must hold for content nobody here has seen. */
+
+/* ---------- Head: name, summary, actions, screenshot ---------- */
+
+.proj-head { position: relative; padding-top: clamp(20px, 4vh, 48px); padding-bottom: clamp(40px, 6vw, 80px);
+  --smear-y: 0; --smear-w: 50%; --smear-h: 300px; --smear-o: .85; }
+.proj-head--shot { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+.crumb { margin: 0 0 18px; font-size: var(--t-small); font-weight: 600; color: var(--chalk-dim); }
+.crumb [aria-current] { color: var(--chalk-dim); font-weight: 500; }
+.proj-title { font-size: clamp(2.75rem, 1.6rem + 4.2vw, 5.5rem); line-height: 1.12; margin: 0 0 .4em; padding-top: .08em; overflow-wrap: anywhere; }
+.proj-title span { display: inline; }
+.proj-intro .lead { color: var(--chalk); }
+.proj-intro .actions { margin-top: 26px; }
+/* A real fact with a link (vektorgrid -> Marshal), so it is not aria-hidden. */
+.proj-note { margin-top: 26px; transform: rotate(-2deg); transform-origin: left center; width: fit-content; max-width: 100%; }
+.proj-note a { color: inherit; text-decoration-color: rgb(241 210 106 / .55); }
+
+/* No screenshot: the facts stand beside the name, behind a drawn divider,
+   like the main projects beside the name on the main page. */
+.proj-head--side { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 64px; align-items: start; }
+.proj-side { padding-top: 40px; }
+.proj-side .deflist { margin-bottom: 0; }
+/* without JS the divider is a plain line */
+html:not(.js) .proj-side { border-left: 2px solid var(--chalk-line); padding-left: 30px; margin-left: -32px; }
+
+/* The screenshot: as wide as its chalk rendition, never more than the column. */
+.proj-shot { justify-self: end; width: min(100%, var(--w) + 24px); }
+.proj-shot .shot-chalk { width: 100%; }
+
+/* ---------- Body: facts beside the README ---------- */
+
+.proj-body { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: clamp(40px, 6vw, 96px); align-items: start;
+  padding-top: clamp(16px, 3vw, 40px); }
+.proj-facts { position: relative; }
+/* The facts stay beside a long README while there is room for them. */
+@media (min-width: 1001px) and (min-height: 760px) { .proj-facts { position: sticky; top: 28px; } }
+.proj-facts .hand-title { font-size: 1.75rem; margin-bottom: 14px; }
+.proj-facts .deflist { grid-template-columns: max-content minmax(0, 1fr); gap: 10px 18px; margin-bottom: 36px; font-size: .9375rem; }
+.proj-facts .deflist dt { padding-top: .1em; }
+.proj-facts .deflist .stack { font-size: inherit; color: var(--chalk); }
+.proj-push { display: contents; }
+.proj-ticks { margin: 0; }
+.proj-ticks li { font-size: .9375rem; color: var(--chalk-dim); line-height: 1.5; margin-bottom: 1em; }
+
+.proj-body--solo { grid-template-columns: minmax(0, 1fr); }
+/* A reading measure of about 75 characters. */
+.proj-readme { min-width: 0; max-width: 41em; container-type: inline-size; }
+.proj-readme > .hand-title { font-size: clamp(2rem, 1.6rem + 1.2vw, 2.625rem); margin-bottom: 8px; }
+.readme-src { margin: 0 0 32px; font-size: var(--t-small); color: var(--chalk-dim); }
+.readme-missing { color: var(--chalk-dim); }
+
+/* ---------- The README as prose ---------- */
+
+.readme { color: var(--chalk-dim); font-size: var(--t-body); line-height: 1.65; overflow-wrap: break-word; }
+.readme > :first-child { margin-top: 0; }
+.readme :is(p, ul, ol, blockquote, pre, details, .table-wrap) { margin: 0 0 1.1em; }
+.readme :is(strong, b) { color: var(--chalk); }
+.readme a { color: var(--chalk); }
+
+/* Headings: the README's top level in chalk lettering (Kalam), everything
+   under it in Tafel Sans, so a long README keeps one voice. Colour emoji in
+   headings turn grey: one accent on the board. */
+.readme :is(h3, h4, h5, h6) { color: var(--chalk); filter: grayscale(1); scroll-margin-top: 24px; }
+.readme h3 {
+  font: 700 1.75rem/1.2 var(--hand); margin: 1.7em 0 .4em; padding-top: .14em;
+  color: transparent; background: var(--grain-sm) 0 0 / 256px; -webkit-background-clip: text; background-clip: text;
+  filter: url(#chalk-md) grayscale(1);
+}
+.readme h4 { font: 650 1.1875rem/1.35 var(--sans); margin: 1.6em 0 .35em; }
+.readme h5 { font: 650 1.0625rem/1.4 var(--sans); margin: 1.4em 0 .3em; }
+.readme h6 { font: 600 1rem/1.4 var(--sans); color: var(--chalk-dim); margin: 1.4em 0 .3em; }
+.readme :is(h3, h4, h5, h6) :is(strong, b, code) { color: inherit; font-weight: inherit; }
+.readme h3 code { background: none; padding: 0; }
+@media (forced-colors: active) { .readme h3 { color: CanvasText; background: none; filter: none; } }
+
+.readme :is(ul, ol) { padding-left: 1.5em; }
+.readme ul { list-style: none; }
+.readme ul > li { position: relative; }
+.readme ul > li::before { content: '–'; position: absolute; left: -1.2em; color: var(--chalk-mute); }
+.readme ol > li::marker { color: var(--chalk-dim); font-weight: 600; }
+.readme li { margin-bottom: .4em; }
+.readme li > :is(ul, ol) { margin: .4em 0 0; }
+.readme li > p { margin-bottom: .4em; }
+
+.readme blockquote { padding: 2px 0 2px 20px; border-left: 3px solid var(--chalk-faint); }
+.readme blockquote > :last-child { margin-bottom: 0; }
+/* GitHub alerts (Note, Tip, Important): the label in chalk lettering. */
+.readme .rd-alert-title { margin: 0 0 .2em; font: 700 1.25rem/1.3 var(--hand); color: var(--chalk); }
+
+.readme pre { max-width: 100%; color: var(--chalk); }
+.readme :not(pre) > code { overflow-wrap: anywhere; }
+.readme kbd { padding: .1em .4em; border: 1px solid var(--chalk-line); border-radius: 3px; font-size: .85em; }
+
+.readme .table-wrap { margin-bottom: 1.4em; }
+.readme .table { color: var(--chalk-dim); }
+.readme .table td { min-width: 8em; }
+.readme .table :is(strong, a, code) { white-space: nowrap; }
+/* Flags and names in a table keep in one piece: the table scrolls instead. */
+.readme .table code { overflow-wrap: normal; }
+
+.readme hr.rule { margin: 2.6em 0; }
+/* Kit gap: Chrome's UA sheet gives <hr> overflow: hidden, which clips the
+   chalk stroke chalk.js draws inside it. */
+hr.rule { overflow: visible; }
+
+.readme details { padding-left: 2px; }
+.readme summary { cursor: pointer; color: var(--chalk); font-weight: 600; }
+
+/* README pictures come from GitHub in full colour. On the board they are
+   prints pinned up: a chalk frame (chalk.js; dashed without JS), a
+   restrained size, the light toned down until a hover or focus on their
+   link shows the real thing. */
+.rd-pic { display: inline-block; position: relative; max-width: 100%; margin: .4em 0; padding: 10px; vertical-align: top;
+  border: 2px dashed var(--chalk-line); }
+.chalk-ready .rd-pic { border-color: transparent; }
+/* Sized against the README column (cqi), not the frame: a percentage would
+   make the frame and the picture size each other. */
+/* A width the README gives (logos, phone shots) is kept; height follows it. */
+.rd-pic img { max-width: min(640px, 100cqi - 24px); max-height: 520px; object-fit: contain; filter: brightness(.74) saturate(.6); transition: filter .25s ease; }
+.rd-pic img[width] { height: auto; }
+.readme a:is(:hover, :focus-visible) .rd-pic img { filter: none; }
+.readme p:has(> a > .rd-pic, > .rd-pic) { margin-bottom: 1.4em; }
+/* Badges (shields.io): small, grey, in their row. */
+.rd-badge { display: inline-block; height: 20px; width: auto; vertical-align: middle; filter: grayscale(1) brightness(.9); transition: filter .25s ease; }
+.readme a:is(:hover, :focus-visible) .rd-badge { filter: none; }
+.readme p:has(> a > .rd-badge) { display: flex; flex-wrap: wrap; gap: 6px 8px; }
+
+/* ---------- More projects ---------- */
+
+.proj-end { margin: clamp(56px, 7vw, 96px) 0 0; }
+.proj-more { padding-top: 28px; }
+.proj-more .hand-title { font-size: 1.75rem; margin-bottom: 14px; opacity: .82; }
+.proj-more-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 40px; }
+.proj-more-list a { font-size: var(--t-hand-m); line-height: 1.3; text-decoration: none; }
+
+/* ---------- Narrower screens ---------- */
+
+@media (max-width: 1000px) {
+  .proj-head--shot, .proj-head--side { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .proj-head--side { gap: 40px; }
+  .proj-side { padding-top: 0; }
+  html:not(.js) .proj-side { border-left: 0; padding-left: 0; margin-left: 0; }
+  .proj-shot { justify-self: start; }
+  .proj-body { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .proj-facts { max-width: 46em; }
+  .proj-facts .deflist { margin-bottom: 28px; }
+}
+/* The kit stacks a deflist on phones; these labels are short enough to stay beside their values. */
+@media (max-width: 560px) { .proj-facts .deflist dd { margin-bottom: 0; } }
+@media (max-width: 440px) {
+  .proj-intro .actions .btn { flex: 1 1 auto; }
+  .proj-more-list { gap: 4px 28px; }
+  .readme h3 { font-size: 1.5625rem; }
+}
+@media (prefers-reduced-motion: reduce) { .rd-pic img, .rd-badge { transition: none; } }
+
+/* Kit gap: the assistant tab and its closed console are position: fixed at
+   the right edge, and their chalk overlays (chalk.js) reach past the
+   viewport on phones, which lets the page pan sideways by a few pixels.
+   body's overflow-x: clip doesn't catch fixed boxes; the viewport does. */
+html { overflow-x: clip; }

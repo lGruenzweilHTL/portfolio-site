@@ -1,6 +1,8 @@
-// Main page (backend/templates/index.html): the rack. Analytics, nav ports,
-// U grid, feedback drawer, live status (PDU), power-on self-test and
-// entrances. Also loaded by the project pages, which share the nav and the PDU.
+// Every page that uses styles.css: analytics beacon, the phone menu,
+// scroll-spy, live status from /api/status, the copy button and the
+// screenshot component (colours on hover, the original opened large).
+// chalk.js draws; this file only behaves. A classic script on purpose: it
+// runs without module support too.
 
 // Strings in the page's language: window.I18N is rendered from
 // content/i18n/<lang>.yaml (the "js" subtree). A missing key shows as itself.
@@ -10,209 +12,114 @@ function tr(key, values) {
   return s;
 }
 
-// Analytics beacon — auto-tracks outbound link clicks + resume download.
-// /api/track is fire-and-forget; never blocks the click.
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+// Analytics beacon: outbound link clicks and résumé downloads. /api/track is
+// fire-and-forget and never blocks the click.
 (function () {
   function track(name, data) {
     try {
-      const body = JSON.stringify({ name: name, data: data || null });
-      // sendBeacon when available (navigates don't cancel it); fall back to fetch keepalive.
-      if (navigator.sendBeacon) {
-        const blob = new Blob([body], { type: 'application/json' });
-        if (navigator.sendBeacon('/api/track', blob)) return;
-      }
-      fetch('/api/track', { method: 'POST', headers: { 'content-type': 'application/json' }, body: body, keepalive: true });
+      const body = JSON.stringify({ name, data: data || null });
+      if (navigator.sendBeacon && navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' }))) return;
+      fetch('/api/track', { method: 'POST', headers: { 'content-type': 'application/json' }, body, keepalive: true }).catch(() => {});
     } catch (_) { /* tracking is best-effort */ }
   }
-  document.addEventListener('click', function (e) {
+  document.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest('a[href]');
     if (!a) return;
     const href = a.getAttribute('href') || '';
-    if (href.startsWith('mailto:')) {
-      track('contact_clicked', { kind: href.slice(7).split('?')[0] });
-    } else if (/^\/resume(-ats)?\.pdf$/.test(href)) {
-      track('resume_downloaded', { variant: href === '/resume-ats.pdf' ? 'ats' : 'classic' });
-    } else if (a.target === '_blank' && /github\.com/.test(href)) {
-      track('github_clicked', { url: href });
-    }
+    if (href.startsWith('mailto:')) track('contact_clicked', { kind: href.slice(7).split('?')[0] });
+    else if (/^\/resume(-ats)?\.pdf$/.test(href)) track('resume_downloaded', { variant: href === '/resume-ats.pdf' ? 'ats' : 'classic' });
+    else if (a.target === '_blank' && /github\.com/.test(href)) track('github_clicked', { url: href });
   }, { passive: true });
 })();
 
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// Rack grid: number the rails in U, and on wide screens round every unit up
-// to a whole number of rack units (44px, minus the 2px gap between units) so
-// faceplates line up with the rail holes.
+// Menu on narrow screens, and the section in view marked in the nav.
 (function () {
-  const U = 44;
-  const units = [...document.querySelectorAll('.units > .unit, .units-main > .unit')];
-  const rails = [...document.querySelectorAll('.rail')];
-  const wide = matchMedia('(min-width: 901px)');
-  units.forEach((u, i) => u.style.setProperty('--unit-i', i));
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.getElementById('site-nav');
+  if (toggle && nav) {
+    const setOpen = (open) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      nav.classList.toggle('open', open);
+      // the menu panel only has a size now: give it its chalk frame
+      if (open && window.Chalk) { nav.setAttribute('data-chalk', 'box'); window.Chalk.draw(nav); }
+    };
+    document.addEventListener('click', (e) => {
+      if (toggle.getAttribute('aria-expanded') === 'true' && !nav.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    });
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    nav.addEventListener('click', (e) => { if (e.target.closest('a[href*="#"]')) setOpen(false); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); }
+    });
+  }
 
-  function layout() {
-    units.forEach(u => { u.style.minHeight = ''; });
-    const heights = units.map(u => u.offsetHeight); // layout size, ignores the rack-in transform
-    let total = 0;
-    units.forEach((u, i) => {
-      const n = Math.max(1, Math.ceil((heights[i] + 2) / U));
-      total += n;
-      if (wide.matches) u.style.minHeight = (n * U - 2) + 'px';
-    });
-    if (!wide.matches) return;
-    rails.forEach(rail => {
-      if (rail.childElementCount === total) return;
-      rail.textContent = '';
-      for (let i = 0; i < total; i++) {
-        const s = document.createElement('span');
-        s.className = 'rail-u';
-        s.style.top = (i * U) + 'px';
-        s.textContent = total - i;
-        rail.appendChild(s);
-      }
-    });
+  const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+  const sections = links.map((a) => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  if (!sections.length) return;
+  let current = null;
+  function spy() {
+    const line = innerHeight * 0.35;
+    let hit = null;
+    for (const sec of sections) if (sec.getBoundingClientRect().top <= line) hit = sec;
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) hit = sections[sections.length - 1];
+    if (hit === current) return;
+    current = hit;
+    for (const a of links) {
+      if (hit && a.getAttribute('href') === '#' + hit.id) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    }
   }
   let raf = 0;
-  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layout); };
-  window.addEventListener('resize', schedule);
-  document.addEventListener('rack:relayout', schedule);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
-  window.addEventListener('load', schedule);
-  schedule();
-})();
-
-// Power-on self-test: the inline script in <head> adds html.post on the first
-// visit of a browser session; drop it once the sequence has played.
-(function () {
-  const h = document.documentElement;
-  if (!h.classList.contains('post')) return;
-  setTimeout(() => {
-    h.classList.remove('post');
-    try { sessionStorage.setItem('rack.post', '1'); } catch (_) {}
-  }, 1400);
-})();
-
-// Units get racked as they scroll into view: pushed in, then screwed to the
-// rails (the motion is CSS, keyed on .in). Units are racked just before
-// they scroll in, so a fast scroll never lands on an empty rack. Units that
-// arrive together are racked one after the other, top to bottom.
-(function () {
-  const units = document.querySelectorAll('.unit.rv');
-  if (reducedMotion || !('IntersectionObserver' in window)) {
-    units.forEach(el => el.classList.add('in'));
-    return;
-  }
-  const io = new IntersectionObserver(entries => {
-    entries.filter(e => e.isIntersecting).forEach((e, i) => {
-      e.target.style.setProperty('--rv-delay', Math.min(i, 3) * 220 + 'ms');
-      e.target.classList.add('in');
-      io.unobserve(e.target);
-    });
-  }, { rootMargin: '0px 0px 10% 0px' });
-  units.forEach(el => io.observe(el));
-})();
-
-// Nav ports: scroll-spy lights the port of the section in view
-// (aria-current), and its act LED blinks once on change. On phones the
-// ports fold behind a "Ports" key.
-(function () {
-  const ports = [...document.querySelectorAll('.ports a[href^="#"]')];
-  // Sections without a port of their own light up the nearest one.
-  const owner = { hero: null, projects: 'projects', 'more-projects': 'projects', experience: 'experience', stack: 'about', about: 'about', contact: 'contact', pdu: 'contact' };
-  let current = undefined;
-  function light(id) {
-    if (id === current) return;
-    current = id;
-    ports.forEach(a => {
-      const on = id && a.getAttribute('href') === '#' + id;
-      if (on) {
-        a.setAttribute('aria-current', 'true');
-        a.classList.remove('blink'); void a.offsetWidth; a.classList.add('blink');
-      } else {
-        a.removeAttribute('aria-current');
-      }
-    });
-  }
-  // The lit port belongs to the section currently under the nav bar: the
-  // last one whose top has scrolled past it. A short section (Experience
-  // with its rows) still lights up when its port is clicked, because the
-  // jump puts its top right there. At the very bottom, the last one wins.
-  const sections = Object.keys(owner).map(id => document.getElementById(id)).filter(Boolean);
-  const nav = document.getElementById('nav');
-  function spy() {
-    if (!sections.length) return;
-    const line = (nav ? nav.getBoundingClientRect().bottom : 0) + 24;
-    const atEnd = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
-    let hit = sections[0];
-    for (const sec of sections) {
-      if (sec.getBoundingClientRect().top <= line) hit = sec;
-    }
-    if (atEnd) hit = sections[sections.length - 1];
-    light(owner[hit.id]);
-  }
-  let spyRaf = 0;
-  addEventListener('scroll', () => { cancelAnimationFrame(spyRaf); spyRaf = requestAnimationFrame(spy); }, { passive: true });
-  addEventListener('resize', spy);
+  addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; spy(); }); }, { passive: true });
   spy();
-
-  const toggle = document.querySelector('.nav-toggle');
-  const list = document.getElementById('ports');
-  if (!toggle || !list) return;
-  function setOpen(open) {
-    toggle.setAttribute('aria-expanded', String(open));
-    list.classList.toggle('open', open);
-  }
-  toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
-  list.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') { setOpen(false); toggle.focus(); }
-  });
 })();
 
-// KVM drawer with the feedback form. Fault LED: red while the drawer is
-// open, green after a report went through (feedback.js fires feedback:sent).
+// The bug-report form sits open beside Contact on wide screens; where it
+// would stack under it, it starts folded.
 (function () {
-  const toggle = document.querySelector('.drawer-toggle');
-  const drawer = document.getElementById('drawer');
-  const fault = document.getElementById('fault-status');
-  if (!toggle || !drawer) return;
-  const label = fault && fault.querySelector('.fault-label');
-  const inner = drawer.querySelector('.drawer-inner');
-  function setState(state, text) {
-    if (!fault) return;
-    fault.dataset.state = state;
-    if (label) label.textContent = text;
-  }
-  function setOpen(open) {
-    toggle.setAttribute('aria-expanded', String(open));
-    drawer.classList.toggle('open', open);
-    inner.inert = !open;
-    if (fault && fault.dataset.state !== 'sent') setState(open ? 'open' : '', tr(open ? 'fault.reporting' : 'fault.idle'));
-    if (open) setTimeout(() => { const m = drawer.querySelector('textarea'); if (m) m.focus(); }, reducedMotion ? 0 : 360);
-    setTimeout(() => document.dispatchEvent(new Event('rack:relayout')), reducedMotion ? 0 : 380);
-  }
-  inner.inert = true;
-  const flip = () => setOpen(toggle.getAttribute('aria-expanded') !== 'true');
-  toggle.addEventListener('click', flip);
-  const handle = drawer.querySelector('.drawer-handle');
-  if (handle) handle.addEventListener('click', flip);
-  document.addEventListener('feedback:sent', () => setState('sent', tr('fault.sent')));
+  const report = document.querySelector('details.report');
+  if (report && innerWidth < 1100) report.open = false;
 })();
 
-// Live status from /api/status: PDU readouts, "last push" chips on the
-// blades and the console's model name. Refreshes every
-// 60s while the tab is visible; on failure the PDU goes amber and shows "--".
-// LEDs with data-led show real state: "status" is green while this endpoint
-// answers and amber when it doesn't; "push:<slug>" is green if that project
-// was pushed to in the last two weeks, amber if not.
+// Copy the email address (the button only appears when the clipboard works).
 (function () {
-  const $ = sel => document.querySelector(sel);
-  const pduState = $('#pdu-state');
-  const pduLabel = pduState && pduState.querySelector('.pdu-state-label');
+  for (const btn of document.querySelectorAll('[data-copy]')) {
+    if (!navigator.clipboard) continue;
+    btn.hidden = false;
+    const label = btn.querySelector('.copy-label');
+    const status = btn.parentElement.querySelector('.copy-status');
+    const original = label ? label.textContent : '';
+    let timer = 0;
+    btn.addEventListener('click', async () => {
+      let ok = true;
+      try { await navigator.clipboard.writeText(btn.dataset.copy); } catch (_) { ok = false; }
+      if (label) label.textContent = ok ? tr('copied') : original;
+      if (status) status.textContent = ok ? tr('copied') : tr('copy_failed');
+      btn.querySelector('use')?.setAttribute('href', ok ? '#ph-check' : '#ph-copy');
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (label) label.textContent = original;
+        if (status) status.textContent = '';
+        btn.querySelector('use')?.setAttribute('href', '#ph-copy');
+      }, 2200);
+    });
+  }
+})();
+
+// Live status from /api/status, into every [data-status] element (footer,
+// the request path on the main page). A value that arrives un-hides its
+// [data-show="name"] wrappers (and [data-show="readouts"] once any did); on
+// failure they hide again, so the page never shows a row of dashes.
+// Refreshes every 60 s while the tab is visible.
+(function () {
+  const fields = () => document.querySelectorAll('[data-status], [data-push]');
+  if (!fields().length) return;
 
   function ago(iso) {
     const t = Date.parse(iso);
-    if (!t) return '--';
+    if (!t) return '';
     const s = Math.max(0, (Date.now() - t) / 1000);
     if (s < 3600) return Math.max(1, Math.round(s / 60)) + tr('time.m');
     if (s < 86400) return Math.round(s / 3600) + tr('time.h');
@@ -221,67 +128,48 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
     return Math.round(s / (86400 * 365)) + tr('time.y');
   }
   function uptime(sec) {
-    if (sec == null) return '--';
-    const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600);
-    const pad = n => String(n).padStart(2, '0');
-    return d ? d + tr('time.d') + ' ' + pad(h) + tr('time.h') : h + tr('time.h') + ' ' + pad(Math.floor(sec % 3600 / 60)) + tr('time.m');
+    if (sec == null) return '';
+    const d = Math.floor(sec / 86400);
+    const h = Math.floor((sec % 86400) / 3600);
+    const pad = (n) => String(n).padStart(2, '0');
+    return d ? `${d}${tr('time.d')} ${pad(h)}${tr('time.h')}` : `${h}${tr('time.h')} ${pad(Math.floor((sec % 3600) / 60))}${tr('time.m')}`;
   }
-  function set(el, text) {
-    if (!el || el.textContent === text) return;
-    el.textContent = text;
-    if (!reducedMotion) { el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick'); }
+  function show(name, on) {
+    for (const el of document.querySelectorAll(`[data-show="${name}"]`)) el.hidden = !on;
   }
-  function setState(state, text) {
-    if (!pduState) return;
-    pduState.dataset.state = state;
-    if (pduLabel) pduLabel.textContent = text;
-  }
-  function setLed(el, color) {
-    el.classList.remove('led--green', 'led--amber');
-    if (color) el.classList.add('led--' + color);
-  }
-  function leds(s) {
-    document.querySelectorAll('[data-led]').forEach(el => {
-      const src = el.dataset.led;
-      if (src === 'status') setLed(el, s ? 'green' : 'amber');
-      else if (src.startsWith('push:')) {
-        const t = s && s.projects && Date.parse(s.projects[src.slice(5)]);
-        setLed(el, t ? (Date.now() - t < 14 * 86400000 ? 'green' : 'amber') : '');
-      }
-    });
+  function set(name, text) {
+    for (const el of document.querySelectorAll(`[data-status="${name}"]`)) {
+      if (el.textContent !== text) el.textContent = text;
+    }
+    show(name, !!text);
+    return !!text;
   }
   async function poll() {
     let s;
     try {
       const r = await fetch('/api/status', { cache: 'no-store' });
-      if (!r.ok) throw new Error(r.status);
+      if (!r.ok) throw new Error(String(r.status));
       s = await r.json();
     } catch (_) {
-      document.querySelectorAll('[data-status]').forEach(el => set(el, '--'));
-      leds(null);
-      setState('stale', tr('status.stale'));
+      for (const name of ['uptime', 'rev', 'edge', 'nodes']) set(name, '');
+      show('readouts', false);
+      for (const el of document.querySelectorAll('[data-push]')) el.textContent = '--';
       return;
     }
-    set($('[data-status="uptime"]'), uptime(s.uptime_s));
-    set($('[data-status="rev"]'), s.rev ? s.rev + (s.rev_time ? ' · ' + tr('time.ago', { t: ago(s.rev_time) }) : '') : '--');
-    set($('[data-status="edge"]'), s.edge || '--');
-    set($('[data-status="nodes"]'), s.nodes != null ? String(s.nodes) : '--');
-    const projects = s.projects || {};
-    // A "last push" line is only worth showing while it's recent: a stale
-    // date reads as an abandoned project, so its row stays hidden.
-    document.querySelectorAll('[data-push]').forEach(el => {
-      const when = projects[el.dataset.push];
-      const t = when && Date.parse(when);
-      if (when) set(el, ago(when));
-      const row = el.closest('[data-push-row]');
-      if (row) row.hidden = !(t && Date.now() - t < 90 * 86400000);
-    });
-    leds(s);
-    setState('live', tr('status.online'));
-    window.__rackStatus = s;
-    document.dispatchEvent(new CustomEvent('rack:status', { detail: s }));
+    let any = false;
+    any = set('uptime', uptime(s.uptime_s)) || any;
+    any = set('rev', s.rev ? s.rev + (s.rev_time && ago(s.rev_time) ? ', ' + tr('time.ago', { t: ago(s.rev_time) }) : '') : '') || any;
+    any = set('edge', s.edge || '') || any;
+    any = set('nodes', s.nodes != null ? String(s.nodes) : '') || any;
+    show('readouts', any);
+    // Project pages: when the repo was last pushed.
+    for (const el of document.querySelectorAll('[data-push]')) {
+      const at = s.projects && s.projects[el.dataset.push];
+      el.textContent = at && ago(at) ? tr('time.ago', { t: ago(at) }) : '--';
+    }
+    window.__siteStatus = s;
+    document.dispatchEvent(new CustomEvent('site:status', { detail: s }));
   }
-
   let timer = null;
   function sync() {
     if (document.hidden) { clearInterval(timer); timer = null; return; }
@@ -291,3 +179,67 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   sync();
 })();
 
+// Screenshots (<figure class="shot">): the chalk rendition is a link to the
+// original. Hover or keyboard focus fades the real colours in, in place; a
+// click opens the original large in a dialog. Without JS the link opens the
+// image file. The original only loads when someone asks for it.
+(function () {
+  const links = document.querySelectorAll('.shot-link');
+  if (!links.length) return;
+  function real(link) {
+    let img = link.querySelector('.shot-real');
+    if (!img) {
+      img = document.createElement('img');
+      img.className = 'shot-real';
+      img.alt = '';
+      img.decoding = 'async';
+      img.src = link.getAttribute('href');
+      (link.querySelector('.shot-pic') || link).appendChild(img);
+    }
+    return img;
+  }
+  const on = (link) => { const img = real(link); const go = () => link.classList.add('is-real'); img.complete ? go() : img.addEventListener('load', go, { once: true }); };
+  const off = (link) => link.classList.remove('is-real');
+
+  let box = null;
+  function lightbox() {
+    if (box) return box;
+    box = document.createElement('dialog');
+    box.className = 'lightbox';
+    box.setAttribute('aria-label', tr('shot.dialog'));
+    const img = document.createElement('img');
+    img.alt = '';
+    const bar = document.createElement('div');
+    bar.className = 'lightbox-bar';
+    const cap = document.createElement('p');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'btn btn--sm';
+    close.textContent = tr('shot.close');
+    close.addEventListener('click', () => box.close());
+    bar.append(cap, close);
+    box.append(img, bar);
+    // a click on the backdrop closes it too
+    box.addEventListener('click', (e) => { if (e.target === box) box.close(); });
+    document.body.appendChild(box);
+    return box;
+  }
+  for (const link of links) {
+    link.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') on(link); });
+    link.addEventListener('pointerleave', () => off(link));
+    link.addEventListener('focus', () => { if (link.matches(':focus-visible')) on(link); });
+    link.addEventListener('blur', () => off(link));
+    link.addEventListener('click', (e) => {
+      const d = lightbox();
+      if (typeof d.showModal !== 'function') return;   // old browser: follow the link
+      e.preventDefault();
+      const shot = link.querySelector('.shot-chalk');
+      const img = d.querySelector('img');
+      img.src = link.getAttribute('href');
+      img.alt = shot ? shot.alt : '';
+      d.querySelector('p').textContent = shot ? shot.alt : '';
+      d.showModal();
+      if (window.Chalk) { d.setAttribute('data-chalk', 'box'); img.decode().catch(() => {}).then(() => window.Chalk.draw(d)); }
+    });
+  }
+})();

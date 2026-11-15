@@ -22,7 +22,7 @@ ORIGIN = "https://gruenzweil.cc"
 PATHS = {"en": "/privacy", "de": "/de/privacy"}
 
 # Date of the last change to the policy text; shown on the page.
-UPDATED = "2026-10-18"
+UPDATED = "2026-11-13"
 
 
 def _render(code: str) -> str:
@@ -34,7 +34,7 @@ def _render(code: str) -> str:
         paths=PATHS,
         origin=ORIGIN,
         updated=UPDATED,
-        # The PDU footer and the page scripts speak the page language.
+        # The header, footer and page scripts speak the page language.
         t=catalog.t,
         js_strings=catalog.js(),
         home="/" if code == DEFAULT_LANG else f"/{code}/",

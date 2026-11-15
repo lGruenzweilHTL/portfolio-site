@@ -1,0 +1,33 @@
+{#- Site header, shared by every page that uses styles.css. Needs `t`; `home`
+    is the main page's path when this isn't the main page (the section links
+    then point back to it); `langs` and `lang` add the language switch.
+    main.js folds the links behind "Menu" on phones; chalk.js draws the
+    button boxes and the menu's frame. Not sticky: it is part of the board. #}
+{%- set base = home or '' -%}
+<header class="site-header" id="site-header">
+  <div class="wrap bar">
+    <a class="wordmark chalk-text" href="{{ base }}#top" aria-label="{{ t('nav.home_label') }}">Lukas Grünzweil</a>
+    <button type="button" class="btn btn--sm nav-toggle" aria-expanded="false" aria-controls="site-nav">{{ t('nav.menu') }}</button>
+    <nav class="site-nav" id="site-nav" aria-label="{{ t('nav.label') }}">
+      <ul class="nav-links">
+        <li><a href="{{ base }}#projects">{{ t('nav.projects') }}</a></li>
+        <li><a href="{{ base }}#experience">{{ t('nav.experience') }}</a></li>
+        <li><a href="{{ base }}#about">{{ t('nav.about') }}</a></li>
+        <li><a href="{{ base }}#contact">{{ t('nav.contact') }}</a></li>
+      </ul>
+      <div class="nav-end">
+        {% if langs %}
+        {#- Language switch: plain links, so crawlers find every version. #}
+        <details class="lang">
+          <summary><span class="sr-only">{{ t('nav.lang_label') }}: {{ lang.name }}</span><span aria-hidden="true">{{ lang.code | upper }}</span></summary>
+          <ul class="lang-list" data-chalk="box">
+            {% for l in langs %}<li><a href="{{ l.path }}" hreflang="{{ l.hreflang }}" lang="{{ l.hreflang }}"{% if l.code == lang.code %} aria-current="page"{% endif %}>{{ l.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </details>
+        {% endif %}
+        <a class="btn btn--sm" href="/resume.pdf" target="_blank" rel="noopener">{{ t('nav.resume') }}<span class="sr-only"> ({{ t('common.new_tab') }})</span></a>
+      </div>
+    </nav>
+  </div>
+</header>

@@ -9,192 +9,230 @@ meta:
   date_locale: fr-FR
 
 head:
-  title: "Lukas Grünzweil · Développeur backend & IA, élève à la HTL Leonding"
+  title: Lukas Grünzweil · Développeur backend, élève à la HTL Leonding
   description: "Lukas Grünzweil, élève à la HTL Leonding en Autriche, développe des systèmes backend, des outils d'IA et des jeux Unity en C#, Python et TypeScript. Actuellement en 4e année sur 5, diplômé en juin 2028, ouvert à un stage backend."
-  og_title: "Lukas Grünzweil · Développeur backend & IA"
-  og_description: "Élève à la HTL Leonding, en Autriche (4e année sur 5). Systèmes backend, outils d'IA et jeux en C#, Python et TypeScript. Ouvert à un stage backend."
-  og_image_alt: "Lukas Grünzweil : systèmes backend, outils d'IA et jeux"
+  og_title: Lukas Grünzweil · Développeur backend
+  og_description: Élève à la HTL Leonding, en Autriche (4e année sur 5). Systèmes backend, outils d'IA et jeux en C#, Python et TypeScript.
+  og_image_alt: 'Lukas Grünzweil : systèmes backend, outils d''IA et jeux'
 
 ld:
   job_title: Élève ingénieur
-  person_description: "Élève à la HTL Leonding en Autriche qui développe des systèmes backend, des outils d'IA et des jeux, principalement en C#, Unity et Python. Actuellement en 4e année sur 5, diplômé en juin 2028, ouvert à un stage backend."
-  seeks_name: "Stage backend"
-  seeks_description: "Ouvert à un stage backend ; actuellement en 4e année sur 5 à la HTL Leonding, diplômé en juin 2028."
-  projects_name: "Projets de Lukas Grünzweil"
-  vektorgrid: "Le prédécesseur de Marshal : un assistant vocal auto-hébergé conçu comme un système distribué, avec des relais edge en C++, un orchestrateur C# qui pilote une chaîne Python de reconnaissance vocale, routage d'intention, LLM et synthèse vocale, et une application Kotlin qui valide les appels d'outils risqués par biométrie."
-  marshal: "Un agent IA auto-hébergé pour Home Assistant : un noyau ASP.NET évalue le risque de chaque appel d'outil, exécute des tâches en arrière-plan et garde une mémoire à long terme, avec une application web Vue."
-  sceneforge: "Un plugin d'IA pour l'éditeur Unity qui transforme une description de scène en texte libre en GameObjects et composants."
-  uniconsole: "Une console de débogage en jeu, gratuite et légère, pour Unity : annotez une méthode statique avec [Command] et appelez-la depuis un terminal dans la scène."
-  forkcast: "Un projet scolaire de planification des repas avec recherche de recettes via l'API Spoonacular, un calendrier des repas et des listes de courses combinées. Lukas a écrit l'essentiel du backend TypeScript."
-  space_defenders: "Un jeu d'arcade mobile réalisé avec Unity, avec des vagues de vaisseaux ennemis toujours plus fortes et des commandes tactiles."
-  pigeon: "Un jeu Unity satirique en cours de développement sur un pigeon qui mène des opérations secrètes pour le gouvernement."
-  roboducks: "Travaux pour la compétition de robotique RescueMaze au club de robotique de la HTL Leonding : un protocole série entre un Raspberry Pi et un hub LEGO SPIKE, et un contrôleur d'exploration de labyrinthe basé sur l'algorithme de Trémaux."
+  person_description: Élève à la HTL Leonding en Autriche qui développe des systèmes backend, des outils d'IA et des jeux, principalement en C#, Unity et Python. Actuellement en 4e année sur 5, diplômé en juin 2028, ouvert à un stage backend.
+  seeks_name: Stage backend
+  seeks_description: Ouvert à un stage backend ; actuellement en 4e année sur 5 à la HTL Leonding, diplômé en juin 2028.
+  projects_name: Projets de Lukas Grünzweil
+  vektorgrid: 'Le prédécesseur de Marshal : un assistant vocal auto-hébergé conçu comme un système distribué, avec des relais edge en C++, un orchestrateur C# qui pilote une chaîne Python de reconnaissance vocale, routage d''intention, LLM et synthèse vocale, et une application Kotlin qui valide les appels d''outils risqués par biométrie.'
+  marshal: 'Un agent IA auto-hébergé pour Home Assistant : un noyau ASP.NET évalue le risque de chaque appel d''outil, exécute des tâches en arrière-plan et garde une mémoire à long terme, avec une application web Vue.'
+  site: 'Ce site : un processus FastAPI dans un homelab Proxmox derrière un Cloudflare Tunnel, qui sert les pages, les CV en PDF, un assistant IA et des statistiques respectueuses de la vie privée, redéployé par un webhook GitHub.'
+  sceneforge: Un plugin d'IA pour l'éditeur Unity qui transforme une description de scène en texte libre en GameObjects et composants.
+  uniconsole: 'Une console de débogage en jeu, gratuite et légère, pour Unity : annotez une méthode statique avec [Command] et appelez-la depuis un terminal dans la scène.'
+  forkcast: Un projet scolaire de planification des repas avec recherche de recettes via l'API Spoonacular, un calendrier des repas et des listes de courses combinées. Lukas a écrit l'essentiel du backend TypeScript.
+  space_defenders: Un jeu d'arcade mobile réalisé avec Unity, avec des vagues de vaisseaux ennemis toujours plus fortes et des commandes tactiles.
+  pigeon: Un jeu Unity satirique en cours de développement sur un pigeon qui mène des opérations secrètes pour le gouvernement.
+  pigeon_status: En cours
+  roboducks: 'Travaux pour la compétition de robotique RescueMaze au club de robotique de la HTL Leonding : un protocole série entre un Raspberry Pi et un hub LEGO SPIKE, et un contrôleur d''exploration de labyrinthe basé sur l''algorithme de Trémaux.'
 
 common:
   email_me: M'écrire
-  tech: Technologies
-
+  new_tab: s'ouvre dans un nouvel onglet
 a11y:
   skip: Aller au contenu
 
-roof: "gruenzweil.cc · servi depuis LG-RACK-01"
-
 nav:
   label: Navigation principale
-  host_label: "Lukas Grünzweil, retour en haut"
-  ports: Ports
+  home_label: Lukas Grünzweil, retour en haut
+  menu: Menu
   projects: Projets
   experience: Expérience
   about: À propos
   contact: Contact
-  resume: "CV"
+  resume: CV
   lang_label: Langue
 
 hero:
-  available: "Ouvert à un stage backend"
-  line1: "Développeur backend et IA, surtout en C# et Python"
-  line2: "4e année sur 5 à la HTL Leonding, près de Linz, Autriche"
-  line3: "Diplômé en juin 2028, je cherche un stage backend"
-  quote: "« L'un des meilleurs projets jamais réalisés ici pendant un stage. »"
-  quote_by_html: '— Responsable du développement chez <a href="#experience">SlideLizard Software GmbH</a>, Linz, à propos de mon stage chez eux en août 2026'
-  bio: "La plupart de ce que je construis tourne sur un serveur, et ces derniers temps il y a souvent un modèle de langage dans la boucle. Le reste du temps, je suis dans Unity, et ça finit souvent en outil pour d'autres développeurs Unity."
-  github_sr: "profil (s'ouvre dans un nouvel onglet)"
-  download: "CV (PDF, en anglais)"
-  plain: "CV en texte brut pour les portails d'emploi"
-  classic_sr: "CV, deux colonnes, s'ouvre dans un nouvel onglet"
-  ats_sr: "CV, texte brut pour les portails d'emploi, s'ouvre dans un nouvel onglet"
-  translation_note: "Page traduite de l'anglais. Lukas travaille en allemand et en anglais."
-  facts: Points clés
-  bay0: "Lycée technique supérieur · 2022–2028"
-  bay1: "Stagiaire en génie logiciel · 08/2026"
-  bay2: "Agent IA pour Home Assistant · en développement actif"
-  bay3: "3 nœuds Proxmox · servent cette page"
-  ask_title: "Posez vos questions à mon assistant IA"
-  ask_lead: "Il en sait plus que cette page : pourquoi je construis ce que je construis, comment je travaille et ce que je recherche."
-  ask_placeholder: "p. ex. Quand est-il disponible ?"
-  ask_send: "Demander"
+  role: Développeur backend, surtout en C#/.NET et Python.
+  school: 4e année sur 5 à la HTL Leonding, près de Linz (Autriche). Diplômé en juin 2028.
+  bio: La plupart de ce que je construis tourne sur un serveur, et ces derniers temps il y a souvent un modèle de langage dans la boucle. Le reste du temps, je suis dans Unity, et ça finit souvent en outil pour d'autres développeurs Unity.
+  resume: CV (PDF)
+  resume_sr: deux colonnes, en anglais, s'ouvre dans un nouvel onglet
+  plain: CV en texte brut pour les portails d'emploi
+  ask: Demander à mon assistant
+  projects: "Projets principaux"
+  p_marshal: "Agent d'IA auto-hébergé pour Home Assistant"
+  p_site: "FastAPI sur mon homelab Proxmox"
+  p_vektorgrid: "Assistant vocal en système distribué"
+  translation_note: Page traduite de l'anglais. Lukas travaille en allemand et en anglais.
+  note: "ouvert à un stage en backend"
 
 mg:
-  featured: "Projet phare"
-  status: "Actif"
-  lead: "Un agent IA auto-hébergé pour Home Assistant. Il pilote l'imprimante 3D, trie les mails, prépare la matinée et retient ce qui compte. Les actions anodines se font seules ; les risquées attendent un oui clair."
-  role: "Auteur"
-  project_page: "Page du projet"
-  repo: "Dépôt sur GitHub"
-  repo_sr: "(dépôt Marshal, s'ouvre dans un nouvel onglet)"
-  docs: "Documentation"
-  docs_sr: "(documentation de Marshal, s'ouvre dans un nouvel onglet)"
-  shot_alt: "Tableau de bord de Marshal avec des validations en attente pour déverrouiller la porte d'entrée et lancer une impression, à côté de l'état en direct de l'imprimante 3D"
+  lead: Un agent IA auto-hébergé pour Home Assistant. Il pilote l'imprimante 3D, trie les mails, prépare la matinée et retient ce qui compte. Les actions anodines se font seules ; les risquées attendent un oui clair.
+  role: Auteur, depuis septembre 2026
+  h1: 'Un harness ASP.NET par lequel passe chaque requête : boucle d''agent, registre d''outils, routeur de modèles, client MCP.'
+  h2: Un moteur de risque classe chaque appel d'outil. Les appels sûrs s'exécutent, « confirm » attend avec ses arguments figés jusqu'à mon accord, « forbidden » ne s'exécute jamais.
+  h3: Des tâches de fond durables et une mémoire à long terme avec recherche hybride sur SQLite et sqlite-vec, avec une application web Vue par-dessus.
+  project_page: Page du projet
+  docs: Documentation
+  docs_sr: documentation de Marshal, s'ouvre dans un nouvel onglet
+  repo: Dépôt
+  repo_sr: Marshal sur GitHub, s'ouvre dans un nouvel onglet
+  shot_alt: Tableau de bord de Marshal avec des validations en attente pour déverrouiller la porte d'entrée et lancer une impression, à côté de l'état en direct de l'imprimante 3D
+  note: "les risquées attendent un oui clair"
 
-blades:
-  title: Autres projets
-  fun_title: "Jeux, faits pour le plaisir"
-  last_push: Dernier push
-  details: Détails
-  details_sr: "sur {name}"
-  repo_sr: "de {name} (s'ouvre dans un nouvel onglet)"
-  shipped: Livré
+gate:
+  title: "Le filtre de risque."
+  caption_html: "Chaque appel d'outil reçoit un niveau de risque. Les appels sûrs s'exécutent aussitôt. Les appels à confirmer, par exemple <code>printer.start_print</code>, sont retenus avec leurs arguments exacts figés pendant 60&nbsp;s au plus, jusqu'à mon accord. Les appels interdits ne s'exécutent jamais."
+  aria: "Schéma : un appel d'outil reçoit un niveau de risque. Les appels sûrs s'exécutent aussitôt ; les appels à confirmer sont retenus avec leurs arguments figés pendant 60 secondes au plus, jusqu'à mon accord ; les appels interdits ne s'exécutent jamais."
+  call: "un appel d'outil"
+  tier: "niveau de risque"
+  every: "chaque appel en reçoit un"
+  safe: "sûr"
+  now: "s'exécute aussitôt"
+  confirm: "à confirmer"
+  example: "p. ex. printer.start_print"
+  held: "retenu"
+  frozen: "arguments exacts figés"
+  ttl: "60 s au plus"
+  say_yes: "je dis oui"
+  runs: "s'exécute"
+  forbidden: "interdit"
+  never: "ne s'exécute jamais"
+
+shot:
+  hint: "Voir la vraie capture"
+
+site:
+  title: Ce site
+  lead: Un processus FastAPI dans mon homelab sert cette page, les CV en PDF, l'assistant, les statistiques et un formulaire de retour. Un webhook GitHub le redéploie à chaque push.
+  role: Auteur, depuis août 2026
+  path_label: Le chemin de votre requête jusqu'ici
+  you: Vous
+  you_note: cette page, à l'instant
+  edge: Cloudflare
+  edge_note: point de présence
+  tunnel: Tunnel
+  tunnel_note: aucun port ouvert à la maison
+  node: Proxmox
+  node_note: nœuds dans mon homelab
+  app: FastAPI
+  app_note: en service depuis
+  repo: Dépôt
+  repo_sr: ce site sur GitHub, s'ouvre dans un nouvel onglet
+
+vk:
+  lead: "Le prédécesseur de Marshal : un assistant vocal auto-hébergé, construit comme un système distribué. Je voulais mon propre Jarvis, et une raison d'utiliser quatre langages de programmation dans un seul projet."
+  h1: "Un orchestrateur en C# par lequel passe chaque appel, avec des relais de mot d'activation en C++ en périphérie."
+  h2: "Un pipeline Python de la voix au texte, via un routeur d'intentions et un modèle de langage, puis retour à la voix."
+  h3: "Les appels d'outils risqués attendaient une validation biométrique dans une application Kotlin sur mon téléphone."
+  learned_title: "Ce que j'en ai appris"
+  learned: "Ne pas écrire à la main le pipeline vocal et le protocole des satellites. Ils ont pris l'essentiel du temps et n'étaient pas la partie intéressante. Marshal confie la voix à Home Assistant Assist et met l'effort dans l'agent."
+
+more:
+  title: "Également réalisé"
+  shipped: Publié
   private: Privé
   in_progress: En cours
+  repo: Dépôt
+  repo_sr: '{name} sur GitHub, s''ouvre dans un nouvel onglet'
   private_repo: Dépôt privé
   not_public: Pas encore public
-  tag_editor: Outils d'éditeur
-  tag_devtools: Outils pour développeurs
-  tag_mobile: Jeu mobile
-  tag_game: Jeu
-  tag_robotics: Robotique
-  predecessor: "Prédécesseur"
-  vektorgrid_desc: "Le prédécesseur de Marshal : un assistant vocal conçu comme un système distribué, avec des relais C++ pour le mot d'activation, un orchestrateur C#, une chaîne Python STT → LLM → TTS et une application Kotlin pour la validation biométrique. Ce que j'en ai appris : ne pas écrire soi-même la chaîne vocale et ses protocoles. Marshal laisse cela à Home Assistant."
-  sceneforge_alt: "Fenêtre de chat de SceneForge AI dans l'éditeur Unity, créant un joueur capsule rouge avec un CharacterController à partir d'un prompt"
-  sceneforge_desc: "Un plugin d'IA pour l'éditeur Unity. Décrivez une scène en texte libre, récupérez des GameObjects et des composants. Supprime la mise en place manuelle en level design."
-  uniconsole_alt: "Terminal UniConsole affichant les commandes disponibles et exécutant une commande echo"
-  uniconsole_desc_html: "Une console de débogage en jeu pour Unity. Annotez une méthode statique avec <code>[Command]</code> et appelez-la depuis un terminal dans la scène. Une alternative gratuite et légère à Quantum Console."
-  forkcast_alt: "Calendrier hebdomadaire de repas Forkcast à côté d'une recherche de recettes de nouilles"
-  forkcast_meta: "Contributeur · backend TypeScript · projet scolaire"
-  forkcast_desc: "Une application de planification des repas. Trouvez des recettes via l'API Spoonacular, placez-les dans un calendrier, obtenez une liste d'ingrédients combinée, notez des recettes, ajoutez des amis. J'ai écrit l'essentiel du backend."
-  roboducks_meta: Club de robotique de la HTL Leonding
-  roboducks_desc: "Travaux pour la compétition RescueMaze au club de robotique du lycée. J'ai créé un protocole série sur mesure pour la communication Raspberry Pi → LEGO SPIKE, et un contrôleur d'exploration de labyrinthe utilisant l'algorithme de Trémaux en simulation."
-  space_alt: "Partie de Space Defenders : un petit vaisseau parmi des vaisseaux ennemis lumineux, avec joystick et bouton de boost à l'écran"
-  space_desc: "Un jeu d'arcade mobile : détruire les vaisseaux ennemis, ne pas mourir. Des vagues toujours plus fortes, pensé pour les écrans tactiles."
-  pigeon_desc: "Vous incarnez un pigeon payé par le gouvernement pour mener des opérations secrètes. Une satire de la paranoïa de la surveillance et du coin d'Internet « Birds Aren't Real »."
+  vektorgrid_role: Architecte et développeur principal
+  sceneforge_role: Auteur
+  sceneforge_desc: Un plugin d'IA pour l'éditeur Unity. Décrivez une scène en texte, recevez des GameObjects et des composants. Supprime la mise en place manuelle dans le level design.
+  uniconsole_role: Auteur
+  uniconsole_desc_html: Une console de débogage en jeu pour Unity. Marquez une méthode statique avec <code>[Command]</code> et appelez-la depuis un terminal dans la scène. Une alternative légère et gratuite à Quantum Console.
+  forkcast_role: Contributeur, j'ai écrit l'essentiel du backend TypeScript. Projet scolaire.
+  forkcast_desc: Une application de planification des repas. Trouvez des recettes via l'API Spoonacular, placez-les dans un calendrier, obtenez une liste d'ingrédients combinée, notez des recettes, ajoutez des amis.
+  roboducks_role: Contributeur, club de robotique de la HTL Leonding
+  roboducks_desc: Travail pour la compétition RescueMaze du club de robotique de l'école. J'ai créé un protocole série pour la communication entre Raspberry Pi et LEGO SPIKE, et un contrôleur qui explore un labyrinthe avec l'algorithme de Trémaux en simulation.
+  space_role: Auteur
+  space_desc: 'Un jeu d''arcade pour mobile : détruisez les vaisseaux ennemis, ne mourez pas. Des vagues de plus en plus dures, conçu pour les écrans tactiles.'
+  pigeon_role: Auteur
+  pigeon_desc: Vous incarnez un pigeon payé par le gouvernement qui mène des opérations secrètes. Une satire de la paranoïa de la surveillance et du coin d'internet « Birds Aren't Real ».
+  sceneforge_alt: "SceneForge AI dans l'éditeur Unity : son panneau de discussion à côté d'une capsule servant de joueur sur un plan, avec l'Inspector à droite"
+  uniconsole_alt: "UniConsole dans une scène en cours : le texte d'aide, les commandes disponibles et une commande echo"
+  forkcast_alt: "Forkcast : des résultats de recherche de recettes avec leurs notes à gauche, le calendrier des repas d'une semaine à droite"
+  space_alt: "Space Defenders : des vaisseaux et des tirs laser au-dessus d'une Terre en pixel art, un chronomètre en haut et les commandes tactiles dans les coins inférieurs"
 
 exp:
   title: Expérience
-  open: 'Détails +'
-  close: 'Fermer −'
+  work: Expérience
+  education: Formation
   sl_role: Stagiaire en génie logiciel
-  sl_place: "Linz · août 2026"
-  sl_desc: "Développement d'une PWA sur Microsoft Dynamics 365 Sales avec prise de notes de réunion par reconnaissance vocale et un assistant Azure OpenAI connecté à Dataverse, plus un petit outil quotidien de suivi de la visibilité GEO. J'en ai réalisé l'essentiel seul, avec l'aide d'un second stagiaire."
+  sl_place: Linz, août 2026
+  sl_desc: Développement d'une PWA sur Microsoft Dynamics 365 Sales avec prise de notes de réunion par reconnaissance vocale et un assistant Azure OpenAI connecté à Dataverse, plus un petit outil quotidien de suivi de la visibilité GEO. J'en ai réalisé l'essentiel seul, avec l'aide d'un second stagiaire.
+  quote: « L'un des meilleurs projets jamais sortis d'un stage chez nous. »
+  quote_by: Head of Development chez SlideLizard
   caritas_org: Caritas Haute-Autriche
-  caritas_role: "Stagiaire assistant bureau et informatique"
-  caritas_place: "Leonding · juil.–août 2025"
-  caritas_desc: "Assistance administrative et informatique : administration, aide à la comptabilité dont la facturation trimestrielle, et support informatique et infrastructure de premier niveau."
-  tag_admin: Administration
-  tag_it: Support informatique
-  tag_billing: Facturation
+  caritas_role: Stagiaire bureau et informatique
+  caritas_place: Leonding, juillet à août 2025
+  caritas_desc: 'Assistance administrative et informatique : administration, aide à la comptabilité dont la facturation trimestrielle, et support informatique et infrastructure de premier niveau.'
+  htl_place: Leonding, 2022 à 2028
+  htl_desc: 'Lycée technique supérieur, section informatique. Matura en juin 2028. Matières préférées : IA et science des données, et technologies réseau.'
 
 stack:
+  title: Stack
   languages: Langages
-  tools: "Outils et infra"
+  tools: Outils et infrastructure
   spoken: Langues parlées
-  german: "Allemand · langue maternelle"
-  english: "Anglais · niveau professionnel"
+  german: Allemand, langue maternelle
+  english: Anglais, niveau professionnel
 
 about:
   title: À propos
-  p1: "Je suis Lukas, élève à la HTL Leonding. Je passe l'essentiel de mon temps sur du code serveur et des jeux, et de temps en temps sur un Raspberry Pi vissé sur un robot LEGO pour une compétition."
-  p2_html: "La plupart de mes projets sont nés d'un agacement. J'ai créé <strong>SceneForge AI</strong> parce que monter des scènes à la main est fastidieux, et le protocole série derrière <strong>RoboDucks</strong> parce qu'il n'existait pas de moyen propre de piloter un LEGO SPIKE depuis un Raspberry Pi."
-  homelab: "Quatre nœuds Proxmox (des PC de bureau reconvertis) qui hébergent Immich, Gitea, Vaultwarden, Jellyfin avec la suite *arr, un serveur Minecraft, Pi-hole et ce site, le tout accessible depuis l'extérieur de mon réseau."
-  homelab_link: Chiffres en direct dans le PDU
-  ender_html: 'J''imprime en 3D des pièces fonctionnelles pour mes projets matériels et j''améliore sans cesse une Ender 3 Pro. Elle tourne sous Klipper sur un Raspberry Pi et a été tellement modifiée que je l''appelle l''<a href="https://fr.wikipedia.org/wiki/Bateau_de_Th%C3%A9s%C3%A9e" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Bateau de Thésée sur Wikipédia, s''ouvre dans un nouvel onglet)</span></a>.'
-  moto_title: Moto
-  moto: "Loin des écrans, je roule à moto. En ce moment sur une Aprilia Tuono 125, avec le projet de passer à plus gros."
+  p1: Je suis Lukas, élève à la HTL Leonding. Je passe l'essentiel de mon temps sur du code serveur et des jeux, et de temps en temps sur un Raspberry Pi vissé sur un robot LEGO pour une compétition.
+  p2_html: La plupart de mes projets sont nés d'un agacement. J'ai créé <strong>SceneForge AI</strong> parce que monter des scènes à la main est fastidieux, et le protocole série derrière <strong>RoboDucks</strong> parce qu'il n'existait pas de moyen propre de piloter un LEGO SPIKE depuis un Raspberry Pi.
+  p3: 'Loin du clavier : tennis de table, motos, et plus de Trackmania que je ne voudrais l''admettre.'
+  homelab: Homelab
+  homelab_desc: Quatre nœuds Proxmox (des ordinateurs de bureau recyclés) qui hébergent Immich, Gitea, Vaultwarden, Jellyfin avec la stack *arr, un serveur Minecraft, Pi-hole et ce site. Ma famille en dépend, il a donc des sauvegardes et un stockage répliqué.
+  ender: Ender of Theseus
+  ender_desc_html: 'Une Ender 3 Pro. Elle a été tellement modifiée que je l''ai nommée d''après le <a href="https://fr.wikipedia.org/wiki/Bateau_de_Th%C3%A9s%C3%A9e" target="_blank" rel="noopener">bateau de Thésée<span class="sr-only"> (Wikipédia, s''ouvre dans un nouvel onglet)</span></a>. Prochaines étapes : un boîtier pour la carte, une alimentation à distance et une double vis Z.'
+  moto: Motos
+  moto_desc: Actuellement une Aprilia Tuono 125, avec l'idée de passer à plus gros.
+  sketch_alt: "Croquis à la craie de mon imprimante 3D Ender 3 Pro"
+  next: "prochaines étapes :"
+  n_z: "une double vis Z"
+  n_power: "une alimentation à distance"
+  n_board: "un boîtier pour la carte"
 
 contact:
   title: Contact
   lead: L'e-mail est le moyen le plus rapide de me joindre.
-  body: "Je suis ouvert aux stages et aux projets intéressants, et je réponds à tout ce qui n'est pas du spam."
-  report: "Signaler un bug sur le site"
-  ask: "Demander à l'assistant IA"
-  feedback_sub: "Vous avez repéré une faute ou un bug ? Dites-le ici. Pour tout le reste, l'e-mail est plus rapide."
+  body: Je suis ouvert aux stages et aux projets intéressants, et je réponds à tout ce qui n'est pas du spam.
+  copy: Copier l'adresse
+  ask: Demander à mon assistant
+  report: Signaler un bug sur le site
+  feedback_sub: Vous avez repéré une faute ou un bug ? Dites-le ici. Pour tout le reste, l'e-mail est plus rapide.
   name_label: Nom (facultatif)
-  email_label: "E-mail (facultatif, pour une réponse)"
+  email_label: E-mail (facultatif, pour une réponse)
   message_label: Message
-  placeholder: "Qu'est-ce qui ne va pas, et où ?"
+  placeholder: Qu'est-ce qui ne va pas, et où ?
   send: Envoyer
 
-pdu:
-  title: État en direct
+foot:
+  status: En direct du homelab
   uptime: Disponibilité
-  deployed: Déployé
+  deployed: Build
   edge: Edge
   nodes: Nœuds
-  how: "Ce site tourne sur mon homelab Proxmox : un processus FastAPI derrière un Cloudflare Tunnel, redéployé par un webhook GitHub à chaque push."
+  how: 'Ce site tourne dans mon homelab Proxmox : un processus FastAPI derrière un Cloudflare Tunnel, redéployé par un webhook GitHub à chaque push.'
   notes: Notes de cours
-  top: Haut de page
-  privacy: "Confidentialité"
+  top: Retour en haut
+  privacy: Confidentialité
 
 js:
-  # Privacy policy for this language (/de/privacy for German, /privacy otherwise).
   privacy_path: /privacy
-  status:
-    connecting: Connexion
-    online: En ligne
-    stale: Obsolète
-  fault:
-    idle: Au repos
-    reporting: Signalement
-    sent: Signalement reçu
+  copied: Copié
+  copy_failed: Copie impossible. Sélectionnez l'adresse.
   time:
-    ago: "il y a {t}"
+    ago: il y a {t}
     m: min
     h: h
     d: j
-    mo: " mois"
-    y: " an"
+    mo: ' mois'
+    y: ' an'
   con:
-    tab: "Demander à mon IA"
-    tab_label: "Ouvrir l'assistant IA : poser des questions sur Lukas"
+    tab: Demander à mon IA
+    tab_label: 'Ouvrir l''assistant IA : poser des questions sur Lukas'
     close: Fermer la console
     clear_title: Nouvelle conversation
     maximize: Agrandir la console
@@ -202,40 +240,43 @@ js:
     resize: Faites glisser pour redimensionner la console
     output_label: Sortie de la console
     input_label: Votre question
-    placeholder: "posez une question…"
+    placeholder: posez une question…
     send: Entrée
     free_model: modèle gratuit
-    hint: "entrée envoyer · échap fermer"
-    last_login: "Dernière connexion :"
-    help: "Tapez une question sur Lukas et appuyez sur Entrée : projets, stages, stack, disponibilité. Les réponses viennent de son CV. Vous préférez un humain ? Écrivez à {email}."
-    examples: "exemples :"
-    ex1: "Qu'est-ce que Marshal ?"
+    hint: entrée envoyer · échap fermer
+    last_login: 'Dernière connexion :'
+    help: 'Tapez une question sur Lukas et appuyez sur Entrée : projets, stages, stack, disponibilité. Les réponses viennent de son CV. Vous préférez un humain ? Écrivez à {email}.'
+    examples: 'exemples :'
+    ex1: Qu'est-ce que Marshal ?
     ex2: Qu'a-t-il construit chez SlideLizard ?
     ex3: Quand est-il disponible ?
     new_session: Nouvelle session.
-    connecting: "[connexion"
-    error: "erreur :"
-    error_sr: "Erreur :"
-    privacy: "Les conversations sont enregistrées pour améliorer le bot."
-    privacy_link: "Politique de confidentialité (en anglais)"
+    connecting: '[connexion'
+    error: 'erreur :'
+    error_sr: 'Erreur :'
+    privacy: Les conversations sont enregistrées pour améliorer le bot.
+    privacy_link: Politique de confidentialité (en anglais)
   reason:
-    rate_limited: "Vous envoyez des messages trop vite. Patientez un instant ou écrivez-moi."
+    rate_limited: Vous envoyez des messages trop vite. Patientez un instant ou écrivez-moi.
     captcha_failed: Échec de la vérification captcha. Rechargez la page et réessayez.
-    message_too_long: "Ce message est trop long ({length} caractères, la limite est de {limit}). Raccourcissez-le et renvoyez-le."
-    bad_request: "Votre message n'est pas passé. Reformulez-le, ou écrivez-moi si le problème persiste."
-    server_misconfigured: "Le chatbot est temporairement indisponible à cause d'un problème de configuration de mon côté. Écrivez-moi et je m'en occupe."
-    server_error: "Le chatbot a rencontré une erreur inattendue. Réessayez, ou écrivez-moi si cela se reproduit."
-    stream_interrupted: "La connexion a été coupée avant la fin de la réponse. Réessayez, ou écrivez-moi si cela se reproduit."
-    network_error: "Erreur réseau. Réessayez, ou écrivez-moi directement."
-    unknown: "Une erreur s'est produite. Réessayez, ou écrivez-moi."
-    moderated: "Je ne peux pas vous aider sur ce point. Posez-moi plutôt une question sur les projets, les compétences ou l'expérience de Lukas."
+    message_too_long: Ce message est trop long ({length} caractères, la limite est de {limit}). Raccourcissez-le et renvoyez-le.
+    bad_request: Votre message n'est pas passé. Reformulez-le, ou écrivez-moi si le problème persiste.
+    server_misconfigured: Le chatbot est temporairement indisponible à cause d'un problème de configuration de mon côté. Écrivez-moi et je m'en occupe.
+    server_error: Le chatbot a rencontré une erreur inattendue. Réessayez, ou écrivez-moi si cela se reproduit.
+    stream_interrupted: La connexion a été coupée avant la fin de la réponse. Réessayez, ou écrivez-moi si cela se reproduit.
+    network_error: Erreur réseau. Réessayez, ou écrivez-moi directement.
+    unknown: Une erreur s'est produite. Réessayez, ou écrivez-moi.
+    moderated: Je ne peux pas vous aider sur ce point. Posez-moi plutôt une question sur les projets, les compétences ou l'expérience de Lukas.
   fb:
     empty: Écrivez d'abord un message.
-    bad_email: "Cette adresse e-mail semble incorrecte. Corrigez-la ou laissez le champ vide."
-    verifying: "Vérification…"
-    network: "Erreur réseau. Réessayez, ou écrivez-moi directement."
+    bad_email: Cette adresse e-mail semble incorrecte. Corrigez-la ou laissez le champ vide.
+    verifying: Vérification…
+    network: Erreur réseau. Réessayez, ou écrivez-moi directement.
     sent: Message envoyé. Merci.
-    rate: "Vous envoyez des messages trop vite. Patientez un instant ou écrivez-moi."
-    rejected: "Le serveur a refusé le formulaire. Vérifiez l'adresse e-mail, ou écrivez-moi directement."
+    rate: Vous envoyez des messages trop vite. Patientez un instant ou écrivez-moi.
+    rejected: Le serveur a refusé le formulaire. Vérifiez l'adresse e-mail, ou écrivez-moi directement.
     captcha: Échec de la vérification captcha. Rechargez la page et réessayez.
-    unknown: "Une erreur s'est produite. Réessayez, ou écrivez-moi."
+    unknown: Une erreur s'est produite. Réessayez, ou écrivez-moi.
+  shot:
+    close: "Fermer"
+    dialog: "Capture d'écran"

@@ -1,0 +1,28 @@
+{#- Footer with live values from /api/status (main.js polls it). Shared by the
+    main page, project pages, /services, /privacy and /admin; needs `t` and,
+    off the main page, `home` (the portfolio link). A value shows only once
+    the endpoint has answered with it ([data-show], main.js), so without JS
+    or without an answer the block stays out instead of showing dashes. #}
+<footer class="site-footer smear smear--r" id="footer">
+  <div class="wrap footer-grid">
+    <div class="footer-main" data-show="readouts" hidden>
+      <h2 class="footer-title chalk-text chalk-text--lg"><span data-chalk="underline">{{ t('foot.status') }}</span></h2>
+      <dl class="readouts">
+        <div data-show="uptime" hidden><dt>{{ t('foot.uptime') }}</dt><dd class="chalk-text chalk-text--md" data-status="uptime"></dd></div>
+        <div data-show="rev" hidden><dt>{{ t('foot.deployed') }}</dt><dd class="chalk-text chalk-text--md"><a data-status="rev" href="https://github.com/lGruenzweilHTL/portfolio-site" target="_blank" rel="noopener"></a></dd></div>
+        <div data-show="edge" hidden><dt>{{ t('foot.edge') }}</dt><dd class="chalk-text chalk-text--md" data-status="edge"></dd></div>
+        <div data-show="nodes" hidden><dt>{{ t('foot.nodes') }}</dt><dd class="chalk-text chalk-text--md" data-status="nodes"></dd></div>
+      </dl>
+    </div>
+    <div class="footer-side">
+      <p class="footer-how">{{ t('foot.how') }}</p>
+      <ul class="footer-links">
+        <li>© 2026 Lukas Grünzweil</li>
+        {% if home %}<li><a href="{{ home }}">Portfolio</a></li>{% endif %}
+        <li><a href="/notes/">{{ t('foot.notes') }}</a></li>
+        <li><a href="{{ t('js.privacy_path') }}">{{ t('foot.privacy') }}</a></li>
+        <li><a href="#top">{{ t('foot.top') }}</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

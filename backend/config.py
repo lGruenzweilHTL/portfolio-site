@@ -99,8 +99,8 @@ class Settings(BaseSettings):
     track_rate_limit: str = "120/minute"
     deploy_rate_limit: str = "10/minute"
 
-    # --- Live rack status (GET /api/status) ---
-    # Number of homelab nodes shown on the PDU readout. Static on purpose:
+    # --- Live homelab status (GET /api/status) ---
+    # Number of homelab nodes shown in the footer and on the main page. Static on purpose:
     # the page never queries Proxmox, so no internal hosts leak.
     homelab_nodes: int = 4
     # How long the per-project "last push" dates from the GitHub API stay

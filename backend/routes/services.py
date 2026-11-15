@@ -26,7 +26,7 @@ def _render_services() -> str:
     en = catalogs()[DEFAULT_LANG]
     return env.get_template("services.html").render(
         categories=get_content().services,
-        # English only; the shared PDU partial and main.js need these.
+        # English only; the shared header, footer and main.js need these.
         t=en.t,
         js_strings=en.js(),
         home="/",

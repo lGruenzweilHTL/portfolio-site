@@ -1,0 +1,100 @@
+/* gruenzweil.cc: the text-and-list pages on the Tafel kit.
+   /services (templates/services.html) and /privacy + /de/privacy
+   (templates/privacy.html). Loaded after styles.css; uses only the kit's
+   tokens and classes (KIT in styles.css). The error page is self-contained
+   and does not load this file. */
+
+/* ---------- Shared: a page that starts with its title ---------- */
+
+.page-band { padding: clamp(20px, 4vw, 48px) var(--gut) 0; --smear-y: -40px; --smear-w: 46%; --smear-h: 320px; --smear-o: .75; }
+.page-head { max-width: 52rem; margin: 0 0 clamp(36px, 5vw, 64px); }
+.page-head .section-title { margin-bottom: .4em; }
+.page-head .lead { color: var(--chalk-dim); margin-bottom: 0; }
+.page-head .actions { margin-top: 26px; }
+/* Long German compounds break at their soft hyphen, never past the edge. */
+.page-head h1 { hyphens: manual; overflow-wrap: break-word; }
+
+/* ---------- /services: the homelab directory ---------- */
+
+/* The one exception that is marked: a hand note in chalk. */
+.svc-lan { font: 400 1.0625rem/1.2 var(--hand); color: var(--chalk); white-space: nowrap; }
+.lead .svc-lan { font-size: 1.15em; }
+
+/* Jump list: every group, slash-separated like a stack. */
+.jump { margin: 30px 0 0; }
+.jump .stack { font-size: .9375rem; row-gap: 6px; }
+.jump a { text-decoration-color: var(--chalk-faint); }
+
+/* Groups are rows of one grid; chalk.js draws a stroke above each (CSS line without it). */
+.svc-groups { display: grid; grid-template-columns: minmax(0, 1fr); }
+html:not(.chalk-ready) .svc-group { border-top: 2px solid var(--chalk-faint); }
+.svc-group {
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: 14px clamp(32px, 5vw, 80px); padding: 34px 0 42px; scroll-margin-top: 16px;
+}
+.svc-head .hand-title { font-size: var(--t-hand-m); margin-bottom: .3em; }
+.svc-desc { color: var(--chalk-dim); font-size: .9375rem; line-height: 1.5; max-width: 26em; margin: 0 0 8px; }
+
+.svc-list { list-style: none; display: grid; gap: 20px; padding-top: 6px; }
+.svc { display: grid; grid-template-columns: minmax(0, 12.5rem) minmax(0, 1fr); gap: 2px 28px; align-items: baseline; }
+.svc-name { font: 650 1.0625rem/1.4 var(--sans); }
+.svc-body { min-width: 0; }
+.svc-body > :last-child { margin-bottom: 0; }
+.svc-host { margin: 0; font: .875rem/1.55 var(--mono); color: var(--chalk-dim); overflow-wrap: break-word; }
+.svc-host .svc-lan { display: inline-block; }
+.svc-note { margin: 2px 0 6px; font-size: .9375rem; line-height: 1.5; color: var(--chalk-dim); max-width: 36em; }
+.svc-body > .svc-lan { display: inline-block; margin: 0 0 4px; }
+/* A service with several addresses: label, address, mark per line. */
+.svc-links { list-style: none; display: grid; gap: 5px; margin: 4px 0 0; }
+.svc-links li { display: grid; grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr); column-gap: 14px; align-items: baseline; }
+.svc-links a { font-weight: 600; font-size: .9375rem; }
+.svc-links .svc-lan { grid-column: 2; }
+
+@media (max-width: 900px) {
+  .svc-group { grid-template-columns: minmax(0, 1fr); padding: 28px 0 34px; }
+}
+@media (max-width: 560px) {
+  .svc { grid-template-columns: minmax(0, 1fr); }
+  .svc-list { gap: 18px; }
+  .svc-links { padding-left: 14px; border-left: 2px solid var(--chalk-faint); margin-top: 8px; }
+  .svc-links li { grid-template-columns: minmax(0, 1fr); margin-bottom: 4px; }
+  .svc-links .svc-lan { grid-column: 1; }
+}
+
+/* ---------- /privacy: a reading page ---------- */
+
+.page-lang { margin: 18px 0 0; }
+
+/* Contents beside the text on wide screens, above it on narrow ones. */
+.policy { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 68ch); gap: 0 clamp(40px, 7vw, 112px); align-items: start; }
+.toc { position: sticky; top: 24px; padding-top: 6px; }
+.toc-title { font-size: 1.5rem; opacity: .82; margin: 0 0 10px; }
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc a { display: grid; grid-template-columns: 1.7em minmax(0, 1fr); padding: 6px 0; font-size: .9375rem; line-height: 1.35;
+  color: var(--chalk-dim); text-decoration: none; }
+.toc a:hover { color: var(--chalk); }
+.toc .sec-n { font: 700 1.0625rem/1.25 var(--hand); }
+/* Closes the contents off from the text where it sits above it. */
+.toc .rule { display: none; margin: 22px 0 30px; }
+
+.prose { min-width: 0; }
+.prose p { color: var(--chalk-dim); margin-bottom: 1.15em; }
+.prose > p:first-child { font-size: var(--t-lead); line-height: 1.55; color: var(--chalk); margin-bottom: .4em; }
+.prose strong, .prose a { color: var(--chalk); }
+.prose a { overflow-wrap: anywhere; }
+.sec-title { font-size: var(--t-hand-m); line-height: 1.2; margin: 1.7em 0 .5em; scroll-margin-top: 24px; }
+.sec-title .sec-n { opacity: .62; }
+.prose .rule { margin: 48px 0 14px; }
+.prose .updated { font-size: var(--t-small); margin: 0; }
+
+@media (max-width: 1000px) {
+  .policy { grid-template-columns: minmax(0, 1fr); }
+  .toc { position: static; margin: 0; }
+  .toc .rule { display: block; }
+  .toc ol { columns: 2; column-gap: 32px; }
+  .toc li { break-inside: avoid; }
+}
+@media (max-width: 560px) {
+  .toc ol { columns: 1; }
+  .toc a { padding: 7px 0; }
+}

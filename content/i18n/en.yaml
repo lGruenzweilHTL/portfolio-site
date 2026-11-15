@@ -13,10 +13,10 @@ meta:
   date_locale: en-US
 
 head:
-  title: "Lukas Grünzweil · Backend & AI developer, student at HTL Leonding"
+  title: "Lukas Grünzweil · Backend developer, student at HTL Leonding"
   description: "Lukas Grünzweil, a student at HTL Leonding in Austria, builds backend systems, AI tooling and Unity games in C#, Python and TypeScript. Currently in year 4 of 5, graduating June 2028, and open to a backend internship."
-  og_title: "Lukas Grünzweil · Backend & AI developer"
-  og_description: "Student at HTL Leonding, Austria (year 4 of 5). Backend systems, AI tooling and games in C#, Python and TypeScript. Open to a backend internship."
+  og_title: "Lukas Grünzweil · Backend developer"
+  og_description: "Student at HTL Leonding, Austria (year 4 of 5). Backend systems, AI tooling and games in C#, Python and TypeScript."
   og_image_alt: "Lukas Grünzweil: backend systems, AI tooling and games"
 
 ld:
@@ -27,26 +27,26 @@ ld:
   projects_name: "Projects by Lukas Grünzweil"
   vektorgrid: "The predecessor of Marshal: a self-hosted voice assistant built as a distributed system, with C++ edge relays, a C# orchestrator running a Python STT, intent-routing, LLM and TTS pipeline, and a Kotlin app that approves risky tool calls with biometrics."
   marshal: "A self-hosted AI agent for Home Assistant: an ASP.NET harness gates every tool call by risk, runs background tasks and keeps a long-term memory, with a Vue web app on top."
+  site: "This website: one FastAPI process on a Proxmox homelab behind a Cloudflare Tunnel, serving the pages, the résumé PDFs, an AI assistant and privacy-friendly analytics, redeployed by a GitHub webhook."
   sceneforge: "An AI plugin for the Unity Editor that turns a plain-text scene description into GameObjects and components."
   uniconsole: "A free, lightweight in-game debug console for Unity: mark a static method with [Command] and call it from a terminal in the scene."
   forkcast: "A meal-planning school project with recipe search via the Spoonacular API, a meal calendar and combined shopping lists. Lukas wrote most of the TypeScript backend."
   space_defenders: "A mobile arcade game made in Unity with escalating waves of enemy spaceships and touch controls."
   pigeon: "A satirical Unity game in progress about a pigeon running covert ops for the government."
+  pigeon_status: "In progress"
   roboducks: "RescueMaze robotics competition work for the HTL Leonding robotics club: a serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm."
 
 common:
   email_me: Email me
-  tech: Tech
+  new_tab: "opens in a new tab"
 
 a11y:
   skip: Skip to content
 
-roof: "gruenzweil.cc · served from LG-RACK-01"
-
 nav:
   label: Primary
-  host_label: "Lukas Grünzweil, back to top"
-  ports: Ports
+  home_label: "Lukas Grünzweil, back to the top"
+  menu: Menu
   projects: Projects
   experience: Experience
   about: About
@@ -55,112 +55,158 @@ nav:
   lang_label: Language
 
 hero:
-  available: "Open to a backend internship"
-  line1: "Backend & AI developer, mostly in C# and Python"
-  line2: "Year 4 of 5 at HTL Leonding, near Linz, Austria"
-  line3: "Graduating June 2028 and looking for a backend internship"
-  quote: "“One of the best projects to come out of an internship here.”"
-  quote_by_html: '— Head of Development at <a href="#experience">SlideLizard Software GmbH</a>, Linz, about my internship there in August 2026'
+  role: "Backend developer, mostly in C#/.NET and Python."
+  school: "Year 4 of 5 at HTL Leonding, near Linz, Austria. Graduating in June 2028."
   bio: "Most of what I build runs on a server, and lately a lot of it has a language model somewhere in the loop. The rest of the time I'm in Unity, which often ends in a tool for other Unity developers."
-  github_sr: "profile (opens in a new tab)"
-  download: "Résumé (PDF)"
+  resume: "Résumé (PDF)"
+  resume_sr: "two columns, opens in a new tab"
   plain: "Plain-text résumé for job portals"
-  classic_sr: "résumé, two-column, opens in a new tab"
-  ats_sr: "résumé, plain text for job portals, opens in a new tab"
+  ask: "Ask my assistant"
+  projects: "Main projects"
+  p_marshal: "Self-hosted AI agent for Home Assistant"
+  p_site: "FastAPI on my Proxmox homelab"
+  p_vektorgrid: "Voice assistant as a distributed system"
   # Shown under the résumé links on machine-assisted translations; empty here.
   translation_note: ""
-  facts: Key facts
-  bay0: "Higher technical college · 2022–2028"
-  bay1: "Software engineering intern · 08/2026"
-  bay2: "Home Assistant AI agent · in active development"
-  bay3: "3 Proxmox nodes · serves this page"
-  ask_title: "Ask my AI assistant"
-  ask_lead: "It knows more than this page: why I built things, how I work and what I'm looking for."
-  ask_placeholder: "e.g. When is he available?"
-  ask_send: "Ask"
+  note: "open to a backend internship"
 
 mg:
-  featured: "Featured project"
-  status: "Active"
   lead: "A self-hosted AI agent for Home Assistant. It runs the 3D printer, sorts mail, prepares the morning and remembers what matters. Harmless actions just happen; risky ones wait for a clear yes."
-  role: "Author"
+  role: "Author, since September 2026"
+  h1: "An ASP.NET harness every request goes through: agent loop, tool registry, model router, MCP client."
+  h2: "A risk engine tiers every tool call. Safe calls run, confirm waits with its exact arguments frozen until I approve, forbidden never runs."
+  h3: "Durable background tasks and a long-term memory with hybrid retrieval on SQLite and sqlite-vec, with a Vue web app on top."
   project_page: "Project page"
-  repo: "Repo on GitHub"
-  repo_sr: "(Marshal repository, opens in a new tab)"
   docs: "Docs"
-  docs_sr: "(Marshal documentation, opens in a new tab)"
+  docs_sr: "Marshal documentation, opens in a new tab"
+  repo: "Repository"
+  repo_sr: "Marshal on GitHub, opens in a new tab"
   shot_alt: "Marshal dashboard with pending approvals to unlock the front door and start a print, next to a live 3D printer status card"
+  note: "risky ones wait for a clear yes"
 
-blades:
-  title: More projects
-  fun_title: "Games, made for fun"
-  last_push: Last push
-  details: Details
-  details_sr: "about {name}"
-  repo_sr: "for {name} (opens in a new tab)"
+gate:
+  title: "The risk gate."
+  caption_html: "Every tool call gets a risk tier. Safe calls run at once. Confirm calls, for example <code>printer.start_print</code>, are held with their exact arguments frozen for up to 60&nbsp;s until I say yes. Forbidden calls never run."
+  aria: "Diagram: a tool call gets a risk tier. Safe calls run at once; confirm calls are held with their arguments frozen for up to 60 seconds until I say yes; forbidden calls never run."
+  call: "a tool call"
+  tier: "risk tier"
+  every: "every call gets one"
+  safe: "safe"
+  now: "runs at once"
+  confirm: "confirm"
+  example: "e.g. printer.start_print"
+  held: "held"
+  frozen: "exact arguments frozen"
+  ttl: "up to 60 s"
+  say_yes: "I say yes"
+  runs: "runs"
+  forbidden: "forbidden"
+  never: "never runs"
+
+shot:
+  hint: "See the real screenshot"
+
+site:
+  title: This website
+  lead: "One FastAPI process on my homelab serves this page, the résumé PDFs, the assistant, the analytics and a feedback form. A GitHub webhook redeploys it on every push."
+  role: "Author, since August 2026"
+  path_label: "How your request got here"
+  you: "You"
+  you_note: "this page, just now"
+  edge: "Cloudflare"
+  edge_note: "edge location"
+  tunnel: "Tunnel"
+  tunnel_note: "no open ports at home"
+  node: "Proxmox"
+  node_note: "nodes in my homelab"
+  app: "FastAPI"
+  app_note: "up for"
+  repo: "Repository"
+  repo_sr: "this website on GitHub, opens in a new tab"
+
+vk:
+  lead: "Marshal's predecessor: a self-hosted voice assistant built as a distributed system. I wanted my own Jarvis, and a reason to use four programming languages in one project."
+  h1: "A C# orchestrator that every call goes through, with wake-word relays in C++ at the edge."
+  h2: "A Python pipeline from speech to text, through an intent router and a language model, back to speech."
+  h3: "Risky tool calls waited for biometric approval in a Kotlin app on my phone."
+  learned_title: "What I learned"
+  learned: "Don't hand-write the speech pipeline and the satellite protocol. They took most of the time and weren't the interesting part. Marshal leaves voice to Home Assistant Assist and puts the effort into the agent."
+
+more:
+  title: "Also built"
   shipped: Shipped
   private: Private
   in_progress: In progress
-  private_repo: Private repo
-  not_public: Not public yet
-  tag_editor: Editor tooling
-  tag_devtools: Developer tooling
-  tag_mobile: Mobile game
-  tag_game: Game
-  tag_robotics: Robotics
-  predecessor: "Predecessor"
-  vektorgrid_desc: "Marshal's predecessor: a voice assistant built as a distributed system, with C++ wake-word relays, a C# orchestrator, a Python STT → LLM → TTS pipeline and a Kotlin app for biometric approval. What I learned: don't hand-write the speech pipeline and its protocols. Marshal leaves that to Home Assistant."
-  sceneforge_alt: "SceneForge AI chat window in the Unity Editor, creating a red capsule player with a CharacterController from a text prompt"
+  repo: Repository
+  repo_sr: "{name} on GitHub, opens in a new tab"
+  private_repo: "Private repository"
+  not_public: "Not public yet"
+  vektorgrid_role: "Architect and main developer"
+  sceneforge_role: "Author"
   sceneforge_desc: "An AI plugin for the Unity Editor. Describe a scene in plain text, get GameObjects and components back. Cuts the manual setup out of level design."
-  uniconsole_alt: "UniConsole terminal listing the available commands and running an echo command"
+  uniconsole_role: "Author"
   uniconsole_desc_html: "An in-game debug console for Unity. Mark a static method with <code>[Command]</code> and call it from a terminal in the scene. A free, lightweight alternative to Quantum Console."
-  forkcast_alt: "Forkcast weekly meal-planning calendar next to a recipe search for noodles"
-  forkcast_meta: "Contributor · TypeScript backend · school project"
-  forkcast_desc: "A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar, get a combined ingredient list, rate recipes, add friends. I wrote most of the backend."
-  roboducks_meta: HTL Leonding robotics club
-  roboducks_desc: "RescueMaze competition work for the school robotics club. I built a custom serial protocol for Raspberry Pi → LEGO SPIKE communication, and a maze-exploration controller running Trémaux's algorithm in simulation."
-  space_alt: "Space Defenders gameplay: a small ship among glowing enemy ships, with on-screen joystick and boost controls"
+  forkcast_role: "Contributor, wrote most of the TypeScript backend. School project."
+  forkcast_desc: "A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar, get a combined ingredient list, rate recipes, add friends."
+  roboducks_role: "Contributor, HTL Leonding robotics club"
+  roboducks_desc: "RescueMaze competition work for the school robotics club. I built a custom serial protocol for Raspberry Pi to LEGO SPIKE communication, and a maze-exploration controller running Trémaux's algorithm in simulation."
+  space_role: "Author"
   space_desc: "A mobile arcade game: destroy enemy spaceships, don't die. Escalating waves, built for touchscreens."
+  pigeon_role: "Author"
   pigeon_desc: "You play a pigeon on the government payroll, running covert ops. A satire built around surveillance paranoia and the \"Birds Aren't Real\" corner of the internet."
+  sceneforge_alt: "SceneForge AI in the Unity Editor: its chat panel next to a capsule player on a ground plane, with the Inspector on the right"
+  uniconsole_alt: "UniConsole in a running scene: the help text, the available commands and an echo command"
+  forkcast_alt: "Forkcast: recipe search results with ratings on the left, a week's meal calendar on the right"
+  space_alt: "Space Defenders: spaceships and laser fire above a pixel-art Earth, a timer at the top and touch controls in the lower corners"
 
 exp:
   title: Experience
-  open: 'Details +'
-  close: 'Close −'
+  work: Work
+  education: Education
   sl_role: Software Engineering Intern
-  sl_place: "Linz · Aug 2026"
+  sl_place: "Linz, August 2026"
   sl_desc: "Built a PWA on top of Microsoft Dynamics 365 Sales with speech-to-text meeting notes and an Azure OpenAI assistant wired into Dataverse, plus a small daily GEO-visibility tracker on the side. I built most of it solo, with help from a second intern."
+  quote: "“One of the best projects to come out of an internship here.”"
+  quote_by: "Head of Development at SlideLizard"
   caritas_org: Caritas Upper Austria
-  caritas_role: "Office & IT Assistant Intern"
-  caritas_place: "Leonding · Jul–Aug 2025"
+  caritas_role: "Office and IT Assistant Intern"
+  caritas_place: "Leonding, July to August 2025"
   caritas_desc: "Office and IT support: administration, accounting assistance including quarterly billing, and first-level IT and infrastructure support."
-  tag_admin: Admin
-  tag_it: IT support
-  tag_billing: Billing
+  htl_place: "Leonding, 2022 to 2028"
+  htl_desc: "Higher technical college, Informatik department. Matura in June 2028. Favourite subjects: AI and data science, and network technologies."
 
 stack:
+  title: Stack
   languages: Languages
-  tools: "Tools & infra"
+  tools: "Tools and infrastructure"
   spoken: Spoken
-  german: "German · native"
-  english: "English · professional"
+  german: "German, native"
+  english: "English, professional"
 
 about:
   title: About
   p1: "I'm Lukas, a student at HTL Leonding. Most of my time goes into server code and games, and every so often into a Raspberry Pi bolted to a LEGO robot for a competition."
   p2_html: "Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong> because setting up scenes by hand is tedious, and the serial protocol behind <strong>RoboDucks</strong> because there was no clean way to drive a LEGO SPIKE from a Raspberry Pi."
-  homelab: "Four Proxmox nodes (repurposed desktops) hosting Immich, Gitea, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site, all reachable from outside my network."
-  homelab_link: Live numbers in the PDU
-  ender_html: 'I 3D print functional parts for my hardware projects and keep upgrading an Ender 3 Pro. It runs Klipper off a Raspberry Pi and has been modded enough that I call it the <a href="https://en.wikipedia.org/wiki/Ship_of_Theseus" target="_blank" rel="noopener">Ender of Theseus<span class="sr-only"> (Ship of Theseus on Wikipedia, opens in a new tab)</span></a>.'
-  moto_title: Motorbikes
-  moto: "Away from screens, I ride motorbikes. Currently on an Aprilia Tuono 125, with plans to move up to something bigger."
+  p3: "Away from the keyboard: table tennis, motorbikes, and more Trackmania than I'd like to admit."
+  homelab: "Homelab"
+  homelab_desc: "Four Proxmox nodes (repurposed desktops) hosting Immich, Gitea, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site. My family relies on it, so it has backups and replicated storage."
+  ender: "Ender of Theseus"
+  ender_desc_html: 'An Ender 3 Pro. It has been modded enough that I named it after the <a href="https://en.wikipedia.org/wiki/Ship_of_Theseus" target="_blank" rel="noopener">Ship of Theseus<span class="sr-only"> (Wikipedia, opens in a new tab)</span></a>. Next on the list: an enclosure for the board, remote power and a dual Z screw.'
+  moto: "Motorbikes"
+  moto_desc: "Currently an Aprilia Tuono 125, with plans to move up to something bigger."
+  sketch_alt: "Chalk sketch of my Ender 3 Pro 3D printer"
+  next: "next on the list:"
+  n_z: "a dual Z screw"
+  n_power: "remote power"
+  n_board: "an enclosure for the board"
 
 contact:
   title: Contact
-  lead: Email is the fastest way to reach me.
+  lead: "Email is the fastest way to reach me."
   body: "I'm open to internships and interesting projects, and I answer anything that isn't spam."
+  copy: "Copy address"
+  ask: "Ask my assistant"
   report: "Report a bug on this site"
-  ask: "Ask the AI assistant"
   feedback_sub: "Spotted a typo or a bug? Tell me here. For anything else, email is faster."
   name_label: Name (optional)
   email_label: "Email (optional, for a reply)"
@@ -168,10 +214,10 @@ contact:
   placeholder: "What's broken or wrong, and where?"
   send: Send report
 
-pdu:
-  title: Live status
+foot:
+  status: "Live from the homelab"
   uptime: Uptime
-  deployed: Deployed
+  deployed: Build
   edge: Edge
   nodes: Nodes
   how: "This site runs on my Proxmox homelab: one FastAPI process behind a Cloudflare Tunnel, redeployed by a GitHub webhook on every push."
@@ -183,14 +229,8 @@ pdu:
 js:
   # Privacy policy for this language (/de/privacy for German, /privacy otherwise).
   privacy_path: /privacy
-  status:
-    connecting: Connecting
-    online: Online
-    stale: Stale
-  fault:
-    idle: Idle
-    reporting: Reporting
-    sent: Report received
+  copied: "Copied"
+  copy_failed: "Couldn't copy. Select the address instead."
   time:
     ago: "{t} ago"
     m: m
@@ -245,3 +285,6 @@ js:
     rejected: "The server rejected the form. Check the email address, or email me directly."
     captcha: Captcha check failed. Refresh and try again.
     unknown: "Something went wrong. Try again, or email me."
+  shot:
+    close: "Close"
+    dialog: "Screenshot"

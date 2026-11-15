@@ -3,156 +3,109 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-{#- Rendered by backend/routes/services.py from content/services.yaml. Same
-    rack anatomy as the main page (templates/index.html, site/styles.css):
-    one unit per category, one card per link or service. English only. #}
+{#- Rendered by backend/routes/services.py from content/services.yaml, on the
+    kit (styles.css) plus pages.css, with the shared header and footer: one
+    group per category, one row per link or service. English only. Behind
+    Cloudflare Access in production, so internal hostnames are fine here. #}
 <title>Services · Lukas Grünzweil</title>
 <meta name="description" content="Public and home-network services hosted by Lukas Grünzweil." />
 {# A utility directory (LAN links included), not portfolio content. #}
 <meta name="robots" content="noindex, follow" />
-<meta name="theme-color" content="#0d0e11" />
+<meta name="theme-color" content="#1b1f22" />
 <meta name="color-scheme" content="dark" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/kalam-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/tafel-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/pages.css">
 <script>
 window.I18N = {{ js_strings | tojson }};
 document.documentElement.classList.add('js');
 </script>
 </head>
-<body>
+<body id="top">
 
-{%- macro host(url) -%}{{ url.split('//')[-1].rstrip('/') }}{%- endmacro -%}
-{%- macro vis_led(visibility) -%}<span class="led led--{{ 'blue' if visibility == 'internal' else 'green' }}" aria-hidden="true"></span>{%- endmacro -%}
+{#- The address without the scheme; a line may break after any dot or slash. #}
+{%- macro host(url) -%}{% for part in url.split('//')[-1].rstrip('/').split('.') %}{% if not loop.first %}.<wbr>{% endif %}{% for seg in part.split('/') %}{% if not loop.first %}/<wbr>{% endif %}{{ seg }}{% endfor %}{% endfor %}{%- endmacro -%}
+{#- Only the exception is marked, once, at the outermost level it applies to
+    (group, service or link): everything unmarked works from anywhere. #}
+{%- macro lan(visibility, parent='public') -%}{% if visibility == 'internal' and parent != 'internal' %}<span class="svc-lan">home network only</span>{% endif %}{%- endmacro -%}
+{%- macro newtab() -%}<span class="sr-only"> (opens in a new tab)</span>{%- endmacro -%}
 {%- set link_count = namespace(n=0) -%}
 {%- for c in categories -%}{%- set link_count.n = link_count.n + c.urls|length + c.services|length -%}{%- endfor %}
 
+{% include "_icons.html" %}
 <a class="skip-link" href="#main">Skip to content</a>
+{% include "_header.html" %}
 
-<div class="cabinet">
-  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
-  <div class="cab-body">
-    <div class="rail rail--l" aria-hidden="true"></div>
-    <div class="units">
+<main id="main" tabindex="-1">
+  <section class="wrap page-band smear smear--r" aria-labelledby="services-title">
+    <header class="page-head">
+      <h1 class="section-title chalk-text chalk-text--lg" id="services-title"><span data-chalk="underline">Self-hosted services</span></h1>
+      <p class="lead">Everything running in my homelab: {{ link_count.n }} entries in {{ categories | length }} groups. Entries marked <span class="svc-lan">home network only</span> open only from inside my network; the rest work from anywhere.</p>
+      <div class="actions">
+        <a class="btn btn--solid" href="/services/bookmarks.html" download><svg class="icon" aria-hidden="true"><use href="#ph-download-simple"/></svg>Export as bookmarks</a>
+      </div>
+      {% if categories %}
+      <nav class="jump" aria-label="Groups">
+        <ul class="stack">
+          {% for category in categories %}<li><a href="#{{ category.id }}">{{ category.name }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+      {% endif %}
+    </header>
 
-      <header class="unit unit--nav unit--nohandle" id="nav">
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        <nav class="face nav" aria-label="Breadcrumb">
-          <ol class="crumbs lcd lcd--chip">
-            <li><a href="/">lukas@lg-rack-01</a></li>
-            <li aria-current="page">services</li>
-          </ol>
-          <a class="key key--sm crumbs-back" href="/"><span aria-hidden="true">←</span> Back to the rack</a>
-        </nav>
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-      </header>
-
-      <main id="main" class="units-main" tabindex="-1">
-        <section class="unit" aria-labelledby="services-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <p class="silk">Service directory</p>
-              <span class="model" aria-hidden="true">Homelab · {{ categories | length }} groups</span>
+    <div class="svc-groups" data-chalk="grid">
+      {% for category in categories %}
+      <section class="svc-group" id="{{ category.id }}" aria-labelledby="category-{{ category.id }}">
+        <div class="svc-head">
+          <h2 class="hand-title chalk-text chalk-text--md" id="category-{{ category.id }}">{{ category.name }}</h2>
+          {% if category.description %}<p class="svc-desc">{{ category.description }}</p>{% endif %}
+          {{ lan(category.visibility) }}
+        </div>
+        <ul class="svc-list">
+          {% for link in category.urls %}
+          <li class="svc">
+            <h3 class="svc-name"><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}{{ newtab() }}</a></h3>
+            <div class="svc-body"><p class="svc-host">{{ host(link.url) }} {{ lan(link.visibility, category.visibility) }}</p></div>
+          </li>
+          {% endfor %}
+          {% for service in category.services %}
+          <li class="svc">
+            <h3 class="svc-name" id="service-{{ category.id }}-{{ service.id }}">
+              {%- if service.urls | length == 1 -%}
+              <a href="{{ service.urls[0].url }}" target="_blank" rel="noopener noreferrer">{{ service.name }}{{ newtab() }}</a>
+              {%- else -%}{{ service.name }}{%- endif -%}
+            </h3>
+            <div class="svc-body">
+              {% if service.urls | length == 1 %}
+              <p class="svc-host">{{ host(service.urls[0].url) }} {{ lan(service.urls[0].visibility, category.visibility) }}</p>
+              {% endif %}
+              {% if service.description %}<p class="svc-note">{{ service.description }}</p>{% endif %}
+              {% if service.urls | length > 1 %}
+              {{ lan(service.visibility, category.visibility) }}
+              <ul class="svc-links">
+                {% for link in service.urls %}
+                <li><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }}{{ newtab() }}</a> <span class="svc-host">{{ host(link.url) }}</span> {{ lan(link.visibility, 'internal' if 'internal' in (service.visibility, category.visibility) else 'public') }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
             </div>
-            <div class="project">
-              <div class="ctrl-display">
-                <div class="vfd-bezel">
-                  <div class="vfd">
-                    <h1 class="vfd-name" id="services-title">Self-hosted services</h1>
-                    <p class="vfd-line">{{ link_count.n }} entries · {{ categories | length }} groups</p>
-                    <p class="vfd-line">Proxmox homelab · Linz area, Austria</p>
-                  </div>
-                </div>
-              </div>
-              <div class="panel-ctl">
-                <p class="lead">
-                  Everything running in my homelab. Green links work from anywhere, blue
-                  ones only from inside my network.
-                </p>
-                <ul class="svc-legend">
-                  <li class="status">{{ vis_led('public') }}Public</li>
-                  <li class="status">{{ vis_led('internal') }}Home network only</li>
-                </ul>
-                <div class="keys">
-                  <a class="key key--sm" href="/services/bookmarks.html" download>Export as bookmarks <span aria-hidden="true">↓</span></a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        {% for category in categories %}
-        <section class="unit rv" id="{{ category.id }}" aria-labelledby="category-{{ category.id }}">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 class="silk" id="category-{{ category.id }}">{{ category.name }}</h2>
-              <span class="model" aria-hidden="true">{{ category.id }}</span>
-              <p class="unit-head-r status">{{ vis_led(category.visibility) }}{{ category.visibility_label }}</p>
-            </div>
-            {% if category.description %}<p class="svc-desc">{{ category.description }}</p>{% endif %}
-            <ul class="svc-grid">
-              {% for link in category.urls %}
-              <li class="svc">
-                <a class="svc-card" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
-                  <div class="svc-top">
-                    <span class="svc-name">{{ link.label }}</span>
-                    <span class="svc-arrow" aria-hidden="true">↗</span>
-                  </div>
-                  <span class="lcd lcd--chip svc-host">{{ host(link.url) }}</span>
-                  <span class="status">{{ vis_led(link.visibility) }}{{ link.visibility_label }}</span>
-                  <span class="sr-only">(opens in a new tab)</span>
-                </a>
-              </li>
-              {% endfor %}
-              {% for service in category.services %}
-              <li class="svc">
-                <article class="svc-card service-card" aria-labelledby="service-{{ category.id }}-{{ service.id }}">
-                  <div class="svc-top">
-                    <h3 class="svc-name" id="service-{{ category.id }}-{{ service.id }}">
-                      {%- if service.urls | length == 1 -%}
-                      <a class="card-link" href="{{ service.urls[0].url }}" target="_blank" rel="noopener noreferrer">{{ service.name }}<span class="sr-only"> (opens in a new tab)</span></a>
-                      {%- else -%}{{ service.name }}{%- endif -%}
-                    </h3>
-                    {% if service.urls | length == 1 %}<span class="svc-arrow" aria-hidden="true">↗</span>{% endif %}
-                  </div>
-                  {% if service.description %}<p class="svc-text">{{ service.description }}</p>{% endif %}
-                  {% if service.urls | length == 1 %}
-                  <span class="lcd lcd--chip svc-host">{{ host(service.urls[0].url) }}</span>
-                  <span class="status">{{ vis_led(service.urls[0].visibility) }}{{ service.urls[0].visibility_label }}</span>
-                  {% else %}
-                  <span class="status">{{ vis_led(service.visibility) }}{{ service.visibility_label }}</span>
-                  <span class="keys">
-                    {% for link in service.urls %}<a class="key key--sm" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }} <span aria-hidden="true">↗</span></a>{% endfor %}
-                  </span>
-                  {% endif %}
-                </article>
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-        {% else %}
-        <section class="unit unit--blank unit--nohandle" aria-label="No services">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i><div class="face vents"><p class="svc-desc">No services configured yet.</p></div><i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-        {% endfor %}
-      </main>
-
-      {% include "_pdu.html" %}
-
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% else %}
+      <p class="svc-desc">No services configured yet.</p>
+      {% endfor %}
     </div>
-    <div class="rail rail--r" aria-hidden="true"></div>
-  </div>
-  <div class="cab-plinth" aria-hidden="true"></div>
-</div>
+  </section>
+</main>
+
+{% include "_footer.html" %}
 
 <script src="/main.js" defer></script>
+<script type="module" src="/chalk.js"></script>
 </body>
 </html>

@@ -3,296 +3,302 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-{#- Rendered by backend/routes/admin.py behind Cloudflare Access. Same rack
-    anatomy as the main page (site/styles.css, "Admin" section for the
-    tables and forms). English only, never indexed. #}
+{#- Rendered by backend/routes/admin.py behind Cloudflare Access. The kit
+    (site/styles.css), header and footer of the main page, plus the admin's
+    own site/admin.css. English only, never indexed. Times are UTC. #}
 <title>Admin · Lukas Grünzweil</title>
 <meta name="robots" content="noindex, nofollow" />
-<meta name="theme-color" content="#0d0e11" />
+<meta name="theme-color" content="#1b1f22" />
 <meta name="color-scheme" content="dark" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/kalam-latin-700.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/tafel-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/admin.css">
 <script>
 window.I18N = {{ js_strings | tojson }};
 document.documentElement.classList.add('js');
 </script>
 </head>
-<body>
+<body id="top" class="adm-page">
 
-{%- macro led_status(color, label) -%}<span class="status"><span class="led{% if color %} led--{{ color }}{% endif %}" aria-hidden="true"></span>{{ label }}</span>{%- endmacro %}
+{#- A state is a word with a chalk marker, never a bare light:
+    ok = a tick, off = a cross, warn = the accent (needs attention). -#}
+{%- macro state(kind, label) -%}<span class="adm-state adm-state--{{ kind }}">{{ label }}</span>{%- endmacro %}
+{#- ISO timestamps as stored, readable: the T becomes a space, UTC is said once. -#}
+{%- macro ts(v) -%}{% if v %}<time datetime="{{ v }}">{{ v | replace('T', ' ') | replace('+00:00', '') }}</time>{% else %}—{% endif %}{%- endmacro %}
+{%- set chat_errors = chat_sessions | sum(attribute='error_count') -%}
+{%- set active_links = secure_links | selectattr('active') | list | length -%}
 
 <a class="skip-link" href="#main">Skip to content</a>
 
-<div class="cabinet">
-  <div class="cab-roof" aria-hidden="true"><span>gruenzweil.cc · served from LG-RACK-01</span></div>
-  <div class="cab-body">
-    <div class="rail rail--l" aria-hidden="true"></div>
-    <div class="units">
+{% include "_icons.html" %}
+{% include "_header.html" %}
 
-      <header class="unit unit--nav unit--nohandle">
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        <nav class="face nav" aria-label="Breadcrumb">
-          <ol class="crumbs lcd lcd--chip">
-            <li><a href="/">lukas@lg-rack-01</a></li>
-            <li aria-current="page">admin</li>
-          </ol>
-          <p class="adm-who silk silk--dim">{{ user }}{% if dev_bypass %} · {{ led_status('amber', 'Dev bypass') }}{% endif %}</p>
-        </nav>
-        <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-      </header>
+<main id="main" class="wrap adm" tabindex="-1">
 
-      <main id="main" class="units-main" tabindex="-1">
-
-        <section class="unit" aria-labelledby="overview-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h1 class="silk" id="overview-title">Admin</h1>
-              <span class="model" aria-hidden="true">resume.db · last 7 days</span>
-              <div class="unit-head-r keys">
-                <button type="button" class="key key--sm" id="regen-resume">Regenerate PDFs</button>
-                <a class="key key--sm" href="/resume.pdf" target="_blank" rel="noopener">Classic <span aria-hidden="true">↗</span></a>
-                <a class="key key--sm" href="/resume-ats.pdf" target="_blank" rel="noopener">ATS <span aria-hidden="true">↗</span></a>
-              </div>
-            </div>
-            <dl class="readouts adm-readouts">
-              <div><dt class="silk silk--dim">Pageviews</dt><dd class="lcd lcd--chip">{{ stats.pageviews_7d }}</dd><dd class="adm-sub">{{ stats.uniques_7d }} unique</dd></div>
-              <div><dt class="silk silk--dim">Events</dt><dd class="lcd lcd--chip">{{ stats.events_7d }}</dd><dd class="adm-sub">chatbot, résumé, links</dd></div>
-              <div><dt class="silk silk--dim">Feedback</dt><dd class="lcd lcd--chip">{{ stats.feedback_7d }}</dd><dd class="adm-sub">{{ stats.feedback_total }} total</dd></div>
-              <div><dt class="silk silk--dim">Chat sessions</dt><dd class="lcd lcd--chip">{{ stats.chat_sessions_7d }}</dd><dd class="adm-sub">{{ stats.chat_messages_7d }} messages</dd></div>
-            </dl>
-            <p class="adm-sub adm-gen">generated {{ generated_at }}</p>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <section class="unit" aria-labelledby="traffic-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="traffic-title">Traffic</h2>
-              <span class="model" aria-hidden="true">7d · successful only</span>
-            </div>
-            <div class="adm-cols">
-              <div class="adm-panel">
-                <h3 class="silk silk--dim">By pageview</h3>
-                <ul class="adm-list">
-                  {% for row in top_paths %}<li><span class="adm-path">{{ row.path }}</span><span class="lcd">{{ row.count }}</span></li>
-                  {% else %}<li class="adm-empty">No data yet.</li>{% endfor %}
-                </ul>
-              </div>
-              <div class="adm-panel">
-                <h3 class="silk silk--dim">By event</h3>
-                <ul class="adm-list">
-                  {% for row in top_events %}<li><span class="adm-path">{{ row.name }}</span><span class="lcd">{{ row.count }}</span></li>
-                  {% else %}<li class="adm-empty">No data yet.</li>{% endfor %}
-                </ul>
-              </div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <section class="unit" aria-labelledby="models-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="models-title">Chat models</h2>
-              <span class="model" aria-hidden="true">fallback order</span>
-            </div>
-            <div class="adm-split">
-              <form id="model-add-form" class="adm-panel adm-form" autocomplete="off">
-                <h3 class="silk silk--dim">Add model</h3>
-                <label class="field">
-                  <span class="silk silk--dim">Model id</span>
-                  <input type="text" name="model" required maxlength="200" pattern="[^\s,]+" placeholder="gemini-3.5-flash-lite" />
-                </label>
-                <p class="adm-sub">Provider id as sent in the request. Appended to the end of the list.</p>
-                <div class="feedback-actions">
-                  <p id="model-result" class="feedback-status" role="status" aria-live="polite"></p>
-                  <button type="submit" class="key key--sm key--primary">Add</button>
-                </div>
-              </form>
-              <div class="adm-panel">
-                {% if chat_models %}
-                <div class="adm-scroll">
-                  <table class="adm-table">
-                    <thead><tr><th>#</th><th>Model</th><th>Enabled</th><th>State</th><th><span class="sr-only">Actions</span></th></tr></thead>
-                    <tbody>
-                      {% for m in chat_models %}
-                      <tr>
-                        <td class="lcd">{{ loop.index }}</td>
-                        <td class="adm-mono adm-strong">{{ m.model }}</td>
-                        <td><input type="checkbox" class="adm-check" data-model-toggle="{{ m.id }}" aria-label="Enable {{ m.model }}" {% if m.enabled %}checked{% endif %}></td>
-                        <td>
-                          {% if not m.enabled %}{{ led_status('', 'Disabled') }}
-                          {% elif m.cooldown_s %}{{ led_status('amber', 'Cooldown ' ~ m.cooldown_s ~ 's') }}
-                          {% else %}{{ led_status('green', 'Ready') }}{% endif %}
-                        </td>
-                        <td class="adm-actions">
-                          <button type="button" class="key key--sm" data-model-move="{{ m.id }}" data-position="{{ loop.index0 - 1 }}" {% if loop.first %}disabled{% endif %} aria-label="Move {{ m.model }} up">↑</button>
-                          <button type="button" class="key key--sm" data-model-move="{{ m.id }}" data-position="{{ loop.index0 + 1 }}" {% if loop.last %}disabled{% endif %} aria-label="Move {{ m.model }} down">↓</button>
-                          <button type="button" class="key key--sm adm-danger" data-model-delete="{{ m.id }}" data-name="{{ m.model }}">Delete</button>
-                        </td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-                {% else %}
-                <p class="adm-empty">No models. The chatbot answers "not configured" until one is added.</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <section class="unit" aria-labelledby="links-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="links-title">Secure download links</h2>
-              <span class="model" aria-hidden="true">site/files/secure</span>
-            </div>
-            <div class="adm-split">
-              <form id="secure-link-form" class="adm-panel adm-form" autocomplete="off">
-                <h3 class="silk silk--dim">Create link</h3>
-                <label class="field">
-                  <span class="silk silk--dim">File</span>
-                  <select name="filename" required>
-                    <option value="">— select a file —</option>
-                    {% for f in secure_files %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
-                  </select>
-                </label>
-                {% if not secure_files %}<p class="adm-sub">No files in /site/files/secure/. Drop a file there and refresh.</p>{% endif %}
-                <div class="feedback-row">
-                  <label class="field">
-                    <span class="silk silk--dim">Expires in</span>
-                    <input type="text" name="expires_in" value="7d" required pattern="[0-9]+[smhdw]?" placeholder="7d, 2h, 30m, 1w" />
-                  </label>
-                  <label class="field">
-                    <span class="silk silk--dim">Max uses (0 = ∞)</span>
-                    <input type="number" name="max_uses" value="5" min="0" max="10000" />
-                  </label>
-                </div>
-                <p class="adm-sub">e.g. 30m, 2h, 1d, 3w, or raw seconds.</p>
-                <div class="feedback-actions">
-                  <p id="secure-link-result" class="feedback-status" role="status" aria-live="polite"></p>
-                  <button type="submit" class="key key--sm key--primary">Generate link</button>
-                </div>
-              </form>
-              <div class="adm-panel">
-                {% if secure_links %}
-                <div class="adm-scroll">
-                  <table class="adm-table">
-                    <thead><tr><th>File</th><th>Expires</th><th>Uses</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
-                    <tbody>
-                      {% for l in secure_links %}
-                      <tr>
-                        <td><div class="adm-strong">{{ l.filename }}</div><div class="adm-sub">#{{ l.id }} · created {{ l.created_at }}</div></td>
-                        <td class="adm-sub">{{ l.expires_at }}</td>
-                        <td class="lcd">{% if l.max_uses == 0 %}∞{% else %}{{ l.uses_remaining }}/{{ l.max_uses }}{% endif %}</td>
-                        <td>
-                          {% if l.active %}{{ led_status('green', 'Active') }}
-                          {% elif l.revoked %}{{ led_status('red', 'Revoked') }}
-                          {% elif l.expired %}{{ led_status('', 'Expired') }}
-                          {% elif l.exhausted %}{{ led_status('', 'Exhausted') }}{% endif %}
-                        </td>
-                        <td>{% if l.active %}<button type="button" class="key key--sm adm-danger" data-revoke="{{ l.id }}">Revoke</button>{% endif %}</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-                {% else %}
-                <p class="adm-empty">No links generated yet.</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <section class="unit" aria-labelledby="feedback-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="feedback-title">Feedback</h2>
-              <span class="model" aria-hidden="true">latest 30</span>
-            </div>
-            {% if feedback %}
-            <ul class="adm-feed">
-              {% for f in feedback %}
-              <li class="adm-panel">
-                <p class="adm-meta"><span class="adm-strong">{% if f.name %}{{ f.name }}{% else %}anonymous{% endif %}</span>{% if f.email %} · <a href="mailto:{{ f.email }}">{{ f.email }}</a>{% endif %} <span class="adm-sub">· {{ f.created_at }}</span></p>
-                <p class="adm-msg">{{ f.message }}</p>
-              </li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <p class="adm-empty">No feedback yet.</p>
-            {% endif %}
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-
-        <section class="unit" aria-labelledby="chats-title">
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-          <div class="face">
-            <div class="unit-head">
-              <h2 id="chats-title">Chat sessions</h2>
-              <span class="model" aria-hidden="true">latest 20</span>
-            </div>
-            {% if chat_sessions %}
-            <div class="adm-sessions">
-              {% for s in chat_sessions %}
-              <details class="adm-session">
-                <summary>
-                  <span class="lcd lcd--chip">{{ s.session_id[:12] }}</span>
-                  <span class="adm-sub">{{ s.created_at }} → {{ s.last_active_at }}</span>
-                  <span class="adm-count">{{ s.message_count }} msgs</span>
-                  {% if s.error_count %}{{ led_status('red', s.error_count ~ ' error' ~ ('s' if s.error_count != 1 else '')) }}{% endif %}
-                </summary>
-                <div class="adm-log">
-                  {% for m in s.messages %}
-                  <div class="adm-line adm-line--{{ m.role }}">
-                    <span class="adm-role">{{ m.role }}{% if m.error %} · {{ m.error }}{% endif %}</span>
-                    <span class="adm-text">{{ m.content }}</span>
-                    {% if m.role == 'assistant' and (m.model or m.attempts) %}
-                    <div class="adm-attempts">
-                      {% if m.model %}<div>answered by <b>{{ m.model }}</b>{% if m.attempts %} after {{ m.attempts | length }} failed attempt{{ 's' if m.attempts | length != 1 }}{% endif %}</div>{% endif %}
-                      {% for a in m.attempts %}
-                      <div class="adm-attempt"><span class="adm-kind{% if a.kind in ('model_unavailable', 'provider_auth') %} adm-kind--bad{% endif %}">{{ a.kind }}</span> {{ a.model }} · status {{ a.status if a.status is not none else '—' }} · finish {{ a.finish or '—' }}{% if a.msg %}<div class="adm-provider">{{ a.msg }}</div>{% endif %}</div>
-                      {% endfor %}
-                    </div>
-                    {% endif %}
-                  </div>
-                  {% endfor %}
-                </div>
-              </details>
-              {% endfor %}
-            </div>
-            {% else %}
-            <p class="adm-empty">No chat sessions yet.</p>
-            {% endif %}
-          </div>
-          <i class="ear" aria-hidden="true"><b class="screw"></b><b class="screw"></b></i>
-        </section>
-      </main>
-
-      {% include "_pdu.html" %}
-
+  <header class="adm-top" id="overview">
+    <div class="adm-title-row">
+      <h1 class="adm-title chalk-text chalk-text--lg"><span data-chalk="underline">Admin</span></h1>
+      <div class="adm-tools">
+        <button type="button" class="btn btn--sm" id="regen-resume">Regenerate PDFs</button>
+        <a class="btn btn--sm" href="/resume.pdf" target="_blank" rel="noopener">Classic PDF <span aria-hidden="true">↗</span><span class="sr-only"> (new tab)</span></a>
+        <a class="btn btn--sm" href="/resume-ats.pdf" target="_blank" rel="noopener">ATS PDF <span aria-hidden="true">↗</span><span class="sr-only"> (new tab)</span></a>
+      </div>
     </div>
-    <div class="rail rail--r" aria-hidden="true"></div>
-  </div>
-  <div class="cab-plinth" aria-hidden="true"></div>
-</div>
+    <p class="adm-who">Signed in as <b>{{ user }}</b>{% if dev_bypass %} {{ state('warn', 'Dev bypass on') }}{% endif %}
+      <span class="adm-dim">resume.db · generated {{ ts(generated_at) }} UTC · refresh for new data</span></p>
+
+    <nav class="adm-toc" aria-label="Admin sections">
+      <ul>
+        <li><a href="#traffic">Traffic</a></li>
+        <li><a href="#models">Chat models</a> <span class="adm-dim">{{ chat_models | length }}</span></li>
+        <li><a href="#links">Download links</a> <span class="adm-dim">{{ active_links }} active</span></li>
+        <li><a href="#feedback">Feedback</a> <span class="adm-dim">{{ stats.feedback_total }}</span></li>
+        <li><a href="#chats">Chat sessions</a> <span class="adm-dim">{{ chat_sessions | length }}</span>{% if chat_errors %} {{ state('warn', chat_errors ~ ' error' ~ ('s' if chat_errors != 1 else '')) }}{% endif %}</li>
+      </ul>
+    </nav>
+
+    <dl class="adm-readouts">
+      <div><dt>Pageviews · 7d</dt><dd class="adm-big">{{ stats.pageviews_7d }}</dd><dd>{{ stats.uniques_7d }} unique</dd></div>
+      <div><dt>Events · 7d</dt><dd class="adm-big">{{ stats.events_7d }}</dd><dd>chatbot, résumé, links</dd></div>
+      <div><dt>Feedback · 7d</dt><dd class="adm-big">{{ stats.feedback_7d }}</dd><dd>{{ stats.feedback_total }} total</dd></div>
+      <div><dt>Chat sessions · 7d</dt><dd class="adm-big">{{ stats.chat_sessions_7d }}</dd><dd>{{ stats.chat_messages_7d }} messages</dd></div>
+    </dl>
+  </header>
+
+  <hr class="rule" data-chalk="rule" />
+
+  <section class="adm-sec" id="traffic" aria-labelledby="traffic-title">
+    <div class="adm-head">
+      <h2 id="traffic-title" class="adm-h chalk-text chalk-text--md">Traffic</h2>
+      <p class="adm-dim">last 7 days · successful pages only · top 10</p>
+    </div>
+    <div class="adm-cols">
+      <div>
+        {% if top_paths %}
+        {% set mx = top_paths[0].count %}
+        <div class="table-wrap adm-wrap">
+          <table class="table adm-table adm-bars">
+            <thead><tr><th scope="col">Page</th><th scope="col" class="num">Views</th></tr></thead>
+            <tbody>
+              {% for row in top_paths %}
+              <tr><td class="adm-long"><span class="adm-bar" style="--w: {{ (row.count / mx * 100) | round(1) }}%" aria-hidden="true"></span><a href="{{ row.path }}">{{ row.path }}</a></td><td class="num">{{ row.count }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="adm-empty">No pageviews in the last 7 days.</p>
+        {% endif %}
+      </div>
+      <div>
+        {% if top_events %}
+        {% set mx = top_events[0].count %}
+        <div class="table-wrap adm-wrap">
+          <table class="table adm-table adm-bars">
+            <thead><tr><th scope="col">Event</th><th scope="col" class="num">Count</th></tr></thead>
+            <tbody>
+              {% for row in top_events %}
+              <tr><td class="adm-long"><span class="adm-bar" style="--w: {{ (row.count / mx * 100) | round(1) }}%" aria-hidden="true"></span><code>{{ row.name }}</code></td><td class="num">{{ row.count }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="adm-empty">No events in the last 7 days.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" data-chalk="rule" />
+
+  <section class="adm-sec" id="models" aria-labelledby="models-title">
+    <div class="adm-head">
+      <h2 id="models-title" class="adm-h chalk-text chalk-text--md">Chat models</h2>
+      <p class="adm-dim">fallback order: the chatbot tries them top to bottom</p>
+    </div>
+    <div class="panel adm-panel" data-chalk="box">
+      {% if chat_models %}
+      <div class="table-wrap adm-wrap">
+        <table class="table adm-table adm-models">
+          <thead><tr><th scope="col" class="num">#</th><th scope="col">Model</th><th scope="col">On</th><th scope="col">State</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            {% for m in chat_models %}
+            <tr{% if not m.enabled %} class="adm-off"{% endif %}>
+              <td class="num">{{ loop.index }}</td>
+              <td class="adm-long"><code>{{ m.model }}</code></td>
+              <td><input type="checkbox" data-model-toggle="{{ m.id }}" aria-label="Enable {{ m.model }}" {% if m.enabled %}checked{% endif %}></td>
+              <td class="nowrap">
+                {% if not m.enabled %}{{ state('off', 'Disabled') }}
+                {% elif m.cooldown_s %}{{ state('warn', 'Cooldown ' ~ m.cooldown_s ~ ' s') }}
+                {% else %}{{ state('ok', 'Ready') }}{% endif %}
+              </td>
+              <td class="adm-act">
+                <button type="button" class="link-btn adm-rowbtn adm-rowbtn--icon" data-model-move="{{ m.id }}" data-position="{{ loop.index0 - 1 }}" {% if loop.first %}disabled{% endif %} aria-label="Move {{ m.model }} up">↑</button>
+                <button type="button" class="link-btn adm-rowbtn adm-rowbtn--icon" data-model-move="{{ m.id }}" data-position="{{ loop.index0 + 1 }}" {% if loop.last %}disabled{% endif %} aria-label="Move {{ m.model }} down">↓</button>
+                <button type="button" class="link-btn adm-rowbtn" data-model-delete="{{ m.id }}" data-name="{{ m.model }}" aria-label="Delete {{ m.model }}">Delete</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="adm-empty">{{ state('warn', 'No models') }} The chatbot answers “not configured” until one is added.</p>
+      {% endif %}
+
+      <form id="model-add-form" class="adm-form adm-form--model" autocomplete="off">
+        <label class="field">
+          <span>Add a model</span>
+          <input type="text" name="model" required maxlength="200" pattern="[^\s,]+" placeholder="gemini-3.5-flash-lite" aria-describedby="model-hint" />
+          <span class="field-hint" id="model-hint">Provider id as sent in the request, no spaces or commas. Goes to the end of the list.</span>
+        </label>
+        <button type="submit" class="btn btn--solid btn--sm">Add model</button>
+        <p id="model-result" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="adm-sec" id="links" aria-labelledby="links-title">
+    <div class="adm-head">
+      <h2 id="links-title" class="adm-h chalk-text chalk-text--md">Download links</h2>
+      <p class="adm-dim">token links to files in <code>site/files/secure/</code> · latest 100</p>
+    </div>
+    <div class="panel adm-panel" data-chalk="box">
+      <form id="secure-link-form" class="adm-form adm-form--link" autocomplete="off">
+        <label class="field">
+          <span>File</span>
+          <select name="filename" required{% if not secure_files %} aria-describedby="no-files"{% endif %}>
+            <option value="">Select a file</option>
+            {% for f in secure_files %}<option value="{{ f }}">{{ f }}</option>{% endfor %}
+          </select>
+          {% if not secure_files %}<span class="field-hint" id="no-files">No files in site/files/secure/. Drop one there and refresh.</span>{% endif %}
+        </label>
+        <label class="field">
+          <span>Expires in</span>
+          <input type="text" name="expires_in" value="7d" required pattern="[0-9]+[smhdw]?" placeholder="7d" aria-describedby="exp-hint" />
+          <span class="field-hint" id="exp-hint">30m, 2h, 1d, 3w or seconds</span>
+        </label>
+        <label class="field">
+          <span>Max uses</span>
+          <input type="number" name="max_uses" value="5" min="0" max="10000" aria-describedby="uses-hint" />
+          <span class="field-hint" id="uses-hint">0 = unlimited</span>
+        </label>
+        <button type="submit" class="btn btn--solid btn--sm">Generate link</button>
+        <p id="secure-link-result" class="form-status" role="status" aria-live="polite"></p>
+      </form>
+
+      {% if secure_links %}
+      <div class="table-wrap adm-wrap">
+        <table class="table adm-table adm-links">
+          <thead><tr><th scope="col">File</th><th scope="col">Created</th><th scope="col">Expires</th><th scope="col" class="num">Uses left</th><th scope="col">State</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            {% for l in secure_links %}
+            <tr{% if not l.active %} class="adm-off"{% endif %}>
+              <td class="adm-long"><b>{{ l.filename }}</b> <span class="adm-dim">#{{ l.id }}</span></td>
+              <td class="nowrap">{{ ts(l.created_at) }}</td>
+              <td class="nowrap">{{ ts(l.expires_at) }}</td>
+              <td class="num nowrap">{% if l.max_uses == 0 %}∞{% else %}{{ l.uses_remaining }} / {{ l.max_uses }}{% endif %}</td>
+              <td class="nowrap">
+                {% if l.active %}{{ state('ok', 'Active') }}
+                {% elif l.revoked %}{{ state('off', 'Revoked') }}
+                {% elif l.expired %}{{ state('off', 'Expired') }}
+                {% elif l.exhausted %}{{ state('off', 'Used up') }}{% endif %}
+              </td>
+              <td class="adm-act">{% if l.active %}<button type="button" class="link-btn adm-rowbtn" data-revoke="{{ l.id }}" aria-label="Revoke link #{{ l.id }} to {{ l.filename }}">Revoke</button>{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="adm-empty">No links generated yet.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="adm-sec" id="feedback" aria-labelledby="feedback-title">
+    <div class="adm-head">
+      <h2 id="feedback-title" class="adm-h chalk-text chalk-text--md">Feedback</h2>
+      <p class="adm-dim">{{ stats.feedback_total }} total{% if stats.feedback_total > 30 %} · latest 30 shown{% endif %} · newest first</p>
+    </div>
+    {% if feedback %}
+    <ol class="adm-feed">
+      {% for f in feedback %}
+      <li>
+        <p class="adm-feed-meta"><b>{% if f.name %}{{ f.name }}{% else %}<span class="adm-dim">anonymous</span>{% endif %}</b>{% if f.email %} <a href="mailto:{{ f.email }}">{{ f.email }}</a>{% endif %} <span class="adm-dim">{{ ts(f.created_at) }}</span></p>
+        <p class="adm-msg">{{ f.message }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="adm-empty">No feedback yet. The form at the bottom of the main page posts here.</p>
+    {% endif %}
+  </section>
+
+  <hr class="rule" data-chalk="rule" />
+
+  <section class="adm-sec" id="chats" aria-labelledby="chats-title">
+    <div class="adm-head">
+      <h2 id="chats-title" class="adm-h chalk-text chalk-text--md">Chat sessions</h2>
+      <p class="adm-dim">latest 20 by last activity · open one to read it</p>
+    </div>
+    {% if chat_sessions %}
+    <ul class="adm-chats">
+      {% for s in chat_sessions %}
+      <li>
+        <details class="adm-chat">
+          <summary>
+            <span class="adm-chat-time">{{ ts(s.last_active_at) }}</span>
+            <span class="adm-chat-n">{{ s.message_count }} msg{{ 's' if s.message_count != 1 }}</span>
+            <span class="adm-chat-first">{% for m in s.messages if m.role == 'user' %}{% if loop.first %}{{ m.content | truncate(120, true, '…') }}{% endif %}{% endfor %}</span>
+            {% if s.error_count %}{{ state('warn', s.error_count ~ ' error' ~ ('s' if s.error_count != 1 else '')) }}{% endif %}
+          </summary>
+          <div class="adm-log">
+            <p class="adm-dim adm-log-meta">session <code>{{ s.session_id }}</code> · started {{ ts(s.created_at) }} · last active {{ ts(s.last_active_at) }}</p>
+            {% for m in s.messages %}
+            <div class="adm-line adm-line--{{ m.role }}">
+              <p class="adm-role">{{ m.role }} <span class="adm-dim">{{ (m.created_at or '')[11:19] }}</span></p>
+              <div class="adm-said">
+                {% if m.error %}<p class="adm-err">{% if m.error == 'moderated' %}{{ state('off', 'moderated') }}{% else %}{{ state('warn', m.error) }}{% endif %}</p>{% endif %}
+                <p class="adm-text">{{ m.content }}</p>
+                {% if m.role == 'assistant' and (m.model or m.attempts) %}
+                <div class="adm-attempts">
+                  {% if m.model %}<p>answered by <code>{{ m.model }}</code>{% if m.attempts %} after {{ m.attempts | length }} failed attempt{{ 's' if m.attempts | length != 1 }}{% endif %}</p>
+                  {% else %}<p>no model answered · {{ m.attempts | length }} attempt{{ 's' if m.attempts | length != 1 }}</p>{% endif %}
+                  {% if m.attempts %}
+                  <ol>
+                    {% for a in m.attempts %}
+                    <li>
+                      {% if a.kind in ('model_unavailable', 'provider_auth') %}{{ state('warn', a.kind) }}{% else %}{{ state('off', a.kind) }}{% endif %}
+                      <code>{{ a.model }}</code> <span class="adm-dim">status {{ a.status if a.status is not none else '—' }} · finish {{ a.finish or '—' }}</span>
+                      {% if a.msg %}<pre class="adm-provider">{{ a.msg }}</pre>{% endif %}
+                    </li>
+                    {% endfor %}
+                  </ol>
+                  {% endif %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </details>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="adm-empty">No chat sessions yet.</p>
+    {% endif %}
+  </section>
+</main>
+
+{% include "_footer.html" %}
 
 <script src="/main.js" defer></script>
+<script type="module" src="/chalk.js"></script>
 <script>
 (function () {
   // Shared fetch helper: JSON in, JSON out, {ok, detail} back.
@@ -313,7 +319,7 @@ document.documentElement.classList.add('js');
   function show(el, text, ok) {
     if (!el) { if (!ok) alert(text); return; }
     el.textContent = text;
-    el.className = 'feedback-status ' + (ok ? 'ok' : 'err');
+    el.className = 'form-status ' + (ok ? 'ok' : 'err');
   }
 
   // Résumé PDFs
@@ -357,19 +363,24 @@ document.documentElement.classList.add('js');
     });
     if (!r.ok || !r.json.url) { show(linkResult, r.detail, false); return; }
     const url = r.json.url;
-    linkResult.className = 'feedback-status ok';
+    linkResult.className = 'form-status ok adm-linkout';
     linkResult.textContent = 'Link generated: ';
     const a = document.createElement('a');
     a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = url;
     const copy = document.createElement('button');
-    copy.type = 'button'; copy.className = 'key key--sm'; copy.textContent = 'Copy';
+    // the label is its own span: chalk.js draws the box inside the button,
+    // and replacing the button's text would wipe it
+    const label = document.createElement('span');
+    label.textContent = 'Copy';
+    copy.type = 'button'; copy.className = 'btn btn--sm'; copy.append(label);
     copy.addEventListener('click', function () {
       navigator.clipboard && navigator.clipboard.writeText(url).then(
-        () => { copy.textContent = 'Copied'; },
-        () => { copy.textContent = 'Failed'; }
+        () => { label.textContent = 'Copied'; if (window.Chalk) window.Chalk.draw(copy); },
+        () => { label.textContent = 'Failed'; if (window.Chalk) window.Chalk.draw(copy); }
       );
     });
     linkResult.append(a, ' ', copy);
+    if (window.Chalk) window.Chalk.draw(linkResult);
   });
 
   document.addEventListener('click', async function (e) {

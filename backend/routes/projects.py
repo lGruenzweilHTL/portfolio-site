@@ -32,14 +32,29 @@ router = APIRouter()
 
 ORIGIN = "https://gruenzweil.cc"
 
-# resume.yaml status -> LED colour + label on the page.
+# resume.yaml status -> label on the page.
 _STATUS = {
-    "active": ("green led--pulse", "Active"),
-    "shipped": ("green", "Shipped"),
-    "in_progress": ("amber", "In progress"),
-    "private": ("blue", "Private"),
-    "superseded": ("off", "Predecessor"),  # no led--off rule: the LED stays unlit
+    "active": "Active",
+    "shipped": "Shipped",
+    "in_progress": "In progress",
+    "private": "Private",
+    "superseded": "Predecessor",
 }
+
+# Projects with a screenshot in site/img/ (and its baked chalk rendition,
+# scripts/bake_chalk_shots.py): file name, chalk size, the alt text's key in
+# the English catalog (shared with the main page), and a README image that
+# shows the same screen, left out so the page doesn't show it twice.
+_SHOTS = {
+    "marshal": {"img": "marshal", "w": 1000, "h": 625, "alt": "mg.shot_alt", "readme_dup": "/docs/images/dashboard.png"},
+    "sceneforge-ai": {"img": "sceneforge", "w": 786, "h": 300, "alt": "more.sceneforge_alt"},
+    "uniconsole": {"img": "uniconsole", "w": 368, "h": 300, "alt": "more.uniconsole_alt"},
+    "space-defenders": {"img": "space-defenders", "w": 537, "h": 300, "alt": "more.space_alt"},
+}
+
+# A superseded project points at the one that replaced it (resume.yaml:
+# vektorgrid is "the predecessor of Marshal").
+_SUCCESSOR = {"vektorgrid": "marshal"}
 
 # Cable colour class per language, same as the main page.
 _LANG = {"C#": "cs", "Python": "py", "TypeScript": "ts", "C": "c", "C++": "cpp", "Kotlin": "kt", "Java": "java", "HTML/CSS": "html"}
@@ -51,6 +66,30 @@ def _env() -> Environment:
 
 def _one_line(text: str | None) -> str:
     return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def _tidy_readme(readme: str | None, proj: dict, shot: dict | None) -> str | None:
+    """Drop what the page already shows: a leading README title that only
+    repeats the project name, and a README image of the screenshot above."""
+    if not readme:
+        return readme
+    m = re.match(r"\s*<h3>(.*?)</h3>(<span id=\"[^\"]*\"></span>)?\s*", readme, re.S)
+    if m and _norm(re.sub(r"<[^>]+>", "", m.group(1))) == _norm(proj.get("name", "")):
+        readme = readme[m.end():]
+    # Without its title the README may start at h4: lift every heading so the
+    # README's top level sits right under the page's "README" h2.
+    levels = [int(n) for n in re.findall(r"<h([3-6])[ >]", readme)]
+    lift = min(levels) - 3 if levels else 0
+    if lift > 0:
+        readme = re.sub(r"<(/?)h([3-6])([ >])", lambda m: f"<{m.group(1)}h{int(m.group(2)) - lift}{m.group(3)}", readme)
+    dup = shot and shot.get("readme_dup")
+    if dup:
+        readme = re.sub(r'<p>\s*(?:<a [^>]*>)?<span class="rd-pic"[^>]*><img [^>]*src="[^"]*' + re.escape(dup) + r'"[^>]*></span>(?:</a>)?\s*</p>\s*', "", readme, count=1)
+    return readme
 
 
 def _json_ld(slug: str, proj: dict, src, description: str) -> str:
@@ -103,22 +142,25 @@ def project_page(slug: str) -> HTMLResponse:
         raise HTTPException(status_code=404)
     proj, src = found
     description = _one_line(proj.get("summary"))
-    led, status_label = _STATUS.get(proj.get("status", ""), ("green", "Shipped"))
+    status_label = _STATUS.get(proj.get("status", ""), "Shipped")
     others = [(s, p["name"]) for s, p, _ in github_projects() if s != slug]
+    shot = _SHOTS.get(slug)
+    successor = next(((s, p["name"]) for s, p, _ in github_projects() if s == _SUCCESSOR.get(slug)), None)
     html = _env().get_template("project.html").render(
         slug=slug,
         proj=proj,
         src=src,
         description=description,
-        led=led,
         status_label=status_label,
         stack=[(s, _LANG.get(s, "")) for s in proj.get("stack", [])],
-        readme=get_readme(slug, src),
+        readme=_tidy_readme(get_readme(slug, src), proj, shot),
+        shot=shot,
+        successor=successor,
         others=others,
         json_ld=_json_ld(slug, proj, src, description),
         origin=ORIGIN,
-        # Project pages are English; the shared PDU partial and main.js /
-        # chat.js still take their strings from the English catalog.
+        # Project pages are English; the shared header/footer and main.js /
+        # chat.js take their strings from the English catalog.
         t=catalogs()[DEFAULT_LANG].t,
         js_strings=catalogs()[DEFAULT_LANG].js(),
         home="/",

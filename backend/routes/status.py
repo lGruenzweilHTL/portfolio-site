@@ -1,7 +1,7 @@
-"""GET /api/status — coarse live values for the rack UI on the main page.
+"""GET /api/status — coarse live values for the site's footer and pages.
 
-Feeds the PDU readout in the footer, the "last push" chips on the project
-blades and the model name in the chat console. Everything here is either
+Feeds the readouts in the footer, the "last push" values on the project
+pages and the model name in the chat console. Everything here is either
 public anyway (GitHub push dates, the deployed commit) or deliberately coarse
 (uptime, a configured node count). No hostnames, IPs, versions or service
 names ever leave this endpoint.
