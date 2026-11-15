@@ -47,6 +47,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   retention.py             Deletes personal data older than DATA_RETENTION_DAYS (startup + daily)
   turnstile.py             siteverify helper with dev bypass + per-widget action check
   resume.py                WeasyPrint PDF render (mtime-based cache invalidation)
+  readme/                  Chalk SVGs for the GitHub profile README (see "GitHub profile images")
   i18n.py                  Translation catalogs for the main page (content/i18n/*.yaml)
   templates/index.html     Main portfolio page: hero, the projects, experience, about and contact
   routes/                  One file per route group, including /services
@@ -59,7 +60,7 @@ the only ingress; the tunnel's `config.yml` just repointed from
   services.yaml            Public/home-network service catalog
 /deploy                    systemd units + tmpfiles.d drop-in for the deploy webhook
 /scripts                   Dev tooling: résumé preview render, chalk renditions of the screenshots
-/static/generated          Cached resume PDFs (gitignored, regenerated on deploy)
+/static/generated          Cached resume PDFs and profile README images (gitignored, regenerated)
 /tests                     pytest suite (no network: provider mocked with respx)
 /.github/workflows         CI: pytest on PRs and pushes to master (Python 3.10 + 3.13)
 .env.example               Copy to .env; all required env vars documented
@@ -88,6 +89,31 @@ box changes size.
   Re-run `python scripts/bake_chalk_shots.py` after replacing a screenshot.
 - Hidden starting states are gated on `html.js`, and reduced motion shows the
   finished drawing.
+
+## GitHub profile images
+
+The profile README (the `lGruenzweilHTL/lGruenzweilHTL` repository) is mostly
+`<img>` tags pointing at `https://gruenzweil.cc/readme/<name>.svg`, so it
+matches the site and its numbers stay current. `backend/readme/` draws them:
+
+- `data.py`: one GraphQL query (contribution calendar, public repositories
+  with stars, languages and last push). Needs `GITHUB_TOKEN`, a fine-grained
+  token with read access to public repositories only. Without it, or when
+  GitHub fails, the images use sample numbers and the log says so.
+- `cards.py`: one function per image. Copy comes from `content/i18n/en.yaml`
+  (`hero.*`) and `content/resume.yaml`, like the main page. Cards shown side
+  by side are 412 px wide with the same height; the others 840 px.
+- `board.py`, `chalk.py`, `fonts.py`: the chalk kit for a standalone SVG. The
+  stroke geometry is ported from `site/chalk.js`; strokes and lettering draw
+  themselves once on load (CSS inside the SVG, which plays inside an `<img>`),
+  and reduced motion shows the finished board. Fonts are subset from
+  `site/fonts/` with fontTools and embedded as base64 woff2. The grain is
+  drawn with `feTurbulence`, since the site's tiles don't compress.
+
+`readme_loop()` draws all images on startup and then every 6 hours into
+`static/generated/readme/`. To look at them locally, start the app and open
+`/readme/header.svg`; keep the README's layout in the profile repository in
+step when you add, rename or resize an image.
 
 ## System dependencies
 
@@ -193,6 +219,7 @@ error text. Visitors never see provider text.
 | `/resume.pdf` | GET | Cached PDF, two-column styled version. Regenerated on startup + deploy |
 | `/resume-ats.pdf` | GET | Single-column ATS-friendly version |
 | `/resume-themed.pdf` | GET | 301 → `/resume.pdf`. Retired dark variant, kept for old bookmarks |
+| `/readme/<name>.svg` | GET | The GitHub profile README's chalk images (`header`, `stats`, `languages`, `activity`, `recent`, `now`, `cta`), drawn on startup and every 6 hours. `no-cache`; 503 until the first drawing. |
 | `/api/chat` | POST | SSE stream from the chat provider (Gemini API or OpenRouter). Turnstile-gated. 10/min/IP. |
 | `/api/feedback` | POST | Turnstile-gated. 5/min/IP. |
 | `/api/track` | POST | Custom event beacon. 120/min/IP. |
@@ -234,6 +261,10 @@ session anyway. `/resume.pdf` and `/resume-ats.pdf` are `no-cache` for
 the same reason as the CSS: the deploy webhook re-renders them in place,
 so an hour-long `max-age` would show a résumé that contradicts the rest
 of the site.
+
+`/readme/*.svg` are `no-cache` too: GitHub shows them through its camo
+proxy, which revalidates on that header, so the profile picks up a new
+drawing without waiting out a `max-age`.
 
 If you ever add fingerprinted assets (`styles.abc123.css`), give those
 `max-age=31536000, immutable` instead and take them out of the

@@ -354,6 +354,18 @@ def create_app() -> FastAPI:
         if task is not None:
             task.cancel()
 
+    # GitHub profile README images: drawn now, then every few hours.
+    @app.on_event("startup")
+    async def _start_readme() -> None:
+        from .readme import readme_loop
+        app.state.readme_task = asyncio.create_task(readme_loop())
+
+    @app.on_event("shutdown")
+    async def _stop_readme() -> None:
+        task = getattr(app.state, "readme_task", None)
+        if task is not None:
+            task.cancel()
+
     # --- Healthcheck (not logged as a pageview) ---
     @app.get("/healthz")
     def healthz() -> dict:
@@ -374,6 +386,7 @@ def create_app() -> FastAPI:
     from .routes import home
     from .routes import privacy
     from .routes import chat_models_admin
+    from .routes import readme
     app.include_router(chat.router)
     app.include_router(feedback.router)
     app.include_router(track.router)
@@ -389,6 +402,7 @@ def create_app() -> FastAPI:
     app.include_router(home.router)
     app.include_router(privacy.router)
     app.include_router(chat_models_admin.router)
+    app.include_router(readme.router)
 
     # --- Exception handlers: styled HTML for browsers, JSON for API clients ---
     _install_error_handlers(app)

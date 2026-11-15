@@ -106,6 +106,10 @@ class Settings(BaseSettings):
     # How long the per-project "last push" dates from the GitHub API stay
     # cached. Unauthenticated GitHub allows 60 requests/hour per IP.
     github_cache_seconds: int = 3600
+    # Read-only token (fine-grained, public repositories, no permissions) for
+    # the GraphQL API behind the profile README images (backend/readme/).
+    # Empty: the images are drawn with sample numbers.
+    github_token: str = ""
 
     # --- Chat safety ---
     chat_max_tokens: int = 600
