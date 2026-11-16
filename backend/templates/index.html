@@ -148,11 +148,11 @@ document.documentElement.classList.add('js');
           "description": {{ t('ld.forkcast') | tojson }},
           "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 5, "item": {
-          "@type": "SoftwareSourceCode", "name": "RoboDucks — RescueMaze", "url": "https://gruenzweil.cc/projects/roboducks-rescuemaze",
-          "description": {{ t('ld.roboducks') | tojson }},
-          "codeRepository": "https://github.com/lGruenzweilHTL/lego-spike-serial",
-          "programmingLanguage": ["Python", "C"],
-          "contributor": { "@id": "https://gruenzweil.cc/#person" } } },
+          "@type": "SoftwareSourceCode", "name": "naollm", "url": "https://gruenzweil.cc/projects/naollm",
+          "description": {{ t('ld.naollm') | tojson }},
+          "codeRepository": "https://github.com/lGruenzweilHTL/naollm",
+          "programmingLanguage": "Python",
+          "author": { "@id": "https://gruenzweil.cc/#person" } } },
         { "@type": "ListItem", "position": 6, "item": {
           "@type": "SoftwareSourceCode", "name": "SceneForge AI", "url": "https://gruenzweil.cc/projects/sceneforge-ai",
           "description": {{ t('ld.sceneforge') | tojson }},
@@ -405,7 +405,7 @@ document.documentElement.classList.add('js');
   <div class="wrap">
     <h2 class="section-title chalk-text chalk-text--lg" id="more-title"><span data-chalk="underline">{{ t('more.title') }}</span></h2>
     {#- The four with a screenshot first, each with its chalk thumbnail (a
-         link to the real one); RoboDucks and P.I.G.E.O.N. have none and
+         link to the real one); naollm and P.I.G.E.O.N. have none and
          share the last row. No drawn stand-ins. #}
     <ul class="also" data-chalk="grid">
       <li>
@@ -449,11 +449,12 @@ document.documentElement.classList.add('js');
         <p class="also-links"><a href="https://github.com/lGruenzweilHTL/Space-Defenders" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='Space Defenders') }})</span></a></p>
       </li>
       <li>
-        <h3 class="chalk-text chalk-text--md"><a href="/projects/roboducks-rescuemaze">RoboDucks: RescueMaze</a></h3>
-        <p class="meta"><span class="mark-done" data-chalk="tick">{{ t('more.shipped') }}</span><span>{{ t('more.roboducks_role') }}</span></p>
-        <p>{{ t('more.roboducks_desc') }}</p>
-        <ul class="stack"><li>Python</li><li>C</li></ul>
-        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/lego-spike-serial" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='RoboDucks') }})</span></a></p>
+        <h3 class="chalk-text chalk-text--md"><a href="/projects/naollm">naollm</a></h3>
+        <p class="meta"><span>{{ t('more.in_progress') }}</span><span>{{ t('more.naollm_role') }}</span></p>
+        <p>{{ t('more.naollm_desc') }}</p>
+        <p class="note note--card chalk-acc">{{ t('more.naollm_note') }}</p>
+        <ul class="stack"><li>Python</li><li>Ollama</li><li>NAOqi</li></ul>
+        <p class="also-links"><a href="https://github.com/lGruenzweilHTL/naollm" target="_blank" rel="noopener">{{ t('more.repo') }}<span class="sr-only"> ({{ t('more.repo_sr', name='naollm') }})</span></a></p>
       </li>
       <li>
         <h3 class="chalk-text chalk-text--md">P.I.G.E.O.N.: Covert Ops</h3>

@@ -165,15 +165,21 @@ projects:
     repo_url: null  # private school project
     status: "private"
 
-  - name: "RoboDucks — RescueMaze"
+  - name: "naollm"
     summary: >
-      RescueMaze competition work for the HTL Leonding robotics club. Built a
-      custom serial protocol for Raspberry Pi → LEGO SPIKE communication, and a
-      maze-exploration controller running Trémaux's algorithm in simulation.
-    role: "Contributor · HTL Leonding robotics club"
-    stack: ["Python", "C"]
-    repo_url: "https://github.com/lGruenzweilHTL/lego-spike-serial"
-    status: "shipped"
+      A local bridge that lets a NAO 6 robot hold spoken conversations in
+      German and English through a local LLM, built for the HTL Leonding
+      robotics club's showcase at school. The model asks for gestures and
+      dances as tool calls; a safety gate decides whether they run.
+    role: "Author · HTL Leonding robotics club"
+    stack: ["Python", "Ollama", "faster-whisper", "NAOqi"]
+    repo_url: "https://github.com/lGruenzweilHTL/naollm"
+    status: "in_progress"
+    highlights:
+      - "Safety gate checks every tool call, from the LLM and the operator alike: out-of-range arguments are rejected, not clamped, and a cooldown between dances keeps the motors from overheating"
+      - "Motors-off mode for a robot with a defective battery: its motion class contains no code that can command a motor, and a strict fake of the NAOqi API fails the tests on any call outside an allowlist"
+      - "Tool-call eval of 72 German and English prompts per config profile; the event preflight is not ready until every profile scores at least 90 %"
+      - "Runs on one laptop with no cloud: audio stays in memory and is discarded after transcription, and face recognition stays off until the school clears it and a signed consent form exists"
 
   - name: "Space Defenders"
     summary: >

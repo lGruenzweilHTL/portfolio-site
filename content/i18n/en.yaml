@@ -34,7 +34,7 @@ ld:
   space_defenders: "A mobile arcade game made in Unity with escalating waves of enemy spaceships and touch controls."
   pigeon: "A satirical Unity game in progress about a pigeon running covert ops for the government."
   pigeon_status: "In progress"
-  roboducks: "RescueMaze robotics competition work for the HTL Leonding robotics club: a serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm."
+  naollm: "A local bridge that lets a NAO 6 robot hold spoken conversations through a local LLM, with robot motions as tool calls that a safety gate checks. Built for the HTL Leonding robotics club's showcase."
 
 common:
   email_me: Email me
@@ -148,8 +148,9 @@ more:
   uniconsole_desc_html: "An in-game debug console for Unity. Mark a static method with <code>[Command]</code> and call it from a terminal in the scene. A free, lightweight alternative to Quantum Console."
   forkcast_role: "Contributor, wrote most of the TypeScript backend. School project."
   forkcast_desc: "A meal-planning app. Find recipes through the Spoonacular API, drop them into a calendar, get a combined ingredient list, rate recipes, add friends."
-  roboducks_role: "Contributor, HTL Leonding robotics club"
-  roboducks_desc: "RescueMaze competition work for the school robotics club. I built a custom serial protocol for Raspberry Pi to LEGO SPIKE communication, and a maze-exploration controller running Trémaux's algorithm in simulation."
+  naollm_role: "Author, HTL Leonding robotics club"
+  naollm_desc: "Lets a NAO 6 robot hold spoken conversations in German and English through a local LLM, for the school robotics club's showcase. The model asks for gestures and dances as tool calls, and a safety gate decides whether they run. Speech recognition and the model run on one laptop."
+  naollm_note: "the most fun way to watch a robot walk into a wall"
   space_role: "Author"
   space_desc: "A mobile arcade game: destroy enemy spaceships, don't die. Escalating waves, built for touchscreens."
   pigeon_role: "Author"
@@ -186,7 +187,7 @@ stack:
 about:
   title: About
   p1: "I'm Lukas, a student at HTL Leonding. Most of my time goes into server code and games, and every so often into a Raspberry Pi bolted to a LEGO robot for a competition."
-  p2_html: "Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong> because setting up scenes by hand is tedious, and the serial protocol behind <strong>RoboDucks</strong> because there was no clean way to drive a LEGO SPIKE from a Raspberry Pi."
+  p2_html: "Most of my projects started because something annoyed me. I built <strong>SceneForge AI</strong> because setting up scenes by hand is tedious, and a serial protocol for the robotics club because there was no clean way to drive a LEGO SPIKE from a Raspberry Pi."
   p3: "Away from the keyboard: table tennis, motorbikes, and more Trackmania than I'd like to admit."
   homelab: "Homelab"
   homelab_desc: "Four Proxmox nodes (repurposed desktops) hosting Immich, Gitea, Vaultwarden, Jellyfin with the *arr stack, a Minecraft server, Pi-hole, and this site. My family relies on it, so it has backups and replicated storage."

@@ -31,7 +31,7 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 - Forkcast (private school project): a meal-planning app with recipe search via the Spoonacular API, a meal calendar, combined ingredient lists, ratings and friends. Lukas wrote most of the TypeScript backend; the frontend is Vue.
 - [Space Defenders](https://gruenzweil.cc/projects/space-defenders) ([repo](https://github.com/lGruenzweilHTL/Space-Defenders)): a mobile arcade game in Unity with escalating waves of enemy spaceships, built for touchscreens.
 - P.I.G.E.O.N. — Covert Ops (in progress): a satirical Unity game in which you play a pigeon running covert ops for the government.
-- [RoboDucks — RescueMaze](https://gruenzweil.cc/projects/roboducks-rescuemaze) ([repo](https://github.com/lGruenzweilHTL/lego-spike-serial)): robotics competition work for the HTL Leonding robotics club. A custom serial protocol between a Raspberry Pi and a LEGO SPIKE hub, and a maze-exploration controller using Trémaux's algorithm in simulation. Python, C.
+- [naollm](https://gruenzweil.cc/projects/naollm) ([repo](https://github.com/lGruenzweilHTL/naollm)): in progress, built by Lukas for the HTL Leonding robotics club's showcase at school. A local bridge that lets a NAO 6 robot hold spoken conversations in German and English through a local LLM (Ollama by default) with speech recognition on the same laptop, and no cloud services. The model asks for gestures and dances as tool calls; a safety gate checks every call and rejects out-of-range arguments. It has a motors-off mode for a robot with a defective battery, a tool-call eval of 72 German and English prompts, and a consent workflow for face recognition. Python.
 
 ## Beyond code
 
@@ -42,7 +42,7 @@ This file summarises https://gruenzweil.cc/ for language models. The website and
 ## Links
 
 - [Website](https://gruenzweil.cc/), also in [German](https://gruenzweil.cc/de/), [Spanish](https://gruenzweil.cc/es/), [French](https://gruenzweil.cc/fr/) and [Italian](https://gruenzweil.cc/it/)
-- Project pages with the full README of each repo: [Marshal](https://gruenzweil.cc/projects/marshal), [vektorgrid](https://gruenzweil.cc/projects/vektorgrid), [SceneForge AI](https://gruenzweil.cc/projects/sceneforge-ai), [UniConsole](https://gruenzweil.cc/projects/uniconsole), [Space Defenders](https://gruenzweil.cc/projects/space-defenders), [RoboDucks — RescueMaze](https://gruenzweil.cc/projects/roboducks-rescuemaze)
+- Project pages with the full README of each repo: [Marshal](https://gruenzweil.cc/projects/marshal), [vektorgrid](https://gruenzweil.cc/projects/vektorgrid), [SceneForge AI](https://gruenzweil.cc/projects/sceneforge-ai), [UniConsole](https://gruenzweil.cc/projects/uniconsole), [Space Defenders](https://gruenzweil.cc/projects/space-defenders), [naollm](https://gruenzweil.cc/projects/naollm)
 - [Résumé, designed (PDF)](https://gruenzweil.cc/resume.pdf)
 - [Résumé, ATS-friendly plain text (PDF)](https://gruenzweil.cc/resume-ats.pdf)
 - [Study notes](https://gruenzweil.cc/notes/): cheatsheets on PL/SQL, Java design patterns, JavaFX, Docker and Kubernetes, Git, Scrum, UML and cryptography
