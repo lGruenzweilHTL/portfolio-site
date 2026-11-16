@@ -121,6 +121,31 @@ def test_weekly_sums_sunday_to_saturday():
     assert cards.weekly(days) == [(start, 7), (start + timedelta(days=7), 3)]
 
 
+def test_activity_height_is_logarithmic():
+    # one huge week must not flatten the rest: a tenth of the peak still gets over half the height
+    assert cards.level(0, 191) == 0
+    assert cards.level(191, 191) == 1
+    assert cards.level(19, 191) > 0.5
+    assert cards.level(1, 191) < cards.level(10, 191) < cards.level(100, 191)
+    assert cards.level(0, 0) == 0  # an empty year must not divide by zero
+
+
+def test_activity_labels_its_log_scale(db):
+    svg = cards.activity(data.parse(_user()))
+    assert "log scale" in svg
+
+
+def test_contributions_say_they_are_public(db):
+    # the token sees public contributions only, so the cards must not claim more
+    d = data.parse(_user())
+    assert "public contributions in the last year" in cards.stats(d)
+    assert "812 public contributions" in cards.activity(d)
+
+
+def test_cta_has_no_homelab_note(db):
+    assert "homelab" not in cards.cta(data.parse(_user()))
+
+
 @pytest.mark.parametrize("delta,expected", [
     (timedelta(hours=2), "today"), (timedelta(days=1), "yesterday"), (timedelta(days=9), "9 days ago"),
     (timedelta(days=30), "4 weeks ago"), (timedelta(days=95), "3 months ago"),
