@@ -94,6 +94,8 @@ experience:
 # All projects, for the site and the chatbot. Only the ones marked `cv: true`
 # appear on the résumé PDFs — those are picked to support the backend angle, and
 # the résumé has room for two. Add the flag to a project to promote it.
+# A project too long for the one-page résumé can set `cv_summary` and
+# `cv_highlights` ([] for none); the PDFs use those instead of the site's copy.
 projects:
   - name: "Marshal"
     cv: true
@@ -126,7 +128,6 @@ projects:
       - "Lesson: hand-writing the speech pipeline and the satellite protocol cost most of the time. Marshal leaves voice to Home Assistant Assist"
 
   - name: "SceneForge AI"
-    cv: true
     summary: >
       An AI plugin for the Unity Editor. Describe a scene in plain text, get
       GameObjects and components back. Cuts the manual setup out of level design.
@@ -166,6 +167,12 @@ projects:
     status: "private"
 
   - name: "naollm"
+    cv: true
+    cv_summary: >
+      Lets a NAO 6 robot hold spoken conversations through a local LLM, for the
+      HTL Leonding robotics club's showcase. Gestures and dances are tool calls
+      that a safety gate checks before they run. One laptop, no cloud.
+    cv_highlights: []
     summary: >
       A local bridge that lets a NAO 6 robot hold spoken conversations in
       German and English through a local LLM, built for the HTL Leonding
