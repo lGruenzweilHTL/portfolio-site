@@ -477,15 +477,18 @@
         {# Only projects flagged `cv: true` — picked to support the backend angle.
            The rest stay in resume.yaml for the site and the chatbot. #}
         {% for pr in r.projects if pr.cv %}
+          {#- cv_summary / cv_highlights, when set, replace the site's longer copy here. #}
+          {%- set summary = pr.cv_summary or pr.summary %}
+          {%- set highlights = pr.cv_highlights if pr.cv_highlights is defined else pr.highlights %}
           <div class="entry">
             <div class="entry-title">{{ pr.name }}</div>
             <div class="entry-meta">
               {{ pr.role }}{% if pr.status %} · {{ pr.status|replace('_', ' ') }}{% endif %}
             </div>
             {% if pr.stack %}<div class="stack">{{ pr.stack|join(' · ') }}</div>{% endif %}
-            {% if pr.summary %}<p class="entry-body">{{ pr.summary|trim|replace('\n', ' ') }}</p>{% endif %}
-            {% if pr.highlights %}
-              <ul>{% for h in pr.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
+            {% if summary %}<p class="entry-body">{{ summary|trim|replace('\n', ' ') }}</p>{% endif %}
+            {% if highlights %}
+              <ul>{% for h in highlights %}<li>{{ h }}</li>{% endfor %}</ul>
             {% endif %}
           </div>
         {% endfor %}

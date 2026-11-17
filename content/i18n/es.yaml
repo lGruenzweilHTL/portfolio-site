@@ -31,7 +31,7 @@ ld:
   space_defenders: Un juego arcade para móvil hecho en Unity, con oleadas crecientes de naves enemigas y controles táctiles.
   pigeon: Un juego satírico de Unity en desarrollo sobre una paloma que realiza operaciones encubiertas para el gobierno.
   pigeon_status: En curso
-  roboducks: 'Trabajo para la competición de robótica RescueMaze en el club de robótica de la HTL Leonding: un protocolo serie entre una Raspberry Pi y un hub LEGO SPIKE, y un controlador de exploración de laberintos con el algoritmo de Trémaux.'
+  naollm: "Un puente local que permite a un robot NAO 6 mantener conversaciones habladas con un LLM local; sus movimientos son llamadas a herramientas que revisa un filtro de seguridad. Creado para la exhibición del club de robótica de la HTL Leonding."
 
 common:
   email_me: Escríbeme
@@ -143,8 +143,9 @@ more:
   uniconsole_desc_html: Una consola de depuración dentro del juego para Unity. Marca un método estático con <code>[Command]</code> y llámalo desde un terminal en la escena. Una alternativa ligera y gratuita a Quantum Console.
   forkcast_role: Colaborador, escribí la mayor parte del backend en TypeScript. Proyecto escolar.
   forkcast_desc: Una app para planificar comidas. Busca recetas con la API de Spoonacular, colócalas en un calendario, obtén una lista de ingredientes combinada, valora recetas y añade amigos.
-  roboducks_role: Colaborador, club de robótica de la HTL Leonding
-  roboducks_desc: Trabajo para la competición RescueMaze del club de robótica de la escuela. Construí un protocolo serie propio para la comunicación entre Raspberry Pi y LEGO SPIKE, y un controlador que explora laberintos con el algoritmo de Trémaux en simulación.
+  naollm_role: "Autor, club de robótica de la HTL Leonding"
+  naollm_desc: "Permite a un robot NAO 6 mantener conversaciones habladas en alemán e inglés con un LLM local, para la exhibición del club de robótica de la escuela. El modelo pide gestos y bailes como llamadas a herramientas, y un filtro de seguridad decide si se ejecutan. El reconocimiento de voz y el modelo funcionan en un solo portátil."
+  naollm_note: "la forma más divertida de ver a un robot chocar contra una pared"
   space_role: Autor
   space_desc: 'Un juego arcade para móvil: destruye naves enemigas y no mueras. Oleadas cada vez más duras, pensado para pantallas táctiles.'
   pigeon_role: Autor
@@ -167,7 +168,7 @@ exp:
   caritas_role: Becario de oficina e informática
   caritas_place: Leonding, de julio a agosto de 2025
   caritas_desc: 'Apoyo administrativo e informático: administración, ayuda en contabilidad incluida la facturación trimestral, y soporte de primer nivel de informática e infraestructura.'
-  htl_place: Leonding, de 2022 a 2028
+  htl_place: Leonding, de 2023 a 2028
   htl_desc: 'Escuela técnica superior, departamento de Informática. Matura en junio de 2028. Asignaturas favoritas: IA y ciencia de datos, y tecnología de redes.'
 
 stack:
@@ -181,7 +182,7 @@ stack:
 about:
   title: Sobre mí
   p1: Soy Lukas, estudiante de la HTL Leonding. Paso la mayor parte del tiempo con código de servidor y juegos y, de vez en cuando, con una Raspberry Pi atornillada a un robot de LEGO para una competición.
-  p2_html: La mayoría de mis proyectos nacieron porque algo me molestaba. Creé <strong>SceneForge AI</strong> porque montar escenas a mano es tedioso, y el protocolo serie detrás de <strong>RoboDucks</strong> porque no había una forma limpia de controlar un LEGO SPIKE desde una Raspberry Pi.
+  p2_html: La mayoría de mis proyectos nacieron porque algo me molestaba. Creé <strong>SceneForge AI</strong> porque montar escenas a mano es tedioso, y un protocolo serie para el club de robótica porque no había una forma limpia de controlar un LEGO SPIKE desde una Raspberry Pi.
   p3: 'Lejos del teclado: tenis de mesa, motos y más Trackmania del que me gustaría admitir.'
   homelab: Homelab
   homelab_desc: Cuatro nodos Proxmox (ordenadores de sobremesa reaprovechados) con Immich, Gitea, Vaultwarden, Jellyfin con el stack *arr, un servidor de Minecraft, Pi-hole y este sitio. Mi familia depende de él, así que tiene copias de seguridad y almacenamiento replicado.

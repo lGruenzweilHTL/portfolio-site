@@ -655,7 +655,9 @@ html:not(.js) .note--hero { position: static; transform: none; margin-top: 18px;
 .also h3 a { text-decoration: none; }
 .also .shot { margin: 0 0 18px -12px; width: min(100% + 12px, 200px * var(--ar) + 24px); }
 .also .shot-chalk { width: 100%; }
-.also > li > p:not(.meta):not(.also-links) { color: var(--chalk-dim); font-size: 1rem; max-width: 34em; }
+.also > li > p:not(.meta):not(.also-links):not(.note) { color: var(--chalk-dim); font-size: 1rem; max-width: 34em; }
+/* A joke from the repo, written beside the card's copy (the only place it appears). */
+.also .note--card { margin: -.2em 0 .9em; max-width: 34em; text-wrap: balance; transform: rotate(-1.5deg); transform-origin: 0 50%; }
 .also .stack { margin-bottom: 12px; }
 .also-links { font-size: .9375rem; margin: 0; color: var(--chalk-dim); }
 html:not(.chalk-ready) .also > li { border-top: 1px solid var(--chalk-faint); }

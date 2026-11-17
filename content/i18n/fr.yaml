@@ -30,7 +30,7 @@ ld:
   space_defenders: Un jeu d'arcade mobile réalisé avec Unity, avec des vagues de vaisseaux ennemis toujours plus fortes et des commandes tactiles.
   pigeon: Un jeu Unity satirique en cours de développement sur un pigeon qui mène des opérations secrètes pour le gouvernement.
   pigeon_status: En cours
-  roboducks: 'Travaux pour la compétition de robotique RescueMaze au club de robotique de la HTL Leonding : un protocole série entre un Raspberry Pi et un hub LEGO SPIKE, et un contrôleur d''exploration de labyrinthe basé sur l''algorithme de Trémaux.'
+  naollm: "Une passerelle locale qui permet à un robot NAO 6 de tenir des conversations orales avec un LLM local ; ses mouvements sont des appels d'outils vérifiés par un contrôle de sécurité. Conçue pour la démonstration du club de robotique de la HTL Leonding."
 
 common:
   email_me: M'écrire
@@ -142,8 +142,9 @@ more:
   uniconsole_desc_html: Une console de débogage en jeu pour Unity. Marquez une méthode statique avec <code>[Command]</code> et appelez-la depuis un terminal dans la scène. Une alternative légère et gratuite à Quantum Console.
   forkcast_role: Contributeur, j'ai écrit l'essentiel du backend TypeScript. Projet scolaire.
   forkcast_desc: Une application de planification des repas. Trouvez des recettes via l'API Spoonacular, placez-les dans un calendrier, obtenez une liste d'ingrédients combinée, notez des recettes, ajoutez des amis.
-  roboducks_role: Contributeur, club de robotique de la HTL Leonding
-  roboducks_desc: Travail pour la compétition RescueMaze du club de robotique de l'école. J'ai créé un protocole série pour la communication entre Raspberry Pi et LEGO SPIKE, et un contrôleur qui explore un labyrinthe avec l'algorithme de Trémaux en simulation.
+  naollm_role: "Auteur, club de robotique de la HTL Leonding"
+  naollm_desc: "Permet à un robot NAO 6 de tenir des conversations orales en allemand et en anglais avec un LLM local, pour la démonstration du club de robotique de l'école. Le modèle demande des gestes et des danses sous forme d'appels d'outils, et un contrôle de sécurité décide s'ils s'exécutent. La reconnaissance vocale et le modèle tournent sur un seul ordinateur portable."
+  naollm_note: "la façon la plus drôle de regarder un robot foncer dans un mur"
   space_role: Auteur
   space_desc: 'Un jeu d''arcade pour mobile : détruisez les vaisseaux ennemis, ne mourez pas. Des vagues de plus en plus dures, conçu pour les écrans tactiles.'
   pigeon_role: Auteur
@@ -166,7 +167,7 @@ exp:
   caritas_role: Stagiaire bureau et informatique
   caritas_place: Leonding, juillet à août 2025
   caritas_desc: 'Assistance administrative et informatique : administration, aide à la comptabilité dont la facturation trimestrielle, et support informatique et infrastructure de premier niveau.'
-  htl_place: Leonding, 2022 à 2028
+  htl_place: Leonding, 2023 à 2028
   htl_desc: 'Lycée technique supérieur, section informatique. Matura en juin 2028. Matières préférées : IA et science des données, et technologies réseau.'
 
 stack:
@@ -180,7 +181,7 @@ stack:
 about:
   title: À propos
   p1: Je suis Lukas, élève à la HTL Leonding. Je passe l'essentiel de mon temps sur du code serveur et des jeux, et de temps en temps sur un Raspberry Pi vissé sur un robot LEGO pour une compétition.
-  p2_html: La plupart de mes projets sont nés d'un agacement. J'ai créé <strong>SceneForge AI</strong> parce que monter des scènes à la main est fastidieux, et le protocole série derrière <strong>RoboDucks</strong> parce qu'il n'existait pas de moyen propre de piloter un LEGO SPIKE depuis un Raspberry Pi.
+  p2_html: La plupart de mes projets sont nés d'un agacement. J'ai créé <strong>SceneForge AI</strong> parce que monter des scènes à la main est fastidieux, et un protocole série pour le club de robotique parce qu'il n'existait pas de moyen propre de piloter un LEGO SPIKE depuis un Raspberry Pi.
   p3: 'Loin du clavier : tennis de table, motos, et plus de Trackmania que je ne voudrais l''admettre.'
   homelab: Homelab
   homelab_desc: Quatre nœuds Proxmox (des ordinateurs de bureau recyclés) qui hébergent Immich, Gitea, Vaultwarden, Jellyfin avec la stack *arr, un serveur Minecraft, Pi-hole et ce site. Ma famille en dépend, il a donc des sauvegardes et un stockage répliqué.

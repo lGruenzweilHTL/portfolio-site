@@ -34,7 +34,7 @@ personal:
 education:
   - school: "HTL Leonding"
     location: "Leonding, Austria"
-    start: 2022-09
+    start: 2023-09
     end: 2028-06
     notes: "Higher technical college (Höhere Technische Lehranstalt)"
     # Set date_label instead if you'd rather write the range by hand.
@@ -94,6 +94,8 @@ experience:
 # All projects, for the site and the chatbot. Only the ones marked `cv: true`
 # appear on the résumé PDFs — those are picked to support the backend angle, and
 # the résumé has room for two. Add the flag to a project to promote it.
+# A project too long for the one-page résumé can set `cv_summary` and
+# `cv_highlights` ([] for none); the PDFs use those instead of the site's copy.
 projects:
   - name: "Marshal"
     cv: true
@@ -126,7 +128,6 @@ projects:
       - "Lesson: hand-writing the speech pipeline and the satellite protocol cost most of the time. Marshal leaves voice to Home Assistant Assist"
 
   - name: "SceneForge AI"
-    cv: true
     summary: >
       An AI plugin for the Unity Editor. Describe a scene in plain text, get
       GameObjects and components back. Cuts the manual setup out of level design.
@@ -165,15 +166,27 @@ projects:
     repo_url: null  # private school project
     status: "private"
 
-  - name: "RoboDucks — RescueMaze"
+  - name: "naollm"
+    cv: true
+    cv_summary: >
+      Lets a NAO 6 robot hold spoken conversations through a local LLM, for the
+      HTL Leonding robotics club's showcase. Gestures and dances are tool calls
+      that a safety gate checks before they run. One laptop, no cloud.
+    cv_highlights: []
     summary: >
-      RescueMaze competition work for the HTL Leonding robotics club. Built a
-      custom serial protocol for Raspberry Pi → LEGO SPIKE communication, and a
-      maze-exploration controller running Trémaux's algorithm in simulation.
-    role: "Contributor · HTL Leonding robotics club"
-    stack: ["Python", "C"]
-    repo_url: "https://github.com/lGruenzweilHTL/lego-spike-serial"
-    status: "shipped"
+      A local bridge that lets a NAO 6 robot hold spoken conversations in
+      German and English through a local LLM, built for the HTL Leonding
+      robotics club's showcase at school. The model asks for gestures and
+      dances as tool calls; a safety gate decides whether they run.
+    role: "Author · HTL Leonding robotics club"
+    stack: ["Python", "Ollama", "faster-whisper", "NAOqi"]
+    repo_url: "https://github.com/lGruenzweilHTL/naollm"
+    status: "in_progress"
+    highlights:
+      - "Safety gate checks every tool call, from the LLM and the operator alike: out-of-range arguments are rejected, not clamped, and a cooldown between dances keeps the motors from overheating"
+      - "Motors-off mode for a robot with a defective battery: its motion class contains no code that can command a motor, and a strict fake of the NAOqi API fails the tests on any call outside an allowlist"
+      - "Tool-call eval of 72 German and English prompts per config profile; the event preflight is not ready until every profile scores at least 90 %"
+      - "Runs on one laptop with no cloud: audio stays in memory and is discarded after transcription, and face recognition stays off until the school clears it and a signed consent form exists"
 
   - name: "Space Defenders"
     summary: >

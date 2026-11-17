@@ -29,7 +29,7 @@ ld:
   space_defenders: Ein Arcade-Spiel für Mobilgeräte, gebaut in Unity, mit immer stärkeren Wellen feindlicher Raumschiffe und Touch-Steuerung.
   pigeon: Ein satirisches Unity-Spiel in Arbeit über eine Taube, die verdeckte Einsätze für die Regierung erledigt.
   pigeon_status: In Arbeit
-  roboducks: 'Arbeit für den RescueMaze-Robotikwettbewerb im Robotikclub der HTL Leonding: ein serielles Protokoll zwischen Raspberry Pi und LEGO-SPIKE-Hub sowie ein Labyrinth-Explorer mit dem Trémaux-Algorithmus.'
+  naollm: "Eine lokale Brücke, mit der ein NAO-6-Roboter über ein lokales LLM Gespräche führt; seine Bewegungen sind Tool-Aufrufe, die eine Sicherheitsprüfung kontrolliert. Gebaut für eine Vorführung des Robotik-Clubs der HTL Leonding."
 
 common:
   email_me: E-Mail schreiben
@@ -141,8 +141,9 @@ more:
   uniconsole_desc_html: Eine Debug-Konsole für Unity-Spiele. Eine statische Methode mit <code>[Command]</code> markieren und sie im laufenden Spiel aus einem Terminal aufrufen. Eine schlanke, kostenlose Alternative zu Quantum Console.
   forkcast_role: Mitwirkender, habe den Großteil des TypeScript-Backends geschrieben. Schulprojekt.
   forkcast_desc: Eine App zur Essensplanung. Rezepte über die Spoonacular-API finden, in einen Kalender ziehen, eine gemeinsame Einkaufsliste bekommen, Rezepte bewerten, Freunde hinzufügen.
-  roboducks_role: Mitwirkender, Robotik-Club der HTL Leonding
-  roboducks_desc: Arbeit für den RescueMaze-Bewerb des Robotik-Clubs der Schule. Ich habe ein eigenes serielles Protokoll für die Kommunikation zwischen Raspberry Pi und LEGO SPIKE gebaut und einen Controller, der ein Labyrinth in der Simulation mit dem Trémaux-Algorithmus erkundet.
+  naollm_role: "Autor, Robotik-Club der HTL Leonding"
+  naollm_desc: "Lässt einen NAO-6-Roboter über ein lokales LLM Gespräche auf Deutsch und Englisch führen, für eine Vorführung des Robotik-Clubs der Schule. Das Modell fordert Gesten und Tänze als Tool-Aufrufe an, und eine Sicherheitsprüfung entscheidet, ob sie laufen. Spracherkennung und Modell laufen auf einem Laptop."
+  naollm_note: "der lustigste Weg, einem Roboter zuzusehen, wie er gegen eine Wand läuft"
   space_role: Autor
   space_desc: 'Ein Arcade-Spiel fürs Handy: feindliche Raumschiffe zerstören, nicht sterben. Immer härtere Wellen, gebaut für Touchscreens.'
   pigeon_role: Autor
@@ -165,7 +166,7 @@ exp:
   caritas_role: Praktikant in Büro und IT
   caritas_place: Leonding, Juli bis August 2025
   caritas_desc: 'Büro- und IT-Unterstützung: Verwaltung, Mithilfe in der Buchhaltung inklusive Quartalsabrechnung sowie First-Level-Support für IT und Infrastruktur.'
-  htl_place: Leonding, 2022 bis 2028
+  htl_place: Leonding, 2023 bis 2028
   htl_desc: 'Höhere Technische Lehranstalt, Abteilung Informatik. Matura im Juni 2028. Lieblingsfächer: KI und Data Science sowie Netzwerktechnik.'
 
 stack:
@@ -179,7 +180,7 @@ stack:
 about:
   title: Über mich
   p1: Ich bin Lukas, Schüler an der HTL Leonding. Die meiste Zeit stecke ich in Servercode und Spiele, und ab und zu in einen Raspberry Pi, der für einen Wettbewerb auf einen LEGO-Roboter geschraubt ist.
-  p2_html: Die meisten meiner Projekte sind entstanden, weil mich etwas genervt hat. <strong>SceneForge AI</strong> habe ich gebaut, weil es mühsam ist, Szenen von Hand aufzubauen, und das serielle Protokoll hinter <strong>RoboDucks</strong>, weil es keinen sauberen Weg gab, einen LEGO SPIKE von einem Raspberry Pi aus zu steuern.
+  p2_html: Die meisten meiner Projekte sind entstanden, weil mich etwas genervt hat. <strong>SceneForge AI</strong> habe ich gebaut, weil es mühsam ist, Szenen von Hand aufzubauen, und ein serielles Protokoll für den Robotik-Club, weil es keinen sauberen Weg gab, einen LEGO SPIKE von einem Raspberry Pi aus zu steuern.
   p3: 'Abseits der Tastatur: Tischtennis, Motorräder und mehr Trackmania, als ich zugeben möchte.'
   homelab: Homelab
   homelab_desc: Vier Proxmox-Nodes (ausrangierte Desktop-PCs) mit Immich, Gitea, Vaultwarden, Jellyfin samt *arr-Stack, einem Minecraft-Server, Pi-hole und dieser Website. Meine Familie verlässt sich darauf, also gibt es Backups und replizierten Speicher.
